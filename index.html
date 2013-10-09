@@ -3,6 +3,13 @@
 <head>
 	<meta charset="UTF-8" />
 	<title>Generic Video Player</title>
+	<link href="sources/videoplayer/video-js.min.css" rel="stylesheet" type="text/css" />
+	<link href="sources/videoplayer/videojs.progressTips.min.css" rel="stylesheet" />
+	<link href="sources/css/gvp.css" rel="stylesheet" media="all" />
+	<script src="sources/scripts/jquery.min.js" type="text/javascript"></script>
+	<script src="sources/videoplayer/combined.video.js" type="text/javascript"></script>
+	<script src="sources/videoplayer/videojs.progressTips.min.js" type="text/javascript"></script>
+	<script src="sources/scripts/gvp.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -13,10 +20,14 @@
 	</noscript>
 	
 	<div class="gvp_wrapper">
-		<div class="title_bar"></div>
+		<div class="title_bar">This is a title.</div>
 		<div class="video_holder">
-			
+			<video id="gvp_video" class="video-js vjs-default-skin" controls preload="metadata" width="640" height="360" poster="smgt370_course_intro.jpg">
+				<source src="smgt370_course_intro.mp4" type="video/mp4" />
+				<track src="smgt370_course_intro.vtt" kind="subtitles" srclang="en" label="English" />
+			</video>
 		</div>
+		<div class="download_bar"></div>
 	</div>
 	
 </body>
