@@ -5,7 +5,8 @@ $(document).ready(function(){
 
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
-	var width = 640, height = 360, intro = false, type = null, dl = null, introPlayer;
+	var width = 640, height = 360, intro = 0, dl = null, introPlayer,
+		mainPlayer;
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -47,8 +48,8 @@ $(document).ready(function(){
 		}
 		
 		// get intro flag from query string if available
-		if ($.trim(getParameterByName("intro")) !== "" && Number($.trim(getParameterByName("intro"))) === 1) {
-			intro = true;
+		if ($.trim(getParameterByName("intro")) !== "" && Number($.trim(getParameterByName("intro")))) {
+			intro = $.trim(getParameterByName("intro"));
 			console.log("Intro: " + intro);
 		}
 		
@@ -87,7 +88,7 @@ $(document).ready(function(){
 			this.progressTips();
 			this.width(width);
 			this.height(height);
-			this.src({type: "video/mp4", src:type+".mp4"});
+			this.src({type: "video/mp4", src:"intros/"+intro+".mp4"});
 		});
 		
 		introPlayer.on("ended", function() {
@@ -110,6 +111,7 @@ $(document).ready(function(){
 		}
 		
 		videojs("gvp_video",{},function() {
+			mainPlayer = this;
 			this.progressTips();
 			this.width(width);
 			this.height(height);
@@ -119,11 +121,17 @@ $(document).ready(function(){
 			}
 		});
 		
+		mainPlayer.on("ended", function() {
+			this.currentTime(0);
+			$(".vjs-poster").delay(6000).queue(function() {
+				$(this).css("background-image","url(smgt370_course_intro.jpg)").html("<span class=\"replay-button\"></span>").show();
+			});
+		});
+		
 	}
 	
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
 	
-	// call functions
 	getQueryStringValues();
 	
 	if (intro) {
