@@ -6,7 +6,7 @@ $(document).ready(function(){
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
 	var width = 640, height = 360, intro = 0, dl = null, introPlayer,
-		mainPlayer;
+		mainPlayer, source = "smgt370_course_intro";
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -41,6 +41,7 @@ $(document).ready(function(){
 	}
 	
 	function getQueryStringValues() {
+	
 		// get title from query string if available
 		if ($.trim(getParameterByName("ttl")) !== "") {
 			$(".title_bar").html(capitalizeEachWord($.trim(getParameterByName("ttl")).replace(/\_+/g," ")));
@@ -81,7 +82,7 @@ $(document).ready(function(){
 	
 	function setupIntroVideo() {
 	
-		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls preload=\"metadata\" poster=\"smgt370_course_intro.jpg\"></video>");
+		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls preload=\"metadata\" poster=\""+source+".jpg\"></video>");
 	
 		videojs("gvp_video",{},function() {
 			introPlayer = this;
@@ -89,6 +90,11 @@ $(document).ready(function(){
 			this.width(width);
 			this.height(height);
 			this.src({type: "video/mp4", src:"intros/"+intro+".mp4"});
+		});
+		
+		introPlayer.on("error",function(e) {
+			this.dispose();
+			$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p>");
 		});
 		
 		introPlayer.on("ended", function() {
@@ -105,9 +111,9 @@ $(document).ready(function(){
 		}
 		
 		if (poster) {
-			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls poster=\"smgt370_course_intro.jpg\"><track src=\"smgt370_course_intro.vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default /></video>");
+			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls poster=\""+source+".jpg\"><track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default /></video>");
 		} else {
-			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls><track src=\"smgt370_course_intro.vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default /></video>");
+			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls><track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default /></video>");
 		}
 		
 		videojs("gvp_video",{},function() {
@@ -115,16 +121,21 @@ $(document).ready(function(){
 			this.progressTips();
 			this.width(width);
 			this.height(height);
-			this.src({type: "video/mp4", src:"smgt370_course_intro.mp4"});
+			this.src({type: "video/mp4", src: source+".mp4"});
 			if (intro) {
 				this.play();
 			}
 		});
 		
+		mainPlayer.on("error",function(e) {
+			this.dispose();
+			$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small>Video file "+ source +".mp4 is not found or does not exist. Please double check the name of the directory, which holds the video. The name of the directory must the same with the video.</small></p>");
+		});
+		
 		mainPlayer.on("ended", function() {
 			this.currentTime(0);
 			$(".vjs-poster").delay(6000).queue(function() {
-				$(this).css("background-image","url(smgt370_course_intro.jpg)").html("<span class=\"replay-button\"></span>").show();
+				$(this).css("background-image","url("+source+".jpg)").html("<span class=\"replay-button\"></span>").show();
 			});
 		});
 		
