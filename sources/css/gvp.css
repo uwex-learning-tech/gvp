@@ -7,6 +7,8 @@ body {
 .gvp_wrapper {
 	position: relative;
 	width:640px;
+	float: left;
+	clear: both;
 }
 .title_bar {
 	position: absolute;
@@ -71,4 +73,49 @@ body {
 .error small {
 	display: block;
 	color:#333;
+}
+
+/* DOWNLOAD BAR */
+#download_bar {
+	width:100%;
+	margin-top: 10px;
+	text-align: right;
+	float: left;
+	clear: both;
+}
+#download_bar p {
+	font-size: 12px;
+	color: #b5b5b5;
+	font-weight: normal;
+	margin: 0;
+	display: inline-block;
+	margin-left: 10px;
+}
+#download_bar ul {
+	margin: 0px 0px 0px 10px;
+	padding: 0px;
+	display: inline-block;
+	list-style: none;
+}
+#download_bar ul li {
+	display: inline-block;
+	margin-left: 10px;
+	
+}
+#download_bar ul li a,
+#download_bar ul li a:visited {
+	display: block;
+	font-size: 14px;
+	text-decoration: none;
+	padding:5px 20px 5px 28px;
+	color: #333;
+	background-image: url("../img/download_icon.png");
+	background-repeat: no-repeat;
+	background-position: left 2px;
+	border: #ccc solid 1px;
+	opacity: 0.75;
+}
+#download_bar ul li a:hover {
+	border: #333 solid 1px;
+	opacity: 1;
 }

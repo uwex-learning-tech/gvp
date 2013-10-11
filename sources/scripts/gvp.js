@@ -54,12 +54,6 @@ $(document).ready(function(){
 			console.log("Intro: " + intro);
 		}
 		
-		// get intro type from the query string if intro is true
-		if (intro && $.trim(getParameterByName("type")) !== "") {
-			type = $.trim(getParameterByName("type"));
-			console.log("Intro type: " + type);
-		}
-		
 		// get width from query string if available
 		if ($.trim(getParameterByName("w")) !== "") {
 			width = Number($.trim(getParameterByName("w")));
@@ -92,7 +86,7 @@ $(document).ready(function(){
 			this.src({type: "video/mp4", src:"intros/"+intro+".mp4"});
 		});
 		
-		introPlayer.on("error",function(e) {
+		introPlayer.on("error",function() {
 			this.dispose();
 			$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p>");
 		});
@@ -127,7 +121,7 @@ $(document).ready(function(){
 			}
 		});
 		
-		mainPlayer.on("error",function(e) {
+		mainPlayer.on("error",function() {
 			this.dispose();
 			$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small>Video file "+ source +".mp4 is not found or does not exist. Please double check the name of the directory, which holds the video. The name of the directory must the same with the video.</small></p>");
 		});
@@ -141,9 +135,65 @@ $(document).ready(function(){
 		
 	}
 	
+	function dowloadableFile(file, ext) {
+	
+		var content_type;
+		
+		if (ext === "pdf") {
+			content_type = "application/pdf";
+		} else if (ext === "mp3") {
+			content_type = "audio/mpeg";
+		} else if (ext === "mp4") {
+			content_type = "video/mp4";
+		}
+		
+		$.ajax({
+			url: file + "." + ext,
+			type: 'HEAD',
+			dataType: 'text',
+			contentType: content_type,
+			async: true,
+			beforeSend: function (xhr) {
+				xhr.overrideMimeType(content_type);
+				xhr.setRequestHeader("Accept", content_type);
+			},
+			success: function () {
+		
+				if (ext === "pdf") {
+					$("#download_bar ul").append("<li><a href=\"" + file + "." + ext + "\" target=\"_blank\">Transcript</a></li>");
+				} else if (ext === "mp3") {
+					$("#download_bar ul").append("<li><a href=\"" + file + "." + ext + "\" target=\"_blank\">MP3</a></li>");
+				} else if (ext === "mp4") {
+					$("#download_bar ul").append("<li><a href=\"" + file + "." + ext + "\" target=\"_blank\">Video</a></li>");
+				}
+				
+			},
+			error: function () {
+		
+				var string;
+		
+				if (ext === "pdf") {
+					string = "Transcript";
+				} else if (ext === "mp3") {
+					string = "MP3";
+				} else if (ext === "mp4") {
+					string = "Video";
+				}
+		
+				string += " pending...";
+				$("#download_bar ul").before("<p>" + string + "</p>");
+		
+			}
+		});
+	}
+	
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
 	
 	getQueryStringValues();
+	
+	dowloadableFile(source,"mp4");
+	dowloadableFile(source,"mp3");
+	dowloadableFile(source,"pdf");
 	
 	if (intro) {
 		setupIntroVideo();
