@@ -87,7 +87,7 @@ $(document).ready(function(){
 			this.progressTips();
 			this.width(width);
 			this.height(height);
-			this.src({type: "video/mp4", src:"intros/"+intro+".mp4"});
+			this.src({type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"});
 		});
 		
 		introPlayer.on("error",function() {
@@ -200,7 +200,7 @@ $(document).ready(function(){
 		});
 	}
 	
-	function getDownloadableFiles(files,tonly){
+	function getDownloadableFiles(files){
 		
 		if (files !== null) {
 				
