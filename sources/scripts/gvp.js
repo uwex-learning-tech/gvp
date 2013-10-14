@@ -45,33 +45,37 @@ $(document).ready(function(){
 		// get title from query string if available
 		if ($.trim(getParameterByName("ttl")) !== "") {
 			$(".title_bar").html(capitalizeEachWord($.trim(getParameterByName("ttl")).replace(/\_+/g," ")));
-			console.log("Title: " + capitalizeEachWord($.trim(getParameterByName("ttl")).replace(/\_+/g," ")));
 		}
 		
 		// get intro flag from query string if available
 		if ($.trim(getParameterByName("intro")) !== "" && Number($.trim(getParameterByName("intro")))) {
 			intro = $.trim(getParameterByName("intro"));
-			console.log("Intro: " + intro);
 		}
 		
 		// get width from query string if available
 		if ($.trim(getParameterByName("w")) !== "") {
 			width = Number($.trim(getParameterByName("w")));
-			console.log("Width: " + width);
 		}
 		
 		// get height from query string if available
 		if ($.trim(getParameterByName("h")) !== "") {
 			height = Number($.trim(getParameterByName("h")));
-			console.log("Height: " + height);
 		}
 		
 		// get downloadable flag from query string if available
 		if ($.trim(getParameterByName("dl")) !== "") {
-			dl = $.trim(getParameterByName("dl"));
-			dl = dl.split("");
-			console.log("Downloadable flag: " + dl);
+			dl = $.trim(getParameterByName("dl")).split("");
 		}
+	}
+	
+	function getSource() {
+		var urlToParse = window.location.href, src;
+		
+		console.log("URL to parse: " + urlToParse);
+		src = urlToParse.split("?");
+		src = src[0].split("/");
+		src = src[src.length-1].replace(".html", "");
+		console.log("Parse result: " + src);
 	}
 	
 	function setupIntroVideo() {
@@ -152,19 +156,28 @@ $(document).ready(function(){
 			type: 'HEAD',
 			dataType: 'text',
 			contentType: content_type,
-			async: true,
+			async: false,
 			beforeSend: function (xhr) {
 				xhr.overrideMimeType(content_type);
 				xhr.setRequestHeader("Accept", content_type);
 			},
 			success: function () {
-		
+				
+				var f = file;
+				var downloadBar = $("#download_bar ul");
+				
+				if (location.protocol === "http:") {
+					var url = window.location.href;
+					url = url.substr(0,url.lastIndexOf("/")+1).replace("https","http");
+					f = url + file;
+				}
+				
 				if (ext === "pdf") {
-					$("#download_bar ul").append("<li><a href=\"" + file + "." + ext + "\" target=\"_blank\">Transcript</a></li>");
+					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Transcript</a></li>");
 				} else if (ext === "mp3") {
-					$("#download_bar ul").append("<li><a href=\"" + file + "." + ext + "\" target=\"_blank\">MP3</a></li>");
+					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">MP3</a></li>");
 				} else if (ext === "mp4") {
-					$("#download_bar ul").append("<li><a href=\"" + file + "." + ext + "\" target=\"_blank\">Video</a></li>");
+					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Video</a></li>");
 				}
 				
 			},
@@ -187,23 +200,88 @@ $(document).ready(function(){
 		});
 	}
 	
+	function getDownloadableFiles(files,tonly){
+		
+		if (files !== null) {
+				
+			for (var i = 0; i < files.length; i++) {
+		
+				switch (files[i]) {
+					case "v":
+						dowloadableFile(source,"mp4");
+					break;
+					case "a":
+						dowloadableFile(source,"mp3");
+					break;
+					case "t":
+						dowloadableFile(source,"pdf");
+					break;
+				} // end case
+				
+			} // end loop
+
+		} // end files
+		
+	}
+	
+	function isMobile() {
+	
+		var ua = navigator.userAgent,
+			checker = {
+				ios: ua.match(/(iPad|iPhone|iPod)/g),
+				blackberry: ua.match(/BlackBerry/),
+				android: ua.match(/Android/),
+				window: ua.match(/IEMobile/)
+			};
+		
+		if (checker.ios || checker.blackberry || checker.android) { return true; }
+		
+		return false;
+
+	}
+	
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
 	
 	getQueryStringValues();
+	getSource();
 	
-	dowloadableFile(source,"mp4");
-	dowloadableFile(source,"mp3");
-	dowloadableFile(source,"pdf");
+	if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
 	
-	if (intro) {
-		setupIntroVideo();
+		$(".video_holder").css({
+			"background-image":"url("+source+".jpg)",
+			"width": width+"px",
+			"height": height+"px",
+			"cursor":"pointer"
+		}).html("<span class=\"newWindow-button\"></span>")
+		.on("click",function() {
+			var url = window.location.href;
+			
+			url = url.replace("https", "http").replace(/intro=[0-9]+/g, "intro=0");
+			
+			if (window.location.search) {
+				url += "&m=1";
+			} else {
+				url += "?m=1";
+			}
+
+			window.open(url);
+		});
+		
 	} else {
-		setupMainVideo(true);
+		
+		if (intro) {
+			setupIntroVideo();
+		} else {
+			setupMainVideo(true);
+		}
+		
+		// hide the title bar when playback begins
+		$(".video_holder").on("click",function() {
+			$(".title_bar").hide();
+		});
+		
 	}
 	
-	// hide the title bar when playback begins
-	$(".video_holder").on("click",function() {
-		$(".title_bar").hide();
-	});
+	getDownloadableFiles(dl);
 	
 });
