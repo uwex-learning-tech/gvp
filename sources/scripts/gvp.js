@@ -15,7 +15,7 @@ $(document).ready(function(){
         var regex = new RegExp(regexS);
         var results = regex.exec(window.location.href);
 
-        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
 
         if (results === null) {
             return "";
@@ -240,48 +240,55 @@ $(document).ready(function(){
 
 	}
 	
+	function setupPlayer() {
+	
+		var title = ($(".title_bar").html().length <= 0) ? capitalizeEachWord($.trim(source.replace(/\_+/g," "))) : $(".title_bar").html();
+	
+		$(document).attr('title', title);
+	
+		if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
+		
+			$(".video_holder").css({
+				"background-image":"url("+source+".jpg)",
+				"width": width+"px",
+				"height": height+"px",
+				"cursor":"pointer"
+			}).html("<span class=\"newWindow-button\"></span>")
+			.on("click",function() {
+				var url = window.location.href;
+				
+				url = url.replace("https", "http").replace(/intro=[0-9]+/g, "intro=0");
+				
+				if (window.location.search) {
+					url += "&m=1";
+				} else {
+					url += "?m=1";
+				}
+	
+				window.open(url);
+			});
+			
+		} else {
+			
+			if (intro) {
+				setupIntroVideo();
+			} else {
+				setupMainVideo(true);
+			}
+			
+			// hide the title bar when playback begins
+			$(".video_holder").on("click",function() {
+				$(".title_bar").hide();
+			});
+			
+		}
+	}
+	
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
 	
 	getQueryStringValues();
 	getSource();
-	
-	if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
-	
-		$(".video_holder").css({
-			"background-image":"url("+source+".jpg)",
-			"width": width+"px",
-			"height": height+"px",
-			"cursor":"pointer"
-		}).html("<span class=\"newWindow-button\"></span>")
-		.on("click",function() {
-			var url = window.location.href;
-			
-			url = url.replace("https", "http").replace(/intro=[0-9]+/g, "intro=0");
-			
-			if (window.location.search) {
-				url += "&m=1";
-			} else {
-				url += "?m=1";
-			}
-
-			window.open(url);
-		});
-		
-	} else {
-		
-		if (intro) {
-			setupIntroVideo();
-		} else {
-			setupMainVideo(true);
-		}
-		
-		// hide the title bar when playback begins
-		$(".video_holder").on("click",function() {
-			$(".title_bar").hide();
-		});
-		
-	}
-	
+	setupPlayer();
 	getDownloadableFiles(dl);
 	
 });

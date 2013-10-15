@@ -108,6 +108,9 @@ body {
 	display: block;
 	color:#333;
 }
+.vjs-poster {
+	background-color: #000;
+}
 
 /* DOWNLOAD BAR */
 #download_bar {
