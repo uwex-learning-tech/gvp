@@ -5,8 +5,8 @@ $(document).ready(function(){
 
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
-	var width = 640, height = 360, intro = 0, dl = null, introPlayer,
-		mainPlayer, source = "smgt370_course_intro";
+	var width = 640, height = 360, intro = 0,
+		introPlayer, mainPlayer, source;
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -62,10 +62,6 @@ $(document).ready(function(){
 			height = Number($.trim(getParameterByName("h")));
 		}
 		
-		// get downloadable flag from query string if available
-		if ($.trim(getParameterByName("dl")) !== "") {
-			dl = $.trim(getParameterByName("dl")).split("");
-		}
 	}
 	
 	function getSource() {
@@ -74,8 +70,8 @@ $(document).ready(function(){
 		console.log("URL to parse: " + urlToParse);
 		src = urlToParse.split("?");
 		src = src[0].split("/");
-		src = src[src.length-1].replace(".html", "");
-		console.log("Parse result: " + src);
+		src = src[src.length-2];
+		source = src;
 	}
 	
 	function setupIntroVideo() {
@@ -184,42 +180,26 @@ $(document).ready(function(){
 		
 				var string;
 		
-				if (ext === "pdf") {
-					string = "Transcript";
-				} else if (ext === "mp3") {
+				if (ext === "mp3") {
 					string = "MP3";
 				} else if (ext === "mp4") {
 					string = "Video";
 				}
-		
-				string += " pending...";
-				$("#download_bar ul").before("<p>" + string + "</p>");
-		
+				
+				if (ext !== "pdf") {
+					string += " pending...";
+					$("#download_bar ul").before("<p>" + string + "</p>");
+				}
+
 			}
 		});
 	}
 	
-	function getDownloadableFiles(files){
+	function getDownloadableFiles(){
 		
-		if (files !== null) {
-				
-			for (var i = 0; i < files.length; i++) {
-		
-				switch (files[i]) {
-					case "v":
-						dowloadableFile(source,"mp4");
-					break;
-					case "a":
-						dowloadableFile(source,"mp3");
-					break;
-					case "t":
-						dowloadableFile(source,"pdf");
-					break;
-				} // end case
-				
-			} // end loop
-
-		} // end files
+		dowloadableFile(source,"mp4");
+		dowloadableFile(source,"mp3");
+		dowloadableFile(source,"pdf");
 		
 	}
 	
@@ -286,6 +266,6 @@ $(document).ready(function(){
 	getQueryStringValues();
 	getSource();
 	setupPlayer();
-	getDownloadableFiles(dl);
+	getDownloadableFiles();
 	
 });
