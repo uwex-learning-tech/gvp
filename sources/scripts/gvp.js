@@ -161,7 +161,7 @@ $(document).ready(function(){
 				
 				var f = file, downloadBar = $("#download_bar ul");
 				
-				if (location.protocol === "http:") {
+				if (location.protocol !== "http:") {
 					var url = window.location.href;
 					url = url.substr(0,url.lastIndexOf("/")+1).replace("https","http");
 					f = url + file;
