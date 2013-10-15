@@ -127,7 +127,7 @@ $(document).ready(function(){
 		
 		mainPlayer.on("error",function() {
 			this.dispose();
-			$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small>Video file "+ source +".mp4 is not found or does not exist. Please double check the name of the directory, which holds the video. The name of the directory must the same with the video.</small></p>");
+			$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small><strong>"+ source +".mp4</strong> is not found or does not exist. Please double check the file name, and its existence.</small></p>");
 		});
 		
 		mainPlayer.on("ended", function() {
