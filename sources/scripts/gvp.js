@@ -163,8 +163,7 @@ $(document).ready(function(){
 			},
 			success: function () {
 				
-				var f = file;
-				var downloadBar = $("#download_bar ul");
+				var f = file, downloadBar = $("#download_bar ul");
 				
 				if (location.protocol === "http:") {
 					var url = window.location.href;
@@ -242,9 +241,7 @@ $(document).ready(function(){
 	
 	function setupPlayer() {
 	
-		var title = ($(".title_bar").html().length <= 0) ? capitalizeEachWord($.trim(source.replace(/\_+/g," "))) : $(".title_bar").html();
-	
-		$(document).attr('title', title);
+		$(document).attr('title', ($(".title_bar").html().length <= 0) ? capitalizeEachWord($.trim(source.replace(/\_+/g," "))) : $(".title_bar").html());
 	
 		if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
 		
@@ -285,7 +282,7 @@ $(document).ready(function(){
 	}
 	
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
-	
+
 	getQueryStringValues();
 	getSource();
 	setupPlayer();
