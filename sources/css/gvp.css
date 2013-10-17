@@ -7,7 +7,7 @@ body {
 }
 .gvp_wrapper {
 	position: relative;
-	width:640px;
+	/* width:640px; */
 	float: left;
 	clear: both;
 }
@@ -16,7 +16,7 @@ body {
 	top:0;
 	left: 0;
 	z-index: 99;
-	width:610px;
+	/* width:610px; */
 	height:24px;
 	color:#FFF;
 	font-size:16px;
@@ -134,7 +134,8 @@ body {
 	margin-left: 10px;
 }
 #download_bar ul {
-	margin: 0px 0px 0px 10px;
+	width: inherit;
+	margin: 0px;
 	padding: 0px;
 	display: inline-block;
 	list-style: none;
@@ -143,22 +144,25 @@ body {
 	display: inline-block;
 	margin-left: 10px;
 }
+#download_bar ul li:first-child {
+	margin-left: 0px;
+}
 #download_bar ul li a,
 #download_bar ul li a:visited {
 	display: block;
 	position: relative;
 	font-size: 14px;
 	text-decoration: none;
-	padding:5px 20px 5px 28px;
+	padding: 5px 20px 5px 28px;
 	font-weight: normal;
-	color: #ccc;
+	color: #818181;
 	background-color: #fdfdfd;
-	border: #ccc solid 1px;
+	border: #939393 solid 1px;
 }
 #download_bar ul li a:after {
 	content:"";
 	background: url("../img/download_icon.png");
-	opacity: 0.50;
+	opacity: 0.75;
 	top: 2px;
     left: 0;
     bottom: 0;

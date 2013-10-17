@@ -222,9 +222,16 @@ $(document).ready(function(){
 	function setupPlayer() {
 	
 		$(document).attr('title', ($(".title_bar").html().length <= 0) ? capitalizeEachWord($.trim(source.replace(/\_+/g," "))) : $(".title_bar").html());
-	
-		if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
 		
+		$(".gvp_wrapper").css({
+			"width": width+"px",
+			"height": height+"px"
+		});
+		
+		$(".title_bar").css("width",(width-30)+"px");
+		
+		if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
+			
 			$(".video_holder").css({
 				"background-image":"url("+source+".jpg)",
 				"width": width+"px",
