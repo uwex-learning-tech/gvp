@@ -1,5 +1,4 @@
 /* global videojs */
-/* global console */
 
 $(document).ready(function(){
 
@@ -261,7 +260,7 @@ $(document).ready(function(){
 			}
 			
 			// hide the title bar when playback begins
-			$(".video_holder").on("click",function() {
+			$(".video_holder").click(function() {
 				$(".title_bar").hide();
 			});
 			
