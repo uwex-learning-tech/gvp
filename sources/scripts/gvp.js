@@ -67,7 +67,7 @@ $(document).ready(function(){
 	function getSource() {
 		var urlToParse = window.location.href, src;
 		
-		console.log("URL to parse: " + urlToParse);
+		/* console.log("URL to parse: " + urlToParse); */
 		src = urlToParse.split("?");
 		src = src[0].split("/");
 		src = src[src.length-2];
