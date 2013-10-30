@@ -89,8 +89,8 @@ $(document).ready(function(){
 		});
 		
 		introPlayer.on("error",function() {
-			this.dispose();
-			$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p>");
+			//this.dispose();
+			//$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p>");
 		});
 		
 		introPlayer.on("ended", function() {
@@ -127,8 +127,8 @@ $(document).ready(function(){
 		});
 		
 		mainPlayer.on("error",function() {
-			this.dispose();
-			$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small><strong>"+ source +".mp4</strong> is not found or does not exist. Please double check the file name, and its existence.</small></p>");
+			//this.dispose();
+			//$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small><strong>"+ source +".mp4</strong> is not found or does not exist. Please double check the file name, and its existence.</small></p>");
 		});
 		
 		mainPlayer.on("ended", function() {
