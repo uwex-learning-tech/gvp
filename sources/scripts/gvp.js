@@ -82,7 +82,10 @@ $(document).ready(function(){
 			this.progressTips();
 			this.width(width);
 			this.height(height);
-			this.src({type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"});
+			this.src([
+				{type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"},
+				{type: "video/ogg", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".ogv"}
+			]);
 		});
 		
 		introPlayer.on("error",function() {
@@ -114,7 +117,10 @@ $(document).ready(function(){
 			this.progressTips();
 			this.width(width);
 			this.height(height);
-			this.src({type: "video/mp4", src: source+".mp4"});
+			this.src([
+				{type: "video/mp4", src: source+".mp4"},
+				{type: "video/ogg", src: source+".ogv"}
+			]);
 			if (intro) {
 				this.play();
 			}
