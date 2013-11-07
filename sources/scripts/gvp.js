@@ -43,7 +43,7 @@ $(document).ready(function(){
 	
 		// get title from query string if available
 		if ($.trim(getParameterByName("ttl")) !== "") {
-			$(".title_bar").html(capitalizeEachWord($.trim(getParameterByName("ttl")).replace(/\_+/g," ")));
+			$(".title_bar").html(capitalizeEachWord($.trim(decodeURIComponent(getParameterByName("ttl")))));
 		}
 		
 		// get intro flag from query string if available
