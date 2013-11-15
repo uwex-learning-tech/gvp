@@ -1,5 +1,5 @@
 # Generic Video Player
-######version 3.0.0
+######version 3.1.2
 
 Author: Ethan S. Lin<br />
 Organization: University of Wisconsin-Extension, division of Continuing Education, Outreach & E-Learning<br />
