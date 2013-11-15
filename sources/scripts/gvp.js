@@ -227,7 +227,7 @@ $(document).ready(function(){
 				
 				if (ext !== "pdf") {
 					string += " download pending...";
-					$("#download_bar ul").before("<p>" + string + "</p>");
+					$("#download_bar ul").prepend("<p>" + string + "</p>");
 				}
 
 			}
