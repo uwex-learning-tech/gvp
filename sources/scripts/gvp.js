@@ -121,7 +121,7 @@ $(document).ready(function(){
 			poster = false;
 		}
 		
-		var subtitle = (fileAvailable(source,"vtt","text/plain")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default />" : "";
+		var subtitle = (fileAvailable(source,"vtt","text/vtt")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default />" : "";
 
 		if (poster) {
 			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls poster=\""+source+".jpg\">"+subtitle+"</video>");
@@ -144,8 +144,6 @@ $(document).ready(function(){
 		});
 		
 		mainPlayer.on("error",function() {
-		
-		var v = $("#gvp_video");
 
 			var mp4 = fileAvailable(source,"mp4","video/mp4"), wm = fileAvailable(source,"webm","video/webm");
 			
