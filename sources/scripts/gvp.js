@@ -84,14 +84,28 @@ $(document).ready(function(){
 			this.height(height);
 			this.src([
 				{type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"},
-				{type: "video/webm", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".webm"},
-				{type: "video/ogg", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".ogv"}
+				{type: "video/webm", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".webm"}
 			]);
 		});
 		
 		introPlayer.on("error",function() {
-			//this.dispose();
-			//$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p>");
+			
+			var mp4 = fileAvailable(intro,"mp4","video/mp4"), wm = fileAvailable(intro,"webm","video/webm");
+			
+			if (mp4 === false) {
+				this.src([{type: "video/webm", src: source+".webm"}]);
+			}
+			
+			if (wm === false) {
+				this.src([{type: "video/mp4", src: source+".mp4"}]);
+				$(".vjs-loading-spinner").hide();
+			}
+			
+			if (wm === false && mp4 === false) {
+				this.dispose();
+				$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p><p class=\"error\">If you see this message, both MP4 and WebM are not found.</p>");
+			}
+			
 		});
 		
 		introPlayer.on("ended", function() {
@@ -107,10 +121,12 @@ $(document).ready(function(){
 			poster = false;
 		}
 		
+		var subtitle = (fileAvailable(source,"vtt","text/plain")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default />" : "";
+
 		if (poster) {
-			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls poster=\""+source+".jpg\"><track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default /></video>");
+			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls poster=\""+source+".jpg\">"+subtitle+"</video>");
 		} else {
-			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls><track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default /></video>");
+			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls> "+subtitle+" </video>");
 		}
 		
 		videojs("gvp_video",{},function() {
@@ -120,8 +136,7 @@ $(document).ready(function(){
 			this.height(height);
 			this.src([
 				{type: "video/mp4", src: source+".mp4"},
-				{type: "video/webm", src: source+".webm"},
-				{type: "video/ogg", src: source+".ogv"}
+				{type: "video/webm", src: source+".webm"}
 			]);
 			if (intro) {
 				this.play();
@@ -129,8 +144,25 @@ $(document).ready(function(){
 		});
 		
 		mainPlayer.on("error",function() {
-			//this.dispose();
-			//$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small><strong>"+ source +".mp4</strong> is not found or does not exist. Please double check the file name, and its existence.</small></p>");
+		
+		var v = $("#gvp_video");
+
+			var mp4 = fileAvailable(source,"mp4","video/mp4"), wm = fileAvailable(source,"webm","video/webm");
+			
+			if (mp4 === false) {
+				this.src([{type: "video/webm", src: source+".webm"}]);
+			}
+			
+			if (wm === false) {
+				this.src([{type: "video/mp4", src: source+".mp4"}]);
+				$(".vjs-loading-spinner").hide();
+			}
+			
+			if (mp4 === false && wm === false) {
+				this.dispose();
+				$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small>Video file \"<strong>"+ source +"</strong>\" is not found. Please double check the video file name. The file name must match the directory name.</small></p><p class=\"error\">If you see this message, both MP4 and WebM are not found.</p>");
+			}
+			
 		});
 		
 		mainPlayer.on("ended", function() {
@@ -177,7 +209,7 @@ $(document).ready(function(){
 				if (ext === "pdf") {
 					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Transcript</a></li>");
 				} else if (ext === "mp3") {
-					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">MP3</a></li>");
+					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Audio</a></li>");
 				} else if (ext === "mp4") {
 					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Video</a></li>");
 				}
@@ -188,13 +220,13 @@ $(document).ready(function(){
 				var string;
 		
 				if (ext === "mp3") {
-					string = "MP3";
+					string = "Audio";
 				} else if (ext === "mp4") {
 					string = "Video";
 				}
 				
 				if (ext !== "pdf") {
-					string += " pending...";
+					string += " download pending...";
 					$("#download_bar ul").before("<p>" + string + "</p>");
 				}
 
@@ -208,6 +240,28 @@ $(document).ready(function(){
 		dowloadableFile(source,"mp3");
 		dowloadableFile(source,"pdf");
 		
+	}
+	
+	function fileAvailable(file,ext,file_type) {
+		var isAvilable = false;
+		$.ajax({
+			url: file + "." + ext,
+			type: 'HEAD',
+			dataType: 'text',
+			contentType: file_type,
+			async: false,
+			beforeSend: function (xhr) {
+				xhr.overrideMimeType(file_type);
+				xhr.setRequestHeader("Accept", file_type);
+			},
+			success: function () {
+				isAvilable = true;
+			},
+			error: function () {
+				isAvilable = false;
+			}
+		});
+		return isAvilable;
 	}
 	
 	function isMobile() {
