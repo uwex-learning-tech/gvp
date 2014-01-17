@@ -215,7 +215,8 @@ $(document).ready(function(){
 			},
 			error: function () {
 		
-				var string;
+				/*
+var string;
 		
 				if (ext === "mp3") {
 					string = "Audio";
@@ -227,6 +228,7 @@ $(document).ready(function(){
 					string += " download pending...";
 					$("#download_bar ul").prepend("<p>" + string + "</p>");
 				}
+*/
 
 			}
 		});
@@ -280,6 +282,11 @@ $(document).ready(function(){
 	
 	function setupPlayer() {
 	
+		if (parent === top) {
+			$("head").append("<link href=\"sources/theme/theme.css\" rel=\"stylesheet\" type=\"text/css\" />");
+			$(".gvp_wrapper").prepend("<div class=\"logo\"></div>");
+		}
+		
 		$(document).attr('title', ($(".title_bar").html().length <= 0) ? capitalizeEachWord($.trim(source.replace(/\_+/g," "))) : $(".title_bar").html());
 		
 		$(".gvp_wrapper").css({

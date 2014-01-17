@@ -1,0 +1,35 @@
+body {
+	background-color: #333333;
+	background-image: url("img/office.png");
+	background-repeat: repeat;
+}
+.gvp_wrapper {
+	position: static;
+	float: none;
+	margin: 15px auto 15px;
+}
+.gvp_wrapper .logo {
+	background-image: url("img/uwex_ceoel.png");
+	width:219px;
+	height:71px;
+	margin: 15px 0px 15px;
+}
+.gvp_wrapper .title_bar {
+	position:static;
+	top:0;
+	left:0;
+	z-index:0;
+	height:auto;
+	color: #F2F2F2;
+	font-size:24px;
+	padding: 5px 0px;
+	background: none;
+	margin:15px 0px;
+}
+.gvp_wrapper .video_holder {
+	box-shadow: 0px 0px 16px #000000;
+}
+
+.gvp_wrapper #download_bar {
+	margin: 15px 0px;
+}
