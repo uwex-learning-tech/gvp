@@ -330,7 +330,9 @@ var string;
 			
 			// hide the title bar when playback begins
 			$(".video_holder").click(function() {
-				$(".title_bar").hide();
+				if (parent !== top) {
+					$(".title_bar").hide();
+				}
 			});
 			
 		}
