@@ -284,9 +284,9 @@ var string;
 	
 		if (parent === top) {
 			var d = new Date();
-			$("head").append("<link href=\"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/video_players/gvp_v3/sources/theme/theme.css\" rel=\"stylesheet\" type=\"text/css\" />");
+			$("head").append("<link href=\"sources/theme/himt.css\" rel=\"stylesheet\" type=\"text/css\" />");
 			$(".gvp_wrapper").prepend("<div class=\"logo\"></div>");
-			$(".gvp_wrapper").append("<div class=\"footer\">Copyright &copy; "+d.getFullYear()+". University of Wisconsin-Extension division of Continuing Education, Outreach &amp; E-Learning. All rights reserved.</div>");
+			$(".gvp_wrapper").append("<div class=\"footer\">Copyright &copy; "+d.getFullYear()+". University of Wisconsin System. All rights reserved.</div>");
 		}
 		
 		$(document).attr('title', ($(".title_bar").html().length <= 0) ? capitalizeEachWord($.trim(source.replace(/\_+/g," "))) : $(".title_bar").html());
