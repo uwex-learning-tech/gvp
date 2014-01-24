@@ -5,7 +5,8 @@ $(document).ready(function(){
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
 	var width = 640, height = 360, intro = 0,
-		introPlayer, mainPlayer, source;
+		introPlayer, mainPlayer, source,
+		programs = ["smgt","msmgt","hwm","himt","bps","il","flx"];
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -283,8 +284,25 @@ var string;
 	function setupPlayer() {
 	
 		if (parent === top) {
+		
 			var d = new Date();
-			$("head").append("<link href=\"sources/theme/himt.css\" rel=\"stylesheet\" type=\"text/css\" />");
+			var address = location.href;
+			var program = "";
+			
+			$.each(programs,function(i){
+				if (programs[i] === address.split("/")[4]) {
+					if (programs[i] === "msmgt") {
+						program = "smgt";
+					} else {
+						program = programs[i];
+					}
+					return false;
+				} else {
+					program = "default";
+				}
+			});
+			
+			$("head").append("<link href=\"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/video_players/gvp_v3/sources/theme/"+program+".css\" rel=\"stylesheet\" type=\"text/css\" />");
 			$(".gvp_wrapper").prepend("<div class=\"logo\"></div>");
 			$(".gvp_wrapper").append("<div class=\"footer\">Copyright &copy; "+d.getFullYear()+". University of Wisconsin System. All rights reserved.</div>");
 		}

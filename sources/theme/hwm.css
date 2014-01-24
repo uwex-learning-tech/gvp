@@ -1,6 +1,6 @@
 body {
-	border-top:15px solid #3b658f;
-	background-color: #ffffff;
+	border-top:15px solid #48a942;
+	background-color: #FFFFFF;
 }
 .gvp_wrapper {
 	position: static;
@@ -8,8 +8,8 @@ body {
 	margin: 15px auto 15px;
 }
 .gvp_wrapper .logo {
-	background-image: url("img/himt.png");
-	width:203px;
+	background-image: url("img/hwm.png");
+	width:224px;
 	height:75px;
 	margin: 0px;
 }

@@ -1,6 +1,6 @@
 body {
-	border-top:15px solid #3b658f;
-	background-color: #ffffff;
+	border-top:15px solid #b60050;
+	background-color: #FFFFFF;
 }
 .gvp_wrapper {
 	position: static;
@@ -8,9 +8,9 @@ body {
 	margin: 15px auto 15px;
 }
 .gvp_wrapper .logo {
-	background-image: url("img/himt.png");
-	width:203px;
-	height:75px;
+	background-image: url("img/flx.png");
+	width:349px;
+	height:50px;
 	margin: 0px;
 }
 .gvp_wrapper .title_bar {
@@ -19,7 +19,7 @@ body {
 	left:0;
 	z-index:0;
 	height:auto;
-	color: #000000;
+	color: #6d6e70;
 	font-size:24px;
 	padding: 5px 0px;
 	background: none;
@@ -56,7 +56,7 @@ body {
 	background-position: left 7px;
 }
 .gvp_wrapper .footer {
-	color:#000000;
+	color:#6d6e70;
 	font-size: 11px;
 	font-weight: normal;
 	margin: 15px 0px;

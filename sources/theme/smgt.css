@@ -9,8 +9,8 @@ body {
 }
 .gvp_wrapper .logo {
 	background-image: url("img/smgt.png");
-	width:203px;
-	height:75px;
+	width:210px;
+	height:55px;
 	margin: 0px;
 }
 .gvp_wrapper .title_bar {
@@ -26,27 +26,34 @@ body {
 	margin:15px 0px;
 }
 .gvp_wrapper .video_holder {
-	box-shadow: 0px 0px 16px #333;
+	box-shadow: 0px 0px 16px #8A8A8A;
 }
 
 .gvp_wrapper #download_bar {
 	margin: 15px 0px;
 }
+.gvp_wrapper #download_bar ul li {
+	margin-left: 3px;
+}
 .gvp_wrapper #download_bar ul li a,
 .gvp_wrapper #download_bar ul li a:visited {
-	color: #000000;
-	background-color: transparent;
-	border: none;
-	border-bottom: 3px solid #5d8828;
+	color: #333333;
+	background-color: #f2f2f2;
+	border: 1px solid #ccc;
+	box-shadow: 0px 1px 0px #ccc;
+	border-radius: 3px 3px;
+	padding: 10px 20px 10px 30px;
 }
 .gvp_wrapper #download_bar ul li a:after {
 	opacity: 1;
+	top: 7px;
 }
 .gvp_wrapper #download_bar ul li a:hover {
-	border: none;
-	border-bottom: 3px solid #00334d;
-	background-color: transparent;
-	color: #000;
+	color: #000000;
+	background-color: #ffffff;
+	border: 1px solid #ccc;
+	box-shadow: 0px 1px 0px #ccc;
+	background-position: left 7px;
 }
 .gvp_wrapper .footer {
 	color:#000000;
