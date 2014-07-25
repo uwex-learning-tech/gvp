@@ -99,7 +99,7 @@ $(document).ready(function(){
 			
 			if (wm === false) {
 				this.src([{type: "video/mp4", src: source+".mp4"}]);
-				$(".vjs-loading-spinner").hide();
+				//$(".vjs-loading-spinner").hide();
 			}
 			
 			if (wm === false && mp4 === false) {
@@ -149,12 +149,14 @@ $(document).ready(function(){
 			var mp4 = fileAvailable(source,"mp4","video/mp4"), wm = fileAvailable(source,"webm","video/webm");
 			
 			if (mp4 === false) {
+
 				this.src([{type: "video/webm", src: source+".webm"}]);
+				
 			}
 			
 			if (wm === false) {
 				this.src([{type: "video/mp4", src: source+".mp4"}]);
-				$(".vjs-loading-spinner").hide();
+				//$(".vjs-loading-spinner").hide();
 			}
 			
 			if (mp4 === false && wm === false) {
