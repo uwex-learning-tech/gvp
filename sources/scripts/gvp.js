@@ -81,7 +81,6 @@ $(document).ready(function(){
 	
 		videojs("gvp_video",{},function() {
 			introPlayer = this;
-			//this.progressTips();
 			this.width(width);
 			this.height(height);
 			this.src([
