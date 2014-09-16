@@ -351,7 +351,7 @@ var string;
 			
 			// hide the title bar when playback begins
 			$(".video_holder").click(function() {
-				if (parent !== top) {
+				if (window.self !== window.top) {
 					$(".title_bar").hide();
 				}
 			});
