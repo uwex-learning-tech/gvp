@@ -79,10 +79,15 @@ $(document).ready(function(){
 	
 		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls preload=\"metadata\" poster=\""+source+".jpg\"></video>");
 	
-		videojs("gvp_video",{},function() {
+		videojs("gvp_video",{
+            
+            'width': width,
+            'height': height
+            
+        },function() {
 			introPlayer = this;
-			this.width(width);
-			this.height(height);
+//			this.width(width);
+//			this.height(height);
 			this.src([
 				{type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"},
 				{type: "video/webm", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".webm"}
@@ -130,11 +135,14 @@ $(document).ready(function(){
 			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls> "+subtitle+" </video>");
 		}
 		
-		videojs("gvp_video",{},function() {
+		videojs("gvp_video",{
+            'width': width,
+            'height': height
+        },function() {
 			mainPlayer = this;
 			this.progressTips();
-			this.width(width);
-			this.height(height);
+//			this.width(width);
+//			this.height(height);
 			this.src([
 				{type: "video/mp4", src: source+".mp4"},
 				{type: "video/webm", src: source+".webm"}
