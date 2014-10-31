@@ -22,6 +22,8 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 ####Version Change Log
 **3.2.1** (10-31-2014)  
 * Updated [video.js](https://github.com/videojs/video.js) to version 4.10.2
+* Converted CSS to SCSS
+* Combined all program themes into one SCSS file
 
 ---
 Ethan S. Lin  

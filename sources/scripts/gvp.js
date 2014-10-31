@@ -68,7 +68,6 @@ $(document).ready(function(){
 	function getSource() {
 		var urlToParse = window.location.href, src;
 
-		/* console.log("URL to parse: " + urlToParse); */
 		src = urlToParse.split("?");
 		src = src[0].split("/");
 		src = src[src.length-2];
@@ -77,17 +76,19 @@ $(document).ready(function(){
 
 	function setupIntroVideo() {
 
-		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls preload=\"metadata\" poster=\""+source+".jpg\"></video>");
+		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\"></video>");
 
-		videojs("gvp_video",{
+		videojs("gvp_video", {
 
             'width': width,
-            'height': height
+            'height': height,
+            "controls": true,
+            "poster": source + ".jpg",
+            "autoplay": false,
+            "preload": "metadata"
 
-        },function() {
+        }, function() {
 			introPlayer = this;
-//			this.width(width);
-//			this.height(height);
 			this.src([
 				{type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"},
 				{type: "video/webm", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".webm"}
@@ -104,7 +105,6 @@ $(document).ready(function(){
 
 			if (wm === false) {
 				this.src([{type: "video/mp4", src: source+".mp4"}]);
-				//$(".vjs-loading-spinner").hide();
 			}
 
 			if (wm === false && mp4 === false) {
@@ -121,36 +121,47 @@ $(document).ready(function(){
 
 	}
 
-	function setupMainVideo(poster) {
+	function setupMainVideo() {
 
-		if (typeof poster === "undefined" || typeof poster === null) {
-			poster = false;
-		}
+		var subtitle = (fileAvailable(source,"vtt","text/vtt")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" />" : "";
 
-		var subtitle = (fileAvailable(source,"vtt","text/vtt")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" default />" : "";
+		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\">"+subtitle+"</video>");
 
-		if (poster) {
-			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls poster=\""+source+".jpg\">"+subtitle+"</video>");
-		} else {
-			$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" controls> "+subtitle+" </video>");
-		}
+		videojs("gvp_video", {
 
-		videojs("gvp_video",{
             'width': width,
-            'height': height
-        },function() {
+            'height': height,
+            "controls": true,
+            "poster": source + ".jpg",
+            "autoplay": false,
+            "preload": "metadata",
+
+            plugins: {
+
+                resolutionSelector : {
+                    default_res : "normal"
+                },
+
+                loopbutton: true
+
+            }
+
+        }, function() {
 			mainPlayer = this;
 			this.progressTips();
-//			this.width(width);
-//			this.height(height);
+
 			this.src([
 				{type: "video/mp4", src: source+".mp4"},
 				{type: "video/webm", src: source+".webm"}
 			]);
+
 			if (intro) {
 				this.play();
 			}
+
 		});
+
+        videojs.options.flash.swf = "https://mediastreamer.doit.wisc.edu/uwli-ltc/media/storybook_plus_v2/sources/videoplayer/video-js.swf";
 
 		mainPlayer.on("error",function() {
 
@@ -226,20 +237,6 @@ $(document).ready(function(){
 			},
 			error: function () {
 
-				/*
-var string;
-
-				if (ext === "mp3") {
-					string = "Audio";
-				} else if (ext === "mp4") {
-					string = "Video";
-				}
-
-				if (ext !== "pdf") {
-					string += " download pending...";
-					$("#download_bar ul").prepend("<p>" + string + "</p>");
-				}
-*/
 
 			}
 		});
