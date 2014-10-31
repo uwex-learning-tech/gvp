@@ -1,182 +1,811 @@
-html,
-body {
-	margin: 0;
-	padding: 0;
-	font-family: Arial, sans-serif;
-	background-color: transparent;
-}
-.gvp_wrapper {
-	position: relative;
-	/* width:640px; */
-	float: left;
-	clear: both;
-}
-.title_bar {
-	position: absolute;
-	top:0;
-	left: 0;
-	z-index: 99;
-	/* width:610px; */
-	height:24px;
-	color:#FFF;
-	font-size:16px;
-	padding-top:6px;
-	padding-left:15px;
-	padding-right:15px;
-	background-color: #131313;
-	background: #4c4c4c;
-	background: -moz-linear-gradient(top, #383838 0%, #383838 49%, #131313 50%, #131313 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #383838), color-stop(49%, #383838), color-stop(50%, #131313), color-stop(100%, #131313));
-	background: -webkit-linear-gradient(top, #383838 0%, #383838 49%, #131313 50%, #131313 100%);
-	background: -o-linear-gradient(top, #383838 0%, #383838 49%, #131313 50%, #131313 100%);
-	background: -ms-linear-gradient(top, #383838 0%, #383838 49%, #131313 50%, #131313 100%);
-	background: linear-gradient(top, #383838 0%, #383838 49%, #131313 50%, #131313 100%);
- 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#383838', endColorstr='#131313', GradientType=0 );
-}
-.replay-button:before {
-	content: "replay";
-}
-.replay-button {
-	left: 50%;
-	margin-left: -2em;
-	top: 50%;
-	margin-top: -1em;
-	font-size: 2em;
-	display: block;
-	z-index: 2;
-	position: absolute;
-	width: 4em;
-	height: 1.6em;
-	padding-top:.4em;
-	text-align: center;
-	vertical-align: bottom;
-	cursor: pointer;
-	opacity: 1;
-	background-color: #006dcc;
-	background-color: rgba(0, 109, 204, 0.7);
-	border: 0em solid #3b4249;
-	-webkit-border-radius: 0.3em;
-	-moz-border-radius: 0.3em;
-	border-radius: 0.3em;
-	-webkit-box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
-	-moz-box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
-	box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
-	-webkit-transition: all 0.4s;
-	-moz-transition: all 0.4s;
-	-o-transition: all 0.4s;
-	transition: all 0.4s;
-}
-.newWindow-button:before {
-	content: "Launch Video in a New Window";
-}
-.newWindow-button {
-	left: 50%;
-	margin-left: -3.9em;
-	top: 25%;
-	margin-top: -1em;
-	font-size: 1.8em;
-	display: block;
-	z-index: 2;
-	position: absolute;
-	width: 8em;
-	/* height: 1.6em; */
-	color:#FFF;
-	padding: .1em .2em 0em .2em;
-	text-align: center;
-	vertical-align: bottom;
-	cursor: pointer;
-	opacity: 1;
-	background-color: #006dcc;
-	background-color: rgba(0, 109, 204, 0.7);
-	border: 0em solid #3b4249;
-	-webkit-border-radius: 0.3em;
-	-moz-border-radius: 0.3em;
-	border-radius: 0.3em;
-	-webkit-box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
-	-moz-box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
-	box-shadow: 0px 0px 1em rgba(255, 255, 255, 0.25);
-	-webkit-transition: all 0.4s;
-	-moz-transition: all 0.4s;
-	-o-transition: all 0.4s;
-	transition: all 0.4s;
-}
-.error {
-	padding: 40px 15px 0;
-	margin: 0;
-	font-weight: bold;
-	color: #ea1515;
-}
-.error small {
-	font-weight: normal;
-	display: block;
-	margin-top: 10px;
-	line-height: 1.3;
-	color:#333;
-}
-.vjs-poster {
-	background-color: #000;
+/* line 5, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+html, body, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a,
+body .gvp_wrapper #download_bar ul li a:visited,
+.default .gvp_wrapper #download_bar ul li a:visited,
+.smgt .gvp_wrapper #download_bar ul li a:visited,
+.hwm .gvp_wrapper #download_bar ul li a:visited,
+.himt .gvp_wrapper #download_bar ul li a:visited,
+.flx .gvp_wrapper #download_bar ul li a:visited,
+.il .gvp_wrapper #download_bar ul li a:visited,
+.bps .gvp_wrapper #download_bar ul li a:visited, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 100%;
+  vertical-align: baseline;
 }
 
-/* DOWNLOAD BAR */
-#download_bar {
-	width:100%;
-	margin-top: 10px;
-	text-align: right;
-	float: left;
-	clear: both;
+/* line 22, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+html, body {
+  line-height: 1;
 }
-#download_bar p {
-	font-size: 12px;
-	color: #b5b5b5;
-	font-weight: normal;
-	margin: 0px 0px 5px 0px;
-	display: inline-block;
-	margin-left: 10px;
+
+/* line 24, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+ol, ul {
+  list-style: none;
 }
-#download_bar ul {
-	width: inherit;
-	margin: 0px;
-	padding: 0px;
-	display: inline-block;
-	list-style: none;
+
+/* line 26, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
 }
-#download_bar ul li {
-	display: inline-block;
-	margin-left: 10px;
+
+/* line 28, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+caption, th, td {
+  text-align: left;
+  font-weight: normal;
+  vertical-align: middle;
 }
-#download_bar ul li:first-child {
-	margin-left: 0px;
+
+/* line 30, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+q, blockquote {
+  quotes: none;
 }
-#download_bar ul li a,
-#download_bar ul li a:visited {
-	display: block;
-	position: relative;
-	font-size: 14px;
-	text-decoration: none;
-	padding: 5px 20px 5px 28px;
-	font-weight: normal;
-	color: #818181;
-	background-color: #fdfdfd;
-	border: #939393 solid 1px;
+/* line 103, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+q:before, q:after, blockquote:before, blockquote:after {
+  content: "";
+  content: none;
 }
-#download_bar ul li a:after {
-	content:"";
-	background: url("../img/download_icon.png");
-	opacity: 0.75;
-	top: 2px;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    z-index: 1;
-    width: 30px;
-    height: 25px;
+
+/* line 32, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+a img, body .gvp_wrapper #download_bar ul li a:visited img, .default .gvp_wrapper #download_bar ul li a:visited img, .smgt .gvp_wrapper #download_bar ul li a:visited img, .hwm .gvp_wrapper #download_bar ul li a:visited img, .himt .gvp_wrapper #download_bar ul li a:visited img, .flx .gvp_wrapper #download_bar ul li a:visited img, .il .gvp_wrapper #download_bar ul li a:visited img, .bps .gvp_wrapper #download_bar ul li a:visited img {
+  border: none;
 }
-#download_bar ul li a:hover {
-	border: #333 solid 1px;
-	background-image: url("../img/download_icon.png");
-	background-repeat: no-repeat;
-	background-position: left 2px;
-	background-color: #FFF;
-	color: #333;
+
+/* line 116, ../../../../../.rvm/gems/ruby-2.1.3/gems/compass-core-1.0.1/stylesheets/compass/reset/_utilities.scss */
+article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+  display: block;
+}
+
+/* line 90, ../scss/gvp.scss */
+* {
+  outline: none;
+}
+
+/* line 94, ../scss/gvp.scss */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: transparent;
+}
+
+/* line 105, ../scss/gvp.scss */
+body .gvp_wrapper {
+  position: relative;
+  float: left;
+  clear: both;
+}
+/* line 110, ../scss/gvp.scss */
+body .gvp_wrapper .title_bar {
+  position: absolute;
+  width: 100%;
+  height: 30px;
+  color: #fff;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 4px 15px 0;
+  background: rgba(0, 0, 0, 0.85);
+  top: 0;
+  left: 0;
+  z-index: 99;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* line 125, ../scss/gvp.scss */
+body .gvp_wrapper .replay-button {
+  display: block;
+  position: absolute;
+  padding: 10px;
+  font-size: 16px;
+  text-align: center;
+  background-color: rgba(0, 109, 204, 0.7);
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  left: 46%;
+  top: 46%;
+  z-index: 2;
+}
+/* line 139, ../scss/gvp.scss */
+body .gvp_wrapper .replay-button:before {
+  content: "replay";
+}
+/* line 143, ../scss/gvp.scss */
+body .gvp_wrapper .newWindow-button {
+  display: block;
+  position: absolute;
+  padding: 10px;
+  font-size: 16px;
+  color: #fff;
+  text-align: center;
+  background-color: rgba(0, 109, 204, 0.7);
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  top: 46%;
+  left: 30%;
+  z-index: 2;
+}
+/* line 158, ../scss/gvp.scss */
+body .gvp_wrapper .newWindow-button:before {
+  content: "Launch Video in a New Window";
+}
+/* line 162, ../scss/gvp.scss */
+body .gvp_wrapper .error {
+  margin: 0;
+  padding: 40px 15px 0;
+  font-weight: bold;
+  color: #ea1515;
+}
+/* line 169, ../scss/gvp.scss */
+body .gvp_wrapper .error small {
+  display: block;
+  margin-top: 10px;
+  font-weight: normal;
+  line-height: 1.3;
+  color: #333;
+}
+/* line 179, ../scss/gvp.scss */
+body .gvp_wrapper .vjs-poster {
+  background-color: #000;
+}
+/* line 184, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar {
+  width: 100%;
+  margin-top: 10px;
+  text-align: right;
+  float: left;
+  clear: both;
+}
+/* line 191, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar p {
+  display: inline-block;
+  margin-left: 10px;
+  margin: 0 0 5px 0;
+  font-size: 12px;
+  color: #b5b5b5;
+  font-weight: normal;
+}
+/* line 202, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar ul {
+  display: inline-block;
+  width: inherit;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* line 210, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar ul li {
+  display: inline-block;
+  margin-left: 10px;
+}
+/* line 215, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar ul li a, body .gvp_wrapper #download_bar ul li a:visited, body .default .gvp_wrapper #download_bar ul li a:visited, .default body .gvp_wrapper #download_bar ul li a:visited, body .smgt .gvp_wrapper #download_bar ul li a:visited, .smgt body .gvp_wrapper #download_bar ul li a:visited, body .hwm .gvp_wrapper #download_bar ul li a:visited, .hwm body .gvp_wrapper #download_bar ul li a:visited, body .himt .gvp_wrapper #download_bar ul li a:visited, .himt body .gvp_wrapper #download_bar ul li a:visited, body .flx .gvp_wrapper #download_bar ul li a:visited, .flx body .gvp_wrapper #download_bar ul li a:visited, body .il .gvp_wrapper #download_bar ul li a:visited, .il body .gvp_wrapper #download_bar ul li a:visited, body .bps .gvp_wrapper #download_bar ul li a:visited, .bps body .gvp_wrapper #download_bar ul li a:visited {
+  display: block;
+  position: relative;
+  font-size: 14px;
+  text-decoration: none;
+  padding: 5px 20px 5px 28px;
+  font-weight: normal;
+  color: #818181;
+  background-color: #fdfdfd;
+  border: #939393 solid 1px;
+}
+/* line 231, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar ul li a:after, body .gvp_wrapper #download_bar ul li a:visited:after, body .default .gvp_wrapper #download_bar ul li a:visited:after, .default body .gvp_wrapper #download_bar ul li a:visited:after, body .smgt .gvp_wrapper #download_bar ul li a:visited:after, .smgt body .gvp_wrapper #download_bar ul li a:visited:after, body .hwm .gvp_wrapper #download_bar ul li a:visited:after, .hwm body .gvp_wrapper #download_bar ul li a:visited:after, body .himt .gvp_wrapper #download_bar ul li a:visited:after, .himt body .gvp_wrapper #download_bar ul li a:visited:after, body .flx .gvp_wrapper #download_bar ul li a:visited:after, .flx body .gvp_wrapper #download_bar ul li a:visited:after, body .il .gvp_wrapper #download_bar ul li a:visited:after, .il body .gvp_wrapper #download_bar ul li a:visited:after, body .bps .gvp_wrapper #download_bar ul li a:visited:after, .bps body .gvp_wrapper #download_bar ul li a:visited:after {
+  position: absolute;
+  width: 30px;
+  height: 25px;
+  content: "";
+  background: url("../img/download_icon.png");
+  opacity: 0.75;
+  top: 2px;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+}
+/* line 245, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar ul li a:hover, body .default .gvp_wrapper #download_bar ul li a:hover:visited, .default body .gvp_wrapper #download_bar ul li a:hover:visited, body .smgt .gvp_wrapper #download_bar ul li a:hover:visited, .smgt body .gvp_wrapper #download_bar ul li a:hover:visited, body .hwm .gvp_wrapper #download_bar ul li a:hover:visited, .hwm body .gvp_wrapper #download_bar ul li a:hover:visited, body .himt .gvp_wrapper #download_bar ul li a:hover:visited, .himt body .gvp_wrapper #download_bar ul li a:hover:visited, body .flx .gvp_wrapper #download_bar ul li a:hover:visited, .flx body .gvp_wrapper #download_bar ul li a:hover:visited, body .il .gvp_wrapper #download_bar ul li a:hover:visited, .il body .gvp_wrapper #download_bar ul li a:hover:visited, body .bps .gvp_wrapper #download_bar ul li a:hover:visited, .bps body .gvp_wrapper #download_bar ul li a:hover:visited {
+  border: #333 solid 1px;
+  background-image: url("../img/download_icon.png");
+  background-repeat: no-repeat;
+  background-position: left 2px;
+  background-color: #fff;
+  color: #333;
+}
+/* line 256, ../scss/gvp.scss */
+body .gvp_wrapper #download_bar ul li:first-child {
+  margin-left: 0;
+}
+/* line 264, ../scss/gvp.scss */
+body .gvp_wrapper .footer {
+  display: none;
+}
+
+/* line 273, ../scss/gvp.scss */
+.default {
+  border-top: 15px solid #0f4b90;
+  background-color: #333;
+}
+/* line 278, ../scss/gvp.scss */
+.default .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 283, ../scss/gvp.scss */
+.default .gvp_wrapper .logo {
+  width: 154px;
+  height: 75px;
+  background-image: url("../img/uwex_ceoel.png");
+}
+/* line 15, ../scss/gvp.scss */
+.default .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 291, ../scss/gvp.scss */
+.default .gvp_wrapper .title_bar {
+  color: #f2f2f2;
+}
+/* line 295, ../scss/gvp.scss */
+.default .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #000;
+  -webkit-box-shadow: 0 0 16px 0 #000;
+  box-shadow: 0 0 16px 0 #000;
+}
+/* line 31, ../scss/gvp.scss */
+.default .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.default .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.default .gvp_wrapper #download_bar ul li a, .default .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.default .gvp_wrapper #download_bar ul li a:after, .default .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.default .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.default .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
+}
+/* line 302, ../scss/gvp.scss */
+.default .gvp_wrapper .footer {
+  color: #a5a5a5;
+}
+
+/* line 311, ../scss/gvp.scss */
+.smgt {
+  border-top: 15px solid #5d8828;
+  background-color: #e1e1dc;
+}
+/* line 316, ../scss/gvp.scss */
+.smgt .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 321, ../scss/gvp.scss */
+.smgt .gvp_wrapper .logo {
+  background-image: url("../img/smgt.png");
+  width: 210px;
+  height: 55px;
+}
+/* line 15, ../scss/gvp.scss */
+.smgt .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 329, ../scss/gvp.scss */
+.smgt .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #8A8A8A;
+  -webkit-box-shadow: 0 0 16px 0 #8A8A8A;
+  box-shadow: 0 0 16px 0 #8A8A8A;
+}
+/* line 31, ../scss/gvp.scss */
+.smgt .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.smgt .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.smgt .gvp_wrapper #download_bar ul li a, .smgt .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.smgt .gvp_wrapper #download_bar ul li a:after, .smgt .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.smgt .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.smgt .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
+}
+
+/* line 341, ../scss/gvp.scss */
+.hwm {
+  border-top: 15px solid #48a942;
+  background-color: #fff;
+}
+/* line 346, ../scss/gvp.scss */
+.hwm .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 351, ../scss/gvp.scss */
+.hwm .gvp_wrapper .logo {
+  background-image: url("../img/hwm.png");
+  width: 224px;
+  height: 75px;
+}
+/* line 15, ../scss/gvp.scss */
+.hwm .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 359, ../scss/gvp.scss */
+.hwm .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #8A8A8A;
+  -webkit-box-shadow: 0 0 16px 0 #8A8A8A;
+  box-shadow: 0 0 16px 0 #8A8A8A;
+}
+/* line 31, ../scss/gvp.scss */
+.hwm .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.hwm .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.hwm .gvp_wrapper #download_bar ul li a, .hwm .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.hwm .gvp_wrapper #download_bar ul li a:after, .hwm .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.hwm .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.hwm .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
+}
+
+/* line 371, ../scss/gvp.scss */
+.himt {
+  border-top: 15px solid #3b658f;
+  background-color: #fff;
+}
+/* line 376, ../scss/gvp.scss */
+.himt .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 381, ../scss/gvp.scss */
+.himt .gvp_wrapper .logo {
+  background-image: url("../img/himt.png");
+  width: 203px;
+  height: 75px;
+}
+/* line 15, ../scss/gvp.scss */
+.himt .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 389, ../scss/gvp.scss */
+.himt .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #8A8A8A;
+  -webkit-box-shadow: 0 0 16px 0 #8A8A8A;
+  box-shadow: 0 0 16px 0 #8A8A8A;
+}
+/* line 31, ../scss/gvp.scss */
+.himt .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.himt .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.himt .gvp_wrapper #download_bar ul li a, .himt .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.himt .gvp_wrapper #download_bar ul li a:after, .himt .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.himt .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.himt .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
+}
+
+/* line 401, ../scss/gvp.scss */
+.flx {
+  border-top: 15px solid #b60050;
+  background-color: #fff;
+}
+/* line 406, ../scss/gvp.scss */
+.flx .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 411, ../scss/gvp.scss */
+.flx .gvp_wrapper .logo {
+  background-image: url("../img/flx.png");
+  width: 349px;
+  height: 50px;
+}
+/* line 15, ../scss/gvp.scss */
+.flx .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 419, ../scss/gvp.scss */
+.flx .gvp_wrapper .title_bar {
+  color: #6d6e70;
+}
+/* line 423, ../scss/gvp.scss */
+.flx .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #8A8A8A;
+  -webkit-box-shadow: 0 0 16px 0 #8A8A8A;
+  box-shadow: 0 0 16px 0 #8A8A8A;
+}
+/* line 31, ../scss/gvp.scss */
+.flx .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.flx .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.flx .gvp_wrapper #download_bar ul li a, .flx .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.flx .gvp_wrapper #download_bar ul li a:after, .flx .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.flx .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.flx .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
+}
+/* line 430, ../scss/gvp.scss */
+.flx .gvp_wrapper .footer {
+  color: #6d6e70;
+}
+
+/* line 439, ../scss/gvp.scss */
+.il {
+  border-top: 15px solid #017b84;
+  background-color: #fff;
+}
+/* line 444, ../scss/gvp.scss */
+.il .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 449, ../scss/gvp.scss */
+.il .gvp_wrapper .logo {
+  background-image: url("../img/il.png");
+  width: 285px;
+  height: 55px;
+}
+/* line 15, ../scss/gvp.scss */
+.il .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 457, ../scss/gvp.scss */
+.il .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #8A8A8A;
+  -webkit-box-shadow: 0 0 16px 0 #8A8A8A;
+  box-shadow: 0 0 16px 0 #8A8A8A;
+}
+/* line 31, ../scss/gvp.scss */
+.il .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.il .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.il .gvp_wrapper #download_bar ul li a, .il .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.il .gvp_wrapper #download_bar ul li a:after, .il .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.il .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.il .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
+}
+
+/* line 469, ../scss/gvp.scss */
+.bps {
+  border-top: 15px solid #333;
+  background-color: #fff;
+}
+/* line 474, ../scss/gvp.scss */
+.bps .gvp_wrapper {
+  margin: 15px auto;
+  float: none;
+}
+/* line 479, ../scss/gvp.scss */
+.bps .gvp_wrapper .logo {
+  background-image: url("../img/bps.png");
+  width: 203px;
+  height: 75px;
+}
+/* line 15, ../scss/gvp.scss */
+.bps .gvp_wrapper .title_bar {
+  position: static;
+  padding: 0;
+  margin: 15px 0;
+  color: #000;
+  font-size: 24px;
+  background: none;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+/* line 487, ../scss/gvp.scss */
+.bps .gvp_wrapper .video_holder {
+  -moz-box-shadow: 0 0 16px 0 #8A8A8A;
+  -webkit-box-shadow: 0 0 16px 0 #8A8A8A;
+  box-shadow: 0 0 16px 0 #8A8A8A;
+}
+/* line 31, ../scss/gvp.scss */
+.bps .gvp_wrapper #download_bar {
+  margin: 15px 0;
+}
+/* line 37, ../scss/gvp.scss */
+.bps .gvp_wrapper #download_bar ul li {
+  margin-left: 3px;
+}
+/* line 41, ../scss/gvp.scss */
+.bps .gvp_wrapper #download_bar ul li a, .bps .gvp_wrapper #download_bar ul li a:visited {
+  color: #333;
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  padding: 10px 20px 10px 30px;
+}
+/* line 54, ../scss/gvp.scss */
+.bps .gvp_wrapper #download_bar ul li a:after, .bps .gvp_wrapper #download_bar ul li a:visited:after {
+  opacity: 1;
+  top: 7px;
+}
+/* line 59, ../scss/gvp.scss */
+.bps .gvp_wrapper #download_bar ul li a:hover {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -moz-box-shadow: 0 1px 0 0 #ccc;
+  -webkit-box-shadow: 0 1px 0 0 #ccc;
+  box-shadow: 0 1px 0 0 #ccc;
+  background-position: left 7px;
+}
+/* line 77, ../scss/gvp.scss */
+.bps .gvp_wrapper .footer {
+  display: block;
+  color: #000;
+  font-size: 12px;
+  font-weight: normal;
+  margin: 15px 0;
 }
