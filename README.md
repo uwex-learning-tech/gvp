@@ -20,7 +20,7 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ####Version Change Log
-**3.2.2** (10-31-2014)  
+**3.2.2** (11-03-2014)  
 * Updated [video.js](https://github.com/videojs/video.js) CSS to version 4.10.0
 
 **3.2.1** (10-31-2014)  
