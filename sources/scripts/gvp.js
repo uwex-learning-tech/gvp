@@ -153,7 +153,7 @@ $(document).ready(function(){
 
 		});
 
-        videojs.options.flash.swf = "https://mediastreamer.doit.wisc.edu/uwli-ltc/media/storybook_plus_v2/sources/videoplayer/video-js.swf";
+        videojs.options.flash.swf = "https://mediastreamer.doit.wisc.edu/uwli-ltc/media/video_players/gvp_v3/sources/videoplayer/video-js.swf";
 
 		mainPlayer.on("error",function() {
 
