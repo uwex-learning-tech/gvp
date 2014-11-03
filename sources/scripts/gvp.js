@@ -85,7 +85,7 @@ $(document).ready(function(){
             "controls": true,
             "poster": source + ".jpg",
             "autoplay": false,
-            "preload": "metadata"
+            "preload": "metadata",
 
         }, function() {
 			introPlayer = this;
@@ -125,7 +125,7 @@ $(document).ready(function(){
 
 		var subtitle = (fileAvailable(source,"vtt","text/vtt")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" />" : "";
 
-		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\">"+subtitle+"</video>");
+		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\">" + subtitle + "</video>");
 
 		videojs("gvp_video", {
 
@@ -134,20 +134,12 @@ $(document).ready(function(){
             "controls": true,
             "poster": source + ".jpg",
             "autoplay": false,
-            "preload": "metadata",
-
-            plugins: {
-
-                resolutionSelector : {
-                    default_res : "normal"
-                },
-
-                loopbutton: true
-
-            }
+            "preload": "metadata"
 
         }, function() {
+
 			mainPlayer = this;
+
 			this.progressTips();
 
 			this.src([
