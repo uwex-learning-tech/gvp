@@ -1,6 +1,8 @@
 document.createElement('video');document.createElement('audio');document.createElement('track');
 /* global videojs */
 
+var ROOT_PATH = "https://media.uwex.edu/";
+
 $(document).ready(function(){
 
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
@@ -90,8 +92,8 @@ $(document).ready(function(){
         }, function() {
 			introPlayer = this;
 			this.src([
-				{type: "video/mp4", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".mp4"},
-				{type: "video/webm", src:"https://mediastreamer.doit.wisc.edu/uwli-ltc/media/intro_videos/"+intro+".webm"}
+				{type: "video/mp4", src:"" + ROOT_PATH + "media/intro_videos/"+intro+".mp4"},
+				{type: "video/webm", src:"" + ROOT_PATH + "media/intro_videos/"+intro+".webm"}
 			]);
 		});
 
@@ -153,7 +155,7 @@ $(document).ready(function(){
 
 		});
 
-        videojs.options.flash.swf = "https://mediastreamer.doit.wisc.edu/uwli-ltc/media/video_players/gvp_v3/sources/videoplayer/video-js.swf";
+        videojs.options.flash.swf = "" + ROOT_PATH + "media/video_players/gvp_v3/sources/videoplayer/video-js.swf";
 
 		mainPlayer.on("error",function() {
 
@@ -264,7 +266,8 @@ $(document).ready(function(){
 		return isAvilable;
 	}
 
-	function isMobile() {
+	/*
+function isMobile() {
 
 		var ua = navigator.userAgent,
 			checker = {
@@ -279,6 +282,7 @@ $(document).ready(function(){
 		return false;
 
 	}
+*/
 
 	function setupPlayer() {
 
@@ -313,7 +317,8 @@ $(document).ready(function(){
 			"width": width+"px"
 		});
 
-		if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
+		/*
+if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
 
 			$(".video_holder").css({
 				"background-image":"url("+source+".jpg)",
@@ -336,6 +341,7 @@ $(document).ready(function(){
 			});
 
 		} else {
+*/
 
 			if (intro) {
 				setupIntroVideo();
@@ -350,7 +356,7 @@ $(document).ready(function(){
 				}
 			});
 
-		}
+		// }
 	}
 
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
