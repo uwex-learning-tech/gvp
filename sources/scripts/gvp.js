@@ -1,7 +1,19 @@
+/*
+ * Generic Video Player (GVP) JS
+ *
+ * @author: Ethan Lin
+ * @url: https://github.com/oel-mediateam/gvp
+ * @version: 3.2.4
+ *
+ * @license: The MIT License (MIT)
+ * Copyright (c) 2014 UW-EX CEOEL
+ *
+ */
+
 document.createElement('video');document.createElement('audio');document.createElement('track');
 /* global videojs */
 
-var ROOT_PATH = "https://media.uwex.edu/";
+var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/content/";
 
 $(document).ready(function(){
 
@@ -73,7 +85,7 @@ $(document).ready(function(){
 		src = urlToParse.split("?");
 		src = src[0].split("/");
 		src = src[src.length-2];
-		source = src;
+		source = src.toLowerCase();
 	}
 
 	function setupIntroVideo() {
