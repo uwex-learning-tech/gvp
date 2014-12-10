@@ -1,5 +1,5 @@
 #Generic Video Player
-**_version 3.2.3_**
+**_version 3.2.4_**
 
 ### Minimum Supported Web Browsers
 * Internet Explorer 9+
@@ -20,6 +20,9 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ####Version Change Log
+**3.2.4** (12-10-2014)  
+* Updated VideoJS to version 4.11.1, which resolved source not found issue on Firefox.
+
 **3.2.3** (11-20-2014)  
 * Updated to work with the new media web server
 * index.html filed updated
