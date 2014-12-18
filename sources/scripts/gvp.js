@@ -13,7 +13,7 @@
 document.createElement('video');document.createElement('audio');document.createElement('track');
 /* global videojs */
 
-var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/content/";
+var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
 
 $(document).ready(function(){
 
@@ -104,8 +104,8 @@ $(document).ready(function(){
         }, function() {
 			introPlayer = this;
 			this.src([
-				{type: "video/mp4", src:"" + ROOT_PATH + "media/intro_videos/"+intro+".mp4"},
-				{type: "video/webm", src:"" + ROOT_PATH + "media/intro_videos/"+intro+".webm"}
+				{type: "video/mp4", src:"" + ROOT_PATH + "intro_videos/"+intro+".mp4"},
+				{type: "video/webm", src:"" + ROOT_PATH + "intro_videos/"+intro+".webm"}
 			]);
 		});
 
@@ -167,7 +167,7 @@ $(document).ready(function(){
 
 		});
 
-        videojs.options.flash.swf = "" + ROOT_PATH + "media/video_players/gvp_v3/sources/videoplayer/video-js.swf";
+        videojs.options.flash.swf = "" + ROOT_PATH + "videoplayer/video-js.swf";
 
 		mainPlayer.on("error",function() {
 
