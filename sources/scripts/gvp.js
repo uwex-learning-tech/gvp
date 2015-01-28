@@ -3,15 +3,16 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp
- * @version: 3.2.4
+ * @version: 3.3.0
  *
  * @license: The MIT License (MIT)
  * Copyright (c) 2014 UW-EX CEOEL
  *
  */
 
-document.createElement('video');document.createElement('audio');document.createElement('track');
+//document.createElement('video');document.createElement('audio');document.createElement('track');
 /* global videojs */
+/* global kWidget */
 
 var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
 
@@ -20,8 +21,9 @@ $(document).ready(function(){
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
 	var width = 640, height = 360, intro = 0,
-		introPlayer, mainPlayer, source,
-		programs = ["smgt","msmgt","hwm","himt","bps","il","flx"];
+		source,
+		programs = ["smgt","msmgt","hwm","himt","bps","il","flx"],
+		isKaltura = false, kalturaId, kOptions;
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -90,6 +92,13 @@ $(document).ready(function(){
 
 		source = src.toLowerCase();
 
+		$.get( 'kaltura.txt', function(data) {
+
+            kalturaId = data.trim();
+    		isKaltura = true;
+
+		} ).always( setupPlayer );
+
 	}
 
 	function setupIntroVideo() {
@@ -107,106 +116,187 @@ $(document).ready(function(){
 
         }, function() {
 
-			introPlayer = this;
 			this.src([
 				{type: "video/mp4", src: "https://media.uwex.edu/content/media/intro_videos/"+intro+".mp4"},
 				{type: "video/webm", src: "https://media.uwex.edu/content/media/intro_videos/"+intro+".webm"}
 			]);
 
-		});
+			this.on("ended", function() {
+    			this.dispose();
+                setupMainVideo();
+			} );
 
-		introPlayer.on("error",function() {
-
-			var mp4 = fileAvailable(intro,"mp4","video/mp4"), wm = fileAvailable(intro,"webm","video/webm");
-
-			if (mp4 === false) {
-				this.src([{type: "video/webm", src: source+".webm"}]);
-			}
-
-			if (wm === false) {
-				this.src([{type: "video/mp4", src: source+".mp4"}]);
-			}
-
-			if (wm === false && mp4 === false) {
-				this.dispose();
-				$(".video_holder").html("<p class=\"error\">Video Error: intro video not found!<small>Intro video code "+ intro +" is not found or does not exist on the centralized location. Please double check the intro video code table for the correct intro video number.</small></p><p class=\"error\">If you see this message, both MP4 and WebM are not found.</p>");
-			}
-
-		});
-
-		introPlayer.on("ended", function() {
-			this.dispose();
-			setupMainVideo();
 		});
 
 	}
 
 	function setupMainVideo() {
 
-		var subtitle = (fileAvailable(source,"vtt","text/vtt")) ? subtitle = "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" />" : "";
+        $(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\"></video>");
 
-		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\">" + subtitle + "</video>");
+        var video = $("#gvp_video");
 
-		videojs("gvp_video", {
+		kOptions = {
 
+            techOrder: ["html5", "flash"],
             'width': width,
             'height': height,
             "controls": true,
-            "poster": source + ".jpg",
+            "poster": source + '.jpg',
             "autoplay": false,
-            "preload": "metadata"
+            "preload": "auto",
+            "plugins": null
 
-        }, function() {
+        };
 
-			mainPlayer = this;
+		if ( isKaltura ) {
 
-			this.progressTips();
+    		$.getScript( "../sources/scripts/mwembedloader.js", function() {
 
-			this.src([
-				{type: "video/mp4", src: source+".mp4"},
-				{type: "video/webm", src: source+".webm"}
-			]);
+        		$.getScript( "../sources/scripts/kwidget.getsources.js", function() {
 
-			if (intro) {
-				this.play();
-			}
+            		var entryId, captionId, captionExt, captionLang, flavors = {}, posterImg;
 
-		});
+                    kWidget.getSources( {
 
-        videojs.options.flash.swf = "" + ROOT_PATH + "videoplayer/video-js.swf";
+                        'partnerId': 1660872,
+                        'entryId': kalturaId,
+                        'callback': function( data ) {
 
-		mainPlayer.on("error",function() {
+                            entryId = data.entryId;
+                            captionId = data.captionId;
+                            captionExt = data.captionExt;
+                            captionLang = data.captionLang;
 
-			var mp4 = fileAvailable(source,"mp4","video/mp4"), wm = fileAvailable(source,"webm","video/webm");
+                            posterImg = "https://cdnsecakmi.kaltura.com/p/1660872/sp/166087200/thumbnail/entry_id/"+entryId+"/width/"+kOptions.width+"/height/"+kOptions.height;
 
-			if (mp4 === false) {
+                            $(".title_bar").html(data.name);
 
-				this.src([{type: "video/webm", src: source+".webm"}]);
+                            for( var i in data.sources ) {
 
-			}
+                                var kSource = data.sources[i];
 
-			if (wm === false) {
-				this.src([{type: "video/mp4", src: source+".mp4"}]);
-				//$(".vjs-loading-spinner").hide();
-			}
+                                if ( kSource.flavorParamsId === 487061 ) {
 
-			if (mp4 === false && wm === false) {
-				this.dispose();
-				$(".video_holder").html("<p class=\"error\">Video Error: video not found!<small>Video file \"<strong>"+ source +"</strong>\" is not found. Please double check the video file name. The file name must match the directory name.</small></p><p class=\"error\">If you see this message, both MP4 and WebM are not found.</p>");
-			}
+                                    flavors.low = kSource.src;
 
-		});
+                                }
 
-		mainPlayer.on("ended", function() {
-			this.currentTime(0);
-			$(".vjs-poster").delay(6000).queue(function() {
-				$(this).css("background-image","url("+source+".jpg)").html("<span class=\"replay-button\"></span>").show();
-			});
-		});
+                                if ( kSource.flavorParamsId === 487071 ) {
+
+                                    flavors.normal = kSource.src;
+
+                                }
+
+                                if ( kSource.flavorParamsId === 487081 ) {
+
+                                    flavors.high = kSource.src;
+
+                                }
+
+                                if ( kSource.flavorParamsId === 487111 ) {
+
+                                    flavors.webm = kSource.src;
+
+                                }
+
+                            } // end for loop
+
+                            // set low res vid if available
+                            if ( flavors.low !== undefined ) {
+                                video.append("<source src=\"" + flavors.low + "\" type=\"video/mp4\" data-res=\"low\" />");
+                            }
+
+                            // set normal res vid
+                            video.append("<source src=\"" + flavors.normal + "\" type=\"video/mp4\" data-res=\"normal\" data-default=\"true\" />");
+
+                            // set high res vid if available
+                            if ( flavors.low !== undefined ) {
+                                video.append("<source src=\"" + flavors.high + "\" type=\"video/mp4\" data-res=\"high\" />");
+                            }
+
+                            if ( flavors.webm !== undefined && $.fn.supportWebm() ) {
+                                video.append("<source src=\"" + flavors.webm + "\" type=\"video/webm\" />");
+                            }
+
+                            // set caption track if available
+                            if ( captionId !== null ) {
+                                video.append("<track kind=\"subtitles\" src=\"https://cdnapisec.kaltura.com/api_v3/index.php/service/caption_captionAsset/action/serve/captionAssetId/" + captionId + "\" srclang=\"en\" label=\"English\">");
+                            }
+
+                            kOptions.poster = posterImg;
+                            kOptions.plugins = { resolutionSelector: { default_res: 'normal' } };
+
+                            loadPlayer();
+                            getDownloadableFiles( data.downloadUrl );
+
+                        }
+
+                    } );
+
+        		} );
+
+    		} );
+
+		} else {
+
+            $.get( source + ".vtt", function() {
+
+        		video.append( "<track src=\""+source+".vtt\" kind=\"subtitles\" srcland=\"en\" label=\"English\" />" );
+
+    		} ).always( function() {
+
+                video.append("<source src=\"" + source + ".mp4\" type=\"video/mp4\" />");
+        		loadPlayer();
+        		getDownloadableFiles( "" );
+
+    		} );
+
+		}
 
 	}
 
-	function getDownloadableFiles() {
+	function loadPlayer() {
+
+        if ( $.fn.supportMp4() === false && $.fn.supportWebm() === false ) {
+
+            kOptions.techOrder = ["flash", "html5"];
+            kOptions.plugins = null;
+
+        }
+
+		videojs("gvp_video", kOptions, function() {
+
+                var player = this;
+
+    			this.progressTips();
+
+    			if ( intro ) {
+    				this.play();
+    			}
+
+    			this.on( "ended", function() {
+
+        			$(".vjs-poster").delay(3000).queue(function() {
+        				$(this).html("<span class=\"replay-button\"></span>").show();
+        				player.currentTime(0);
+        			});
+
+        			$( ".vjs-poster" ).on( "click", function() {
+            			$( ".vjs-poster" ).hide();
+            			player.play();
+        			});
+
+
+    			} );
+
+    		});
+
+            videojs.options.flash.swf = ROOT_PATH + "videoplayer/video-js.swf";
+
+	}
+
+	function getDownloadableFiles( kUrl ) {
 
         var downloadBar = $("#download_bar ul");
     	var fileName;
@@ -215,31 +305,55 @@ $(document).ready(function(){
 		url = url.substr(0,url.lastIndexOf("/")+1);
 		fileName = url + source;
 
-        // get mp4
-        $.get( url + source + ".mp4", function() {
+		if ( kUrl.length >= 1 ) {
 
-            downloadBar.append("<li><a href=\"" + fileName + ".mp4\" target=\"_blank\">Video</a></li>");
+    		downloadBar.append("<li><a href=\"" + kUrl + "\" target=\"_blank\">Video</a></li>");
 
-        } ).always( function() {
+    		// get pdf
+            $.get( url + source + ".pdf", function() {
 
-            // get mp3
-            $.get( url + source + ".mp3", function() {
-
-                downloadBar.append("<li><a href=\"" + fileName + ".mp3\" target=\"_blank\">Audio</a></li>");
+                downloadBar.append("<li><a href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
 
             } ).always( function() {
 
-                // get pdf
-                $.get( url + source + ".pdf", function() {
+                // get supplement zip
+                $.get( url + source + ".zip", function() {
 
-                    downloadBar.append("<li><a href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
+                    downloadBar.append("<li><a href=\"" + fileName + ".zip\" target=\"_blank\">Supplement</a></li>");
+
+                } );
+
+            } );
+
+        } else {
+
+            // get mp4
+            $.get( url + source + ".mp4", function() {
+
+                downloadBar.append("<li><a href=\"" + fileName + ".mp4\" target=\"_blank\">Video</a></li>");
+
+            } ).always( function() {
+
+                // get mp3
+                $.get( url + source + ".mp3", function() {
+
+                    downloadBar.append("<li><a href=\"" + fileName + ".mp3\" target=\"_blank\">Audio</a></li>");
 
                 } ).always( function() {
 
-                    // get supplement zip
-                    $.get( url + source + ".zip", function() {
+                    // get pdf
+                    $.get( url + source + ".pdf", function() {
 
-                        downloadBar.append("<li><a href=\"" + fileName + ".zip\" target=\"_blank\">Supplement</a></li>");
+                        downloadBar.append("<li><a href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
+
+                    } ).always( function() {
+
+                        // get supplement zip
+                        $.get( url + source + ".zip", function() {
+
+                            downloadBar.append("<li><a href=\"" + fileName + ".zip\" target=\"_blank\">Supplement</a></li>");
+
+                        } );
 
                     } );
 
@@ -247,37 +361,13 @@ $(document).ready(function(){
 
             } );
 
-        } );
+        }
 
-	}
-
-	function fileAvailable( file, ext, file_type ) {
-
-		var isAvilable = false;
-
-		$.ajax({
-			url: file + "." + ext,
-			type: 'HEAD',
-			dataType: 'text',
-			contentType: file_type,
-			// async: false,
-			beforeSend: function (xhr) {
-				xhr.overrideMimeType(file_type);
-				xhr.setRequestHeader("Accept", file_type);
-			},
-			success: function () {
-				isAvilable = true;
-			},
-			error: function () {
-				isAvilable = false;
-			}
-		});
-
-		return isAvilable;
 	}
 
 	function setupPlayer() {
 
+        // if not in a iFrame
 		if (window.self === window.top) {
 
 			var d = new Date();
@@ -328,7 +418,19 @@ $(document).ready(function(){
 
 	getQueryStringValues();
 	getSource();
-	setupPlayer();
-	getDownloadableFiles();
 
 });
+
+ $.fn.supportWebm = function () {
+
+     return !!document.createElement( 'video' )
+                    .canPlayType( 'video/webm; codecs="vp8.0, vorbis"' );
+
+ };
+
+ $.fn.supportMp4 = function () {
+
+     return !!document.createElement( 'video' )
+                    .canPlayType( 'video/mp4; codecs="avc1.4D401E, mp4a.40.2"' );
+
+ };
