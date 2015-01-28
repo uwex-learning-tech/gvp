@@ -80,12 +80,16 @@ $(document).ready(function(){
 	}
 
 	function getSource() {
-		var urlToParse = window.location.href, src;
+
+		var urlToParse = window.location.href;
+		var src;
 
 		src = urlToParse.split("?");
 		src = src[0].split("/");
 		src = src[src.length-2];
+
 		source = src.toLowerCase();
+
 	}
 
 	function setupIntroVideo() {
@@ -102,11 +106,13 @@ $(document).ready(function(){
             "preload": "metadata",
 
         }, function() {
+
 			introPlayer = this;
 			this.src([
-				{type: "video/mp4", src:"" + ROOT_PATH + "intro_videos/"+intro+".mp4"},
-				{type: "video/webm", src:"" + ROOT_PATH + "intro_videos/"+intro+".webm"}
+				{type: "video/mp4", src: "https://media.uwex.edu/content/media/intro_videos/"+intro+".mp4"},
+				{type: "video/webm", src: "https://media.uwex.edu/content/media/intro_videos/"+intro+".webm"}
 			]);
+
 		});
 
 		introPlayer.on("error",function() {
@@ -200,70 +206,61 @@ $(document).ready(function(){
 
 	}
 
-	function dowloadableFile(file, ext) {
+	function getDownloadableFiles() {
 
-		var content_type;
+        var downloadBar = $("#download_bar ul");
+    	var fileName;
+    	var url = window.location.href;
 
-		if (ext === "pdf") {
-			content_type = "application/pdf";
-		} else if (ext === "mp3") {
-			content_type = "audio/mpeg";
-		} else if (ext === "mp4") {
-			content_type = "video/mp4";
-		}
+		url = url.substr(0,url.lastIndexOf("/")+1);
+		fileName = url + source;
 
-		$.ajax({
-			url: file + "." + ext,
-			type: 'HEAD',
-			dataType: 'text',
-			contentType: content_type,
-			async: false,
-			beforeSend: function (xhr) {
-				xhr.overrideMimeType(content_type);
-				xhr.setRequestHeader("Accept", content_type);
-			},
-			success: function () {
+        // get mp4
+        $.get( url + source + ".mp4", function() {
 
-				var f = file, downloadBar = $("#download_bar ul");
+            downloadBar.append("<li><a href=\"" + fileName + ".mp4\" target=\"_blank\">Video</a></li>");
 
-				if (location.protocol !== "http:") {
-					var url = window.location.href;
-					url = url.substr(0,url.lastIndexOf("/")+1).replace("https","http");
-					f = url + file;
-				}
+        } ).always( function() {
 
-				if (ext === "pdf") {
-					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Transcript</a></li>");
-				} else if (ext === "mp3") {
-					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Audio</a></li>");
-				} else if (ext === "mp4") {
-					downloadBar.append("<li><a href=\"" + f + "." + ext + "\" target=\"_blank\">Video</a></li>");
-				}
+            // get mp3
+            $.get( url + source + ".mp3", function() {
 
-			},
-			error: function () {
+                downloadBar.append("<li><a href=\"" + fileName + ".mp3\" target=\"_blank\">Audio</a></li>");
 
+            } ).always( function() {
 
-			}
-		});
-	}
+                // get pdf
+                $.get( url + source + ".pdf", function() {
 
-	function getDownloadableFiles(){
+                    downloadBar.append("<li><a href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
 
-		dowloadableFile(source,"mp4");
-		dowloadableFile(source,"mp3");
-		dowloadableFile(source,"pdf");
+                } ).always( function() {
+
+                    // get supplement zip
+                    $.get( url + source + ".zip", function() {
+
+                        downloadBar.append("<li><a href=\"" + fileName + ".zip\" target=\"_blank\">Supplement</a></li>");
+
+                    } );
+
+                } );
+
+            } );
+
+        } );
 
 	}
 
-	function fileAvailable(file,ext,file_type) {
+	function fileAvailable( file, ext, file_type ) {
+
 		var isAvilable = false;
+
 		$.ajax({
 			url: file + "." + ext,
 			type: 'HEAD',
 			dataType: 'text',
 			contentType: file_type,
-			async: false,
+			// async: false,
 			beforeSend: function (xhr) {
 				xhr.overrideMimeType(file_type);
 				xhr.setRequestHeader("Accept", file_type);
@@ -275,26 +272,9 @@ $(document).ready(function(){
 				isAvilable = false;
 			}
 		});
+
 		return isAvilable;
 	}
-
-	/*
-function isMobile() {
-
-		var ua = navigator.userAgent,
-			checker = {
-				ios: ua.match(/(iPad|iPhone|iPod)/g),
-				blackberry: ua.match(/BlackBerry/),
-				android: ua.match(/Android/),
-				window: ua.match(/IEMobile/)
-			};
-
-		if (checker.ios || checker.blackberry || checker.android) { return true; }
-
-		return false;
-
-	}
-*/
 
 	function setupPlayer() {
 
@@ -329,46 +309,19 @@ function isMobile() {
 			"width": width+"px"
 		});
 
-		/*
-if (isMobile() && (getParameterByName("m") === 0 || getParameterByName("m") === "")) {
-
-			$(".video_holder").css({
-				"background-image":"url("+source+".jpg)",
-				"width": width+"px",
-				"height": height+"px",
-				"cursor":"pointer"
-			}).html("<span class=\"newWindow-button\"></span>")
-			.on("click",function() {
-				var url = window.location.href;
-
-				url = url.replace("https", "http").replace(/intro=[0-9]+/g, "intro=0");
-
-				if (window.location.search) {
-					url += "&m=1";
-				} else {
-					url += "?m=1";
-				}
-
-				window.open(url);
-			});
-
+		if (intro) {
+			setupIntroVideo();
 		} else {
-*/
+			setupMainVideo(true);
+		}
 
-			if (intro) {
-				setupIntroVideo();
-			} else {
-				setupMainVideo(true);
+		// hide the title bar when playback begins
+		$(".video_holder").click(function() {
+			if (window.self !== window.top) {
+				$(".title_bar").hide();
 			}
+		});
 
-			// hide the title bar when playback begins
-			$(".video_holder").click(function() {
-				if (window.self !== window.top) {
-					$(".title_bar").hide();
-				}
-			});
-
-		// }
 	}
 
 	/*************************** MAIN CODES (FUNCTION CALLINGS) ***************************************/
