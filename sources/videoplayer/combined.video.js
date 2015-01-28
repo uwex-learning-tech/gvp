@@ -1,3 +1,11 @@
+/*
+ * VIDEO.JS
+ * @version: 4.11.4
+ *
+ * @license: Apache License, Version 2.0
+ *
+ */
+
 /**
  * @fileoverview Main function src.
  */

@@ -6,15 +6,15 @@
  * @version: 3.3.0
  *
  * @license: The MIT License (MIT)
- * Copyright (c) 2014 UW-EX CEOEL
+ * Copyright (c) 2015 UWEX CEOEL
  *
  */
 
-//document.createElement('video');document.createElement('audio');document.createElement('track');
 /* global videojs */
 /* global kWidget */
 
-var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
+//var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
+var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/app/generic_video_player_v3/";
 
 $(document).ready(function(){
 
@@ -151,9 +151,9 @@ $(document).ready(function(){
 
 		if ( isKaltura ) {
 
-    		$.getScript( "../sources/scripts/mwembedloader.js", function() {
+    		$.getScript( ROOT_PATH + "scripts/mwembedloader.js", function() {
 
-        		$.getScript( "../sources/scripts/kwidget.getsources.js", function() {
+        		$.getScript( ROOT_PATH + "scripts/kwidget.getsources.js", function() {
 
             		var entryId, captionId, captionExt, captionLang, flavors = {}, posterImg;
 
