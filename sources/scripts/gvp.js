@@ -20,7 +20,7 @@ $(document).ready(function(){
 
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
-	var width = 640, height = 360, intro = 0,
+	var width = 640, height = 360, intro = -1,
 		source,
 		programs = ["smgt","msmgt","hwm","himt","bps","il","flx"],
 		isKaltura = false, kalturaId, kOptions;
@@ -105,25 +105,35 @@ $(document).ready(function(){
 
 		$(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\"></video>");
 
-		videojs("gvp_video", {
+		var options = {
 
+    		techOrder: ["html5", "flash"],
             'width': width,
             'height': height,
             "controls": true,
-            "poster": source + ".jpg",
+            "poster": source + '.jpg',
             "autoplay": false,
-            "preload": "metadata",
+            "preload": "auto"
 
-        }, function() {
+		};
+
+		if ( isKaltura ) {
+
+    		options.poster = "https://cdnsecakmi.kaltura.com/p/1660872/sp/166087200/thumbnail/entry_id/"+kalturaId+"/width/"+width+"/height/"+height;
+
+		}
+
+		videojs("gvp_video", options, function() {
 
 			this.src([
 				{type: "video/mp4", src: "https://media.uwex.edu/content/media/intro_videos/"+intro+".mp4"},
 				{type: "video/webm", src: "https://media.uwex.edu/content/media/intro_videos/"+intro+".webm"}
 			]);
 
-			this.on("ended", function() {
+			this.on( "ended", function() {
     			this.dispose();
                 setupMainVideo();
+                intro = 0;
 			} );
 
 		});
@@ -144,7 +154,7 @@ $(document).ready(function(){
             "controls": true,
             "poster": source + '.jpg',
             "autoplay": false,
-            "preload": "auto",
+            "preload": "metadata",
             "plugins": null
 
         };
@@ -271,8 +281,12 @@ $(document).ready(function(){
 
     			this.progressTips();
 
-    			if ( intro ) {
-    				this.play();
+    			if ( intro === 0 ) {
+
+    				this.on( 'loadedmetadata', function() {
+        				this.play();
+    				} );
+
     			}
 
     			this.on( "ended", function() {
@@ -399,10 +413,10 @@ $(document).ready(function(){
 			"width": width+"px"
 		});
 
-		if (intro) {
+		if (intro > 0) {
 			setupIntroVideo();
 		} else {
-			setupMainVideo(true);
+			setupMainVideo();
 		}
 
 		// hide the title bar when playback begins
