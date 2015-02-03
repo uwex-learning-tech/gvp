@@ -1,5 +1,5 @@
 #Generic Video Player
-**_version 3.2.4_**
+**_version 3.3.0_**
 
 ### Minimum Supported Web Browsers
 * Internet Explorer 9+
@@ -10,7 +10,7 @@
 
 *Latest stable version is always recommended.*
 
-For documentation, please visit: https://mediastreamer.doit.wisc.edu/uwli-ltc/media/documentation/
+For documentation, please visit https://media.uwex.edu/resources/documentation/generic-video-player-v3/
 
 ---
 ###Bug Reporting and Questions
@@ -20,6 +20,12 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ####Version Change Log
+**3.3.0** (02-03-2015)  
+* Updated jQuery to version 2.1.3
+* Updated VideoJS to version 4.11.4
+* Add Kaltura integration
+* Refactored download files function
+
 **3.2.4** (12-10-2014)  
 * Updated VideoJS to version 4.11.1, which resolved source not found issue on Firefox.
 

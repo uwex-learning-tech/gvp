@@ -13,8 +13,8 @@
 /* global videojs */
 /* global kWidget */
 
-//var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
-var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/app/generic_video_player_v3/";
+var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
+// var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/app/generic_video_player_v3/";
 
 $(document).ready(function(){
 
