@@ -184,7 +184,6 @@ if( ! window.kWidget ){
 				settings.callback({
 					'poster': result[1]['thumbnailUrl'],
 					'duration': result[1]['duration'],
-					'downloadUrl': result[1]['downloadUrl'],
 					'name': result[1]['name'],
 					'entryId' :  result[1]['id'],
 					//'description': result[2]['description'],

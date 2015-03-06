@@ -3,7 +3,7 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp
- * @version: 3.3.0
+ * @version: 3.3.1
  *
  * @license: The MIT License (MIT)
  * Copyright (c) 2015 UWEX CEOEL
@@ -165,7 +165,7 @@ $(document).ready(function(){
 
         		$.getScript( ROOT_PATH + "scripts/kwidget.getsources.js", function() {
 
-            		var entryId, captionId, captionExt, captionLang, flavors = {}, posterImg;
+            		var entryId, captionId, captionExt, captionLang, flavors = {}, posterImg, downloadSrc = "";
 
                     kWidget.getSources( {
 
@@ -190,17 +190,35 @@ $(document).ready(function(){
 
                                     flavors.low = kSource.src;
 
+                                    if ( downloadSrc.length <= 0 ) {
+
+                                        downloadSrc = kSource.src;
+
+                                    }
+
                                 }
 
                                 if ( kSource.flavorParamsId === 487071 ) {
 
                                     flavors.normal = kSource.src;
 
+                                    if ( downloadSrc.length <= 0 ) {
+
+                                        downloadSrc = kSource.src;
+
+                                    }
+
                                 }
 
                                 if ( kSource.flavorParamsId === 487081 ) {
 
                                     flavors.high = kSource.src;
+
+                                    if ( downloadSrc.length <= 0 ) {
+
+                                        downloadSrc = kSource.src;
+
+                                    }
 
                                 }
 
@@ -238,7 +256,7 @@ $(document).ready(function(){
                             kOptions.plugins = { resolutionSelector: { default_res: 'normal' } };
 
                             loadPlayer();
-                            getDownloadableFiles( data.downloadUrl );
+                            getDownloadableFiles( downloadSrc );
 
                         }
 

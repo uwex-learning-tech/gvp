@@ -1,5 +1,5 @@
 #Generic Video Player
-**_version 3.3.0_**
+**_version 3.3.1_**
 
 ### Minimum Supported Web Browsers
 * Internet Explorer 9+
@@ -20,6 +20,9 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ####Version Change Log
+**3.3.1** (03-06-2015)  
+* Fixed the Kaltura download video
+
 **3.3.0** (02-03-2015)  
 * Updated jQuery to version 2.1.3
 * Updated VideoJS to version 4.11.4
