@@ -3,7 +3,7 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp
- * @version: 3.3.1
+ * @version: 3.3.2
  *
  * @license: The MIT License (MIT)
  * Copyright (c) 2015 UWEX CEOEL
@@ -339,12 +339,12 @@ $(document).ready(function(){
 
 		if ( kUrl.length >= 1 ) {
 
-    		downloadBar.append("<li><a href=\"" + kUrl + "\" target=\"_blank\">Video</a></li>");
+    		downloadBar.append("<li><a download=\""+source+".mp4\" href=\"" + kUrl + "\" target=\"_blank\">Video</a></li>");
 
     		// get pdf
             $.get( url + source + ".pdf", function() {
 
-                downloadBar.append("<li><a href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
+                downloadBar.append("<li><a download=\""+source+".pdf\" href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
 
             } ).always( function() {
 
@@ -362,21 +362,21 @@ $(document).ready(function(){
             // get mp4
             $.get( url + source + ".mp4", function() {
 
-                downloadBar.append("<li><a href=\"" + fileName + ".mp4\" target=\"_blank\">Video</a></li>");
+                downloadBar.append("<li><a download=\""+source+".mp4\" href=\"" + fileName + ".mp4\" target=\"_blank\">Video</a></li>");
 
             } ).always( function() {
 
                 // get mp3
                 $.get( url + source + ".mp3", function() {
 
-                    downloadBar.append("<li><a href=\"" + fileName + ".mp3\" target=\"_blank\">Audio</a></li>");
+                    downloadBar.append("<li><a download=\""+source+".mp3\" href=\"" + fileName + ".mp3\" target=\"_blank\">Audio</a></li>");
 
                 } ).always( function() {
 
                     // get pdf
                     $.get( url + source + ".pdf", function() {
 
-                        downloadBar.append("<li><a href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
+                        downloadBar.append("<li><a download=\""+source+".pdf\" href=\"" + fileName + ".pdf\" target=\"_blank\">Transcript</a></li>");
 
                     } ).always( function() {
 

@@ -1,12 +1,12 @@
 #Generic Video Player
-**_version 3.3.1_**
+**_version 3.3.2_**
 
 ### Minimum Supported Web Browsers
-* Internet Explorer 9+
-* Mozilla Firefox 30+
 * Google Chrome 33+
+* Mozilla Firefox 30+
 * Apple Safari 5+
 * Opera 20+
+* Internet Explorer 9+
 
 *Latest stable version is always recommended.*
 
@@ -20,6 +20,9 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ####Version Change Log
+**3.3.2** (03-09-2015)  
+* Added HTML5 download attribute to download links
+
 **3.3.1** (03-06-2015)  
 * Fixed the Kaltura download video
 
