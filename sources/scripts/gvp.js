@@ -13,8 +13,8 @@
 /* global videojs */
 /* global kWidget */
 
-var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
-// var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/app/generic_video_player_v3/";
+// var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
+var ROOT_PATH = "../sources/";
 
 $(document).ready(function(){
 
@@ -22,8 +22,8 @@ $(document).ready(function(){
 
 	var width = 640, height = 360, intro = -1,
 		source,
-		programs = ["smgt","msmgt","hwm","himt","bps","il","flx"],
-		isKaltura = false, kalturaId, kOptions;
+		programs = ["smgt","msmgt","hwm","himt","bps","il","flx","ds"],
+		isKaltura = false, kalturaId, kOptions, flavors = {};
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -165,7 +165,7 @@ $(document).ready(function(){
 
         		$.getScript( ROOT_PATH + "scripts/kwidget.getsources.js", function() {
 
-            		var entryId, captionId, captionExt, captionLang, flavors = {}, posterImg, downloadSrc = "";
+            		var entryId, captionId, captionExt, captionLang, posterImg, downloadSrc = "";
 
                     kWidget.getSources( {
 
@@ -230,30 +230,13 @@ $(document).ready(function(){
 
                             } // end for loop
 
-                            // set low res vid if available
-                            if ( flavors.low !== undefined ) {
-                                video.append("<source src=\"" + flavors.low + "\" type=\"video/mp4\" data-res=\"low\" />");
-                            }
-
-                            // set normal res vid
-                            video.append("<source src=\"" + flavors.normal + "\" type=\"video/mp4\" data-res=\"normal\" data-default=\"true\" />");
-
-                            // set high res vid if available
-                            if ( flavors.low !== undefined ) {
-                                video.append("<source src=\"" + flavors.high + "\" type=\"video/mp4\" data-res=\"high\" />");
-                            }
-
-                            if ( flavors.webm !== undefined && $.fn.supportWebm() ) {
-                                video.append("<source src=\"" + flavors.webm + "\" type=\"video/webm\" />");
-                            }
-
                             // set caption track if available
                             if ( captionId !== null ) {
                                 video.append("<track kind=\"subtitles\" src=\"https://cdnapisec.kaltura.com/api_v3/index.php/service/caption_captionAsset/action/serve/captionAssetId/" + captionId + "\" srclang=\"en\" label=\"English\">");
                             }
 
                             kOptions.poster = posterImg;
-                            kOptions.plugins = { resolutionSelector: { default_res: 'normal' } };
+                            kOptions.plugins = { videoJsResolutionSwitcher: { 'default': 720 } };
 
                             loadPlayer();
                             getDownloadableFiles( downloadSrc );
@@ -297,8 +280,6 @@ $(document).ready(function(){
 
                 var player = this;
 
-    			this.progressTips();
-
     			if ( intro === 0 ) {
 
     				this.on( 'loadedmetadata', function() {
@@ -321,6 +302,38 @@ $(document).ready(function(){
 
 
     			} );
+    			
+    			if ( isKaltura ) {
+        			
+        			this.updateSrc( [
+            			
+            			{
+                			
+                			src: flavors.low,
+                			type: "video/mp4",
+                			label: "low",
+                			res: '360'
+                			
+            			},
+            			{
+                			
+                			src: flavors.normal,
+                			type: "video/mp4",
+                			label: "normal",
+                			res: '720'
+                			
+            			},
+            			{
+                			
+                			src: flavors.high,
+                			type: "video/mp4",
+                			label: "high",
+                			res: '1080'
+                			
+            			}
+            			
+        			] );
+    			}
 
     		});
 
