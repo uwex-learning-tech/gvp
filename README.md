@@ -25,6 +25,7 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 * Updated Kaltura API to version 2.36
 * Updated VideoJS to version 5.5.3
 * Added new URL query parameter: autoplay
+* Updated jQuery to version 2.2.0
 
 **3.3.2** (03-09-2015)  
 * Added HTML5 download attribute to download links
