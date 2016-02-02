@@ -3,10 +3,10 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp
- * @version: 3.3.2
+ * @version: 3.3.3
  *
  * @license: The MIT License (MIT)
- * Copyright (c) 2015 UWEX CEOEL
+ * Copyright (c) 2014-2016 UWEX CEOEL
  *
  */
 
@@ -20,7 +20,7 @@ $(document).ready(function(){
 
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
-	var width = 640, height = 360, intro = -1,
+	var width = 640, height = 360, intro = -1, auto = 0,
 		source,
 		programs = ["smgt","msmgt","hwm","himt","bps","il","flx","ds"],
 		isKaltura = false, kalturaId, kOptions, flavors = {};
@@ -78,6 +78,11 @@ $(document).ready(function(){
 		if ($.trim(getParameterByName("h")) !== "") {
 			height = Number($.trim(getParameterByName("h")));
 		}
+		
+		// get autoplay from query string if available
+		if ($.trim(getParameterByName("autoplay")) !== "") {
+			auto = Number($.trim(getParameterByName("autoplay")));
+		}
 
 	}
 
@@ -112,7 +117,7 @@ $(document).ready(function(){
             'height': height,
             "controls": true,
             "poster": source + '.jpg',
-            "autoplay": false,
+            "autoplay": ( auto ) ? true : false,
             "preload": "auto"
 
 		};
@@ -142,10 +147,10 @@ $(document).ready(function(){
 
 	function setupMainVideo() {
 
-        $(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\"></video>");
+        $(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" crossorigin=\"anonymous\"></video>");
 
         var video = $("#gvp_video");
-
+        
 		kOptions = {
 
             techOrder: ["html5", "flash"],
@@ -153,7 +158,7 @@ $(document).ready(function(){
             'height': height,
             "controls": true,
             "poster": source + '.jpg',
-            "autoplay": false,
+            "autoplay": ( auto ) ? true : false,
             "preload": "metadata",
             "plugins": null
 
@@ -165,7 +170,7 @@ $(document).ready(function(){
 
         		$.getScript( ROOT_PATH + "scripts/kwidget.getsources.js", function() {
 
-            		var entryId, captionId, captionExt, captionLang, posterImg, downloadSrc = "";
+            		var entryId, captionId, captionExt, captionLang, posterImg, duration, downloadSrc = "";
 
                     kWidget.getSources( {
 
@@ -177,6 +182,7 @@ $(document).ready(function(){
                             captionId = data.captionId;
                             captionExt = data.captionExt;
                             captionLang = data.captionLang;
+                            duration = data.duration;
 
                             posterImg = "https://cdnsecakmi.kaltura.com/p/1660872/sp/166087200/thumbnail/entry_id/"+entryId+"/width/"+kOptions.width+"/height/"+kOptions.height;
 
@@ -232,7 +238,7 @@ $(document).ready(function(){
 
                             // set caption track if available
                             if ( captionId !== null ) {
-                                video.append("<track kind=\"subtitles\" src=\"https://cdnapisec.kaltura.com/api_v3/index.php/service/caption_captionAsset/action/serve/captionAssetId/" + captionId + "\" srclang=\"en\" label=\"English\">");
+                                video.append("<track kind=\"subtitles\" src=\"https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId="+captionId+"&segmentDuration="+duration+"&segmentIndex=1\" srclang=\"en\" label=\"English\">");
                             }
 
                             kOptions.poster = posterImg;
