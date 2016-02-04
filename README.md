@@ -20,7 +20,7 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ####Version Change Log
-**3.3.3** (02-??-2016)  
+**3.3.3** (02-04-2016)  
 * Added DS program logo
 * Updated Kaltura API to version 2.36
 * Updated VideoJS to version 5.5.3
