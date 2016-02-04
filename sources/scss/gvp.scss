@@ -3,10 +3,10 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp
- * @version: 3.2.4
+ * @version: 3.3.3
  *
  * @license: The MIT License (MIT)
- * Copyright (c) 2014 UW-EX CEOEL
+ * Copyright (c) 2014-2016 UWEX CEOEL
  *
  */
 
@@ -29,7 +29,7 @@
     	padding: 0;
     	margin: 15px 0;
     	color: #000;
-    	font-size: 24px;
+    	font-size: 22px;
     	background: none;
     	top: 0;
     	left: 0;
@@ -496,6 +496,36 @@ body {
     	.logo {
         	background-image: url( "../img/bps.png" );
             width: 203px;
+            height: 75px;
+        }
+
+        @include getTitleBar();
+
+        .video_holder {
+        	@include single-box-shadow( 0, 0, 16px, 0, #8A8A8A );
+        }
+
+        @include getDownloadBar();
+    	@include getFooter();
+
+    }
+
+}
+
+// bps theme
+.ds {
+
+    border-top: 15px solid #fc6e51;
+	background-color: #fff;
+
+    .gvp_wrapper {
+
+    	margin: 15px auto;
+    	float: none;
+
+    	.logo {
+        	background-image: url( "../img/ds.png" );
+            width: 361px;
             height: 75px;
         }
 

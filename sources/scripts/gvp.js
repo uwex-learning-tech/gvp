@@ -3,27 +3,27 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp
- * @version: 3.3.2
+ * @version: 3.3.3
  *
  * @license: The MIT License (MIT)
- * Copyright (c) 2015 UWEX CEOEL
+ * Copyright (c) 2014-2016 UWEX CEOEL
  *
  */
 
 /* global videojs */
 /* global kWidget */
 
-var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
-// var ROOT_PATH = "https://media.uwex.edu/sandbox/ethan/app/generic_video_player_v3/";
+// var ROOT_PATH = "https://media.uwex.edu/app/generic_video_player_v3/";
+var ROOT_PATH = "../sources/";
 
 $(document).ready(function(){
 
 	/*************************** GLOBAL-SCOPE VARIALBES ***************************/
 
-	var width = 640, height = 360, intro = -1,
+	var width = 640, height = 360, intro = -1, auto = 0,
 		source,
-		programs = ["smgt","msmgt","hwm","himt","bps","il","flx"],
-		isKaltura = false, kalturaId, kOptions;
+		programs = ["smgt","msmgt","hwm","himt","bps","il","flx","ds"],
+		isKaltura = false, kalturaId, kOptions, flavors = {};
 
 	/*************************** FUNCTIONS ***************************************/
 
@@ -78,6 +78,11 @@ $(document).ready(function(){
 		if ($.trim(getParameterByName("h")) !== "") {
 			height = Number($.trim(getParameterByName("h")));
 		}
+		
+		// get autoplay from query string if available
+		if ($.trim(getParameterByName("autoplay")) !== "") {
+			auto = Number($.trim(getParameterByName("autoplay")));
+		}
 
 	}
 
@@ -112,7 +117,7 @@ $(document).ready(function(){
             'height': height,
             "controls": true,
             "poster": source + '.jpg',
-            "autoplay": false,
+            "autoplay": ( auto ) ? true : false,
             "preload": "auto"
 
 		};
@@ -142,10 +147,10 @@ $(document).ready(function(){
 
 	function setupMainVideo() {
 
-        $(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\"></video>");
+        $(".video_holder").html("<video id=\"gvp_video\" class=\"video-js vjs-default-skin\" crossorigin=\"anonymous\"></video>");
 
         var video = $("#gvp_video");
-
+        
 		kOptions = {
 
             techOrder: ["html5", "flash"],
@@ -153,7 +158,7 @@ $(document).ready(function(){
             'height': height,
             "controls": true,
             "poster": source + '.jpg',
-            "autoplay": false,
+            "autoplay": ( auto ) ? true : false,
             "preload": "metadata",
             "plugins": null
 
@@ -165,7 +170,7 @@ $(document).ready(function(){
 
         		$.getScript( ROOT_PATH + "scripts/kwidget.getsources.js", function() {
 
-            		var entryId, captionId, captionExt, captionLang, flavors = {}, posterImg, downloadSrc = "";
+            		var entryId, captionId, captionExt, captionLang, posterImg, duration, downloadSrc = "";
 
                     kWidget.getSources( {
 
@@ -177,6 +182,7 @@ $(document).ready(function(){
                             captionId = data.captionId;
                             captionExt = data.captionExt;
                             captionLang = data.captionLang;
+                            duration = data.duration;
 
                             posterImg = "https://cdnsecakmi.kaltura.com/p/1660872/sp/166087200/thumbnail/entry_id/"+entryId+"/width/"+kOptions.width+"/height/"+kOptions.height;
 
@@ -230,30 +236,13 @@ $(document).ready(function(){
 
                             } // end for loop
 
-                            // set low res vid if available
-                            if ( flavors.low !== undefined ) {
-                                video.append("<source src=\"" + flavors.low + "\" type=\"video/mp4\" data-res=\"low\" />");
-                            }
-
-                            // set normal res vid
-                            video.append("<source src=\"" + flavors.normal + "\" type=\"video/mp4\" data-res=\"normal\" data-default=\"true\" />");
-
-                            // set high res vid if available
-                            if ( flavors.low !== undefined ) {
-                                video.append("<source src=\"" + flavors.high + "\" type=\"video/mp4\" data-res=\"high\" />");
-                            }
-
-                            if ( flavors.webm !== undefined && $.fn.supportWebm() ) {
-                                video.append("<source src=\"" + flavors.webm + "\" type=\"video/webm\" />");
-                            }
-
                             // set caption track if available
                             if ( captionId !== null ) {
-                                video.append("<track kind=\"subtitles\" src=\"https://cdnapisec.kaltura.com/api_v3/index.php/service/caption_captionAsset/action/serve/captionAssetId/" + captionId + "\" srclang=\"en\" label=\"English\">");
+                                video.append("<track kind=\"subtitles\" src=\"https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId="+captionId+"&segmentDuration="+duration+"&segmentIndex=1\" srclang=\"en\" label=\"English\">");
                             }
 
                             kOptions.poster = posterImg;
-                            kOptions.plugins = { resolutionSelector: { default_res: 'normal' } };
+                            kOptions.plugins = { videoJsResolutionSwitcher: { 'default': 720 } };
 
                             loadPlayer();
                             getDownloadableFiles( downloadSrc );
@@ -297,8 +286,6 @@ $(document).ready(function(){
 
                 var player = this;
 
-    			this.progressTips();
-
     			if ( intro === 0 ) {
 
     				this.on( 'loadedmetadata', function() {
@@ -321,6 +308,38 @@ $(document).ready(function(){
 
 
     			} );
+    			
+    			if ( isKaltura ) {
+        			
+        			this.updateSrc( [
+            			
+            			{
+                			
+                			src: flavors.low,
+                			type: "video/mp4",
+                			label: "low",
+                			res: '360'
+                			
+            			},
+            			{
+                			
+                			src: flavors.normal,
+                			type: "video/mp4",
+                			label: "normal",
+                			res: '720'
+                			
+            			},
+            			{
+                			
+                			src: flavors.high,
+                			type: "video/mp4",
+                			label: "high",
+                			res: '1080'
+                			
+            			}
+            			
+        			] );
+    			}
 
     		});
 
