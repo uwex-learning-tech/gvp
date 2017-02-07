@@ -191,8 +191,9 @@ $(document).ready(function(){
                             for( var i in data.sources ) {
 
                                 var kSource = data.sources[i];
-
-                                if ( kSource.flavorParamsId === 487061 ) {
+                                
+                                // old 487061
+                                if ( kSource.flavorParamsId === 487041 ) {
 
                                     flavors.low = kSource.src;
 
@@ -203,8 +204,9 @@ $(document).ready(function(){
                                     }
 
                                 }
-
-                                if ( kSource.flavorParamsId === 487071 ) {
+                                
+                                // old 487071
+                                if ( kSource.flavorParamsId === 487081 ) {
 
                                     flavors.normal = kSource.src;
 
@@ -215,10 +217,11 @@ $(document).ready(function(){
                                     }
 
                                 }
+                                
+                                // formerly as high with 487081
+                                if ( kSource.flavorParamsId === 487061 ) {
 
-                                if ( kSource.flavorParamsId === 487081 ) {
-
-                                    flavors.high = kSource.src;
+                                    flavors.medium = kSource.src;
 
                                     if ( downloadSrc.length <= 0 ) {
 
@@ -331,10 +334,10 @@ $(document).ready(function(){
             			},
             			{
                 			
-                			src: flavors.high,
+                			src: flavors.medium,
                 			type: "video/mp4",
-                			label: "high",
-                			res: '1080'
+                			label: "medium",
+                			res: '640'
                 			
             			}
             			
