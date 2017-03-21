@@ -1,4 +1,4 @@
-#Generic Video Player
+# Generic Video Player
 **_version 3.3.3_**
 
 ### Minimum Supported Web Browsers
@@ -13,13 +13,13 @@
 For documentation, please visit https://media.uwex.edu/resources/documentation/generic-video-player-v3/
 
 ---
-###Bug Reporting and Questions
+### Bug Reporting and Questions
 If any bugs/glitches are found in this Storybook Plus application, please report them under the "**[Issues](https://github.com/oel-mediateam/gvp/issues)**" page on GitHub. When reporting a bug, please write the report as detailed and specifically as possible. Note the steps to reproduce the bug and include screen captures if possible.
 
 For questions, please also post them under the "**[Issues](https://github.com/oel-mediateam/gvp/issues)**" page on GitHub.
 
 ---
-####Version Change Log
+#### Version Change Log
 **3.3.3** (02-04-2016)  
 * Added DS program logo
 * Updated Kaltura API to version 2.36
