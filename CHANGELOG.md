@@ -1,8 +1,8 @@
-# Change Log
+# Version Change Log
 
-**4.0.0 pending...**
+**4.0.0**
+_pending ... currently in development_
 
----
 **3.3.3** (02-04-2016)  
 * Added DS program logo
 * Updated Kaltura API to version 2.36
