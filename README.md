@@ -3,7 +3,7 @@
 
 Generic video player is utilizing VideoJS, a HTML5 video player, to deliver video contents.
 
-## Minimum Supported Web Browsers
+### Minimum Supported Web Browsers
 * Google Chrome 42+
 * Mozilla Firefox 45+
 * Apple Safari 11+

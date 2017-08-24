@@ -45,6 +45,24 @@
 		"rFN": 0,
 		"uCM": 0
 		},
+	"\/CODE_OF_CONDUCT.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/CODE_OF_CONDUCT.html",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
 	"\/LICENSE": {
 		"ft": 8192,
 		"oA": 1,
