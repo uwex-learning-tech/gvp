@@ -1,0 +1,29 @@
+{
+    "lang": "en",
+    "dir": "ltr",
+    "name": "Generic Video Player",
+    "description": "A generic video player version 4.",
+    "short_name": "GVP",
+    "display": "browser",
+    "orientation": "portrait",
+    
+    "gvp_google_tracking_id": "",
+    "gvp_root_directory": "",
+    "gvp_logo_directory": "https://media.uwex.edu/content/media/storybook_support/logo/",
+    "gvp_logo_default": "ceoel",
+    "gvp_kaltura": {
+        "id": 1660872,
+        "normal": 487081,
+        "medium": 487061,
+        "low": 487041
+    },
+    "gvp_custom_themes": [
+        
+        {
+            "logo": "Help",
+            "color": "help"
+        }
+        
+    ]
+       
+}

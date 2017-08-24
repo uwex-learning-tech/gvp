@@ -1,7 +1,14 @@
-# ingore bower components
+# ignore bower components
 bower_components/
 **/bower_components
 
-# ingore SASS cache hidden directory
+# ignore node modules
+node_modules/
+**/node_modules
+
+# ignore SASS cache hidden directory
 .sass-cache
 **/.sass-cache
+
+# ignore ESLint hidden file
+.eslintrc
