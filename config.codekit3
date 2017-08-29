@@ -15,6 +15,12 @@
 		"oAP": "\/build\/.babelrc",
 		"oF": 1
 		},
+	"\/.eslintrc": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/.eslintrc",
+		"oF": 1
+		},
 	"\/.gitignore": {
 		"ft": 8192,
 		"oA": 1,
@@ -62,6 +68,12 @@
 		"pME": 1,
 		"rFN": 0,
 		"uCM": 0
+		},
+	"\/config.rb": {
+		"ft": 8192,
+		"oA": 0,
+		"oAP": "\/config.rb",
+		"oF": 0
 		},
 	"\/LICENSE": {
 		"ft": 8192,
@@ -30708,6 +30720,86 @@
 		"rFN": 0,
 		"uCM": 0
 		},
+	"\/node_modules\/dom-walk\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/dom-walk\/example\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/example\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/dom-walk\/example\/static\/bundle.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/example\/static\/bundle.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/dom-walk\/example\/static\/index.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/example\/static\/index.html",
+		"oF": 1
+		},
+	"\/node_modules\/dom-walk\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/dom-walk\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/dom-walk\/Makefile": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/Makefile",
+		"oF": 1
+		},
+	"\/node_modules\/dom-walk\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/dom-walk\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/dom-walk\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
 	"\/node_modules\/electron-to-chromium\/CHANGELOG.md": {
 		"cS": 0,
 		"eF": 1,
@@ -38606,6 +38698,351 @@
 		"sC": 1,
 		"tS": 0
 		},
+	"\/node_modules\/es5-shim\/.eslintrc": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/.eslintrc",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/.jscs.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/.jscs.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/es5-shim\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/bin.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/bin.html",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/bower.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/bower.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/es5-shim\/CHANGES": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/CHANGES",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/component.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/component.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/es5-shim\/CONTRIBUTORS.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/CONTRIBUTORS.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/es5-shim\/es5-sham.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/es5-sham.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/es5-sham.map": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/es5-sham.map",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/es5-sham.min.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/es5-sham.min.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/es5-shim.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/es5-shim.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/es5-shim.map": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/es5-shim.map",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/es5-shim.min.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/es5-shim.min.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/LICENSE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/LICENSE",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/Makefile": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/Makefile",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/es5-shim\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/es5-shim\/shims.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/shims.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/es5-shim\/tests\/.eslintrc": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/.eslintrc",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/tests\/helpers\/h-matchers.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/helpers\/h-matchers.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/index.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/index.html",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/tests\/index.min.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/index.min.html",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/tests\/lib\/jasmine-html.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/lib\/jasmine-html.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/lib\/jasmine.css": {
+		"aP": 1,
+		"bl": 0,
+		"ft": 16,
+		"ma": 0,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/lib\/jasmine.css",
+		"oF": 1,
+		"oS": 3
+		},
+	"\/node_modules\/es5-shim\/tests\/lib\/jasmine.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/lib\/jasmine.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/lib\/jasmine_favicon.png": {
+		"ft": 32768,
+		"iS": 905,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/lib\/jasmine_favicon.png",
+		"oF": 1,
+		"oIPL": 0,
+		"opt": 0,
+		"oT": 1,
+		"q": 100
+		},
+	"\/node_modules\/es5-shim\/tests\/native.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/native.html",
+		"oF": 1
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/helpers-jasmine.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/helpers-jasmine.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-array.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-array.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-date.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-date.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-error.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-error.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-function.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-function.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-global.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-global.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-number.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-number.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-object.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-object.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-regexp.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-regexp.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/es5-shim\/tests\/spec\/s-string.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/es5-shim\/tests\/spec\/s-string.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/node_modules\/es6-iterator\/#\/chain.js": {
 		"ft": 64,
 		"ma": 0,
@@ -44636,6 +45073,70 @@
 		"sC": 1,
 		"tS": 0
 		},
+	"\/node_modules\/for-each\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/for-each\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/for-each\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/for-each\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/for-each\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/for-each\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/for-each\/test\/test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/for-each\/test\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/node_modules\/fs.realpath\/index.js": {
 		"ft": 64,
 		"ma": 0,
@@ -44896,6 +45397,90 @@
 		"mi": 1,
 		"oA": 1,
 		"oAP": "\/build\/node_modules\/glob\/sync.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/global\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/global\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/global\/console.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/console.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/global\/document.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/document.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/global\/LICENSE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/LICENSE",
+		"oF": 1
+		},
+	"\/node_modules\/global\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/global\/process.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/process.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/global\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/global\/window.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/global\/window.js",
 		"oF": 1,
 		"sC": 1,
 		"tS": 0
@@ -45210,6 +45795,70 @@
 		"pME": 1,
 		"rFN": 0,
 		"uCM": 0
+		},
+	"\/node_modules\/individual\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/individual\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/individual\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/individual\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/individual\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/individual\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/individual\/test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/individual\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
 		},
 	"\/node_modules\/inflight\/inflight.js": {
 		"ft": 64,
@@ -45696,6 +46345,74 @@
 		"pME": 1,
 		"rFN": 0,
 		"uCM": 0
+		},
+	"\/node_modules\/is-function\/browser-test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/browser-test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/is-function\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/is-function\/LICENSE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/LICENSE",
+		"oF": 1
+		},
+	"\/node_modules\/is-function\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/is-function\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/is-function\/test.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/test.html",
+		"oF": 1
+		},
+	"\/node_modules\/is-function\/test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/is-function\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
 		},
 	"\/node_modules\/is-my-json-valid\/.npmignore": {
 		"ft": 8192,
@@ -57783,6 +58500,264 @@
 		"sC": 1,
 		"tS": 0
 		},
+	"\/node_modules\/min-document\/.jshintrc": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/.jshintrc",
+		"oF": 1
+		},
+	"\/node_modules\/min-document\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/min-document\/.testem.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/.testem.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/min-document\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/min-document\/CONTRIBUTION.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/CONTRIBUTION.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/min-document\/docs.mli": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/docs.mli",
+		"oF": 1
+		},
+	"\/node_modules\/min-document\/document.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/document.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/dom-comment.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/dom-comment.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/dom-element.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/dom-element.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/dom-fragment.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/dom-fragment.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/dom-text.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/dom-text.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/event.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/event.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/event\/add-event-listener.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/event\/add-event-listener.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/event\/dispatch-event.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/event\/dispatch-event.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/event\/remove-event-listener.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/event\/remove-event-listener.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/min-document\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/min-document\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/min-document\/serialize.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/serialize.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/test\/cleanup.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/cleanup.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/test\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/test\/static\/index.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/static\/index.html",
+		"oF": 1
+		},
+	"\/node_modules\/min-document\/test\/static\/test-adapter.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/static\/test-adapter.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/test\/test-document.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/test-document.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/test\/test-dom-comment.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/test-dom-comment.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/min-document\/test\/test-dom-element.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/min-document\/test\/test-dom-element.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/node_modules\/minimatch\/LICENSE": {
 		"ft": 8192,
 		"oA": 1,
@@ -58595,6 +59570,86 @@
 		"rFN": 0,
 		"uCM": 0
 		},
+	"\/node_modules\/parse-headers\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/parse-headers\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/parse-headers\/.zuul.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/.zuul.yml",
+		"oF": 1
+		},
+	"\/node_modules\/parse-headers\/example.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/example.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/parse-headers\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/parse-headers\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/parse-headers\/parse-headers.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/parse-headers.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/parse-headers\/readme.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/readme.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/parse-headers\/test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/parse-headers\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/node_modules\/path-is-absolute\/index.js": {
 		"ft": 64,
 		"ma": 0,
@@ -59122,6 +60177,58 @@
 		"oF": 1,
 		"sC": 1,
 		"tS": 0
+		},
+	"\/node_modules\/process\/browser.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/process\/browser.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/process\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/process\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/process\/LICENSE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/process\/LICENSE",
+		"oF": 1
+		},
+	"\/node_modules\/process\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/process\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/process\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/process\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
 		},
 	"\/node_modules\/progress\/.npmignore": {
 		"ft": 8192,
@@ -60993,6 +62100,86 @@
 		"sC": 1,
 		"tS": 0
 		},
+	"\/node_modules\/rust-result\/.editorconfig": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/.editorconfig",
+		"oF": 1
+		},
+	"\/node_modules\/rust-result\/.jshintrc": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/.jshintrc",
+		"oF": 1
+		},
+	"\/node_modules\/rust-result\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/rust-result\/example.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/example.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/rust-result\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/rust-result\/LICENSE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/LICENSE",
+		"oF": 1
+		},
+	"\/node_modules\/rust-result\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/rust-result\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/rust-result\/test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/rust-result\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/node_modules\/rx-lite\/package.json": {
 		"ft": 524288,
 		"oA": 1,
@@ -61099,6 +62286,124 @@
 		"mi": 1,
 		"oA": 1,
 		"oAP": "\/build\/node_modules\/safe-buffer\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/safe-json-parse\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/safe-json-parse\/.testem.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/.testem.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/safe-json-parse\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/safe-json-parse\/callback.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/callback.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/safe-json-parse\/examples\/simple.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/examples\/simple.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/safe-json-parse\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/safe-json-parse\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/safe-json-parse\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/safe-json-parse\/result.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/result.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/safe-json-parse\/test\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/test\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/safe-json-parse\/test\/static\/index.html": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/test\/static\/index.html",
+		"oF": 1
+		},
+	"\/node_modules\/safe-json-parse\/test\/static\/test-adapter.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/test\/static\/test-adapter.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/safe-json-parse\/tuple.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/safe-json-parse\/tuple.js",
 		"oF": 1,
 		"sC": 1,
 		"tS": 0
@@ -63025,6 +64330,80 @@
 		"rFN": 0,
 		"uCM": 0
 		},
+	"\/node_modules\/trim\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/trim\/component.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/component.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/trim\/History.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/History.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/trim\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/trim\/Makefile": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/Makefile",
+		"oF": 1
+		},
+	"\/node_modules\/trim\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/trim\/Readme.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/trim\/Readme.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
 	"\/node_modules\/tryit\/package.json": {
 		"ft": 524288,
 		"oA": 1,
@@ -63057,6 +64436,70 @@
 		"mi": 1,
 		"oA": 1,
 		"oAP": "\/build\/node_modules\/tryit\/tryit.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/tsml\/LICENSE.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/tsml\/LICENSE.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/tsml\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/tsml\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/tsml\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/tsml\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/tsml\/test.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/tsml\/test.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/tsml\/tsml.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/tsml\/tsml.js",
 		"oF": 1,
 		"sC": 1,
 		"tS": 0
@@ -63461,6 +64904,98 @@
 		"rFN": 0,
 		"uCM": 0
 		},
+	"\/node_modules\/xhr\/.npmignore": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/.npmignore",
+		"oF": 1
+		},
+	"\/node_modules\/xhr\/.travis.yml": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/.travis.yml",
+		"oF": 1
+		},
+	"\/node_modules\/xhr\/CONTRIBUTING.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/CONTRIBUTING.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/xhr\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/xhr\/LICENCE": {
+		"ft": 8192,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/LICENCE",
+		"oF": 1
+		},
+	"\/node_modules\/xhr\/package.json": {
+		"ft": 524288,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/package.json",
+		"oF": 1,
+		"oO": 0,
+		"oS": 1
+		},
+	"\/node_modules\/xhr\/README.md": {
+		"cS": 0,
+		"eF": 1,
+		"eL": 1,
+		"eLB": 0,
+		"ema": 1,
+		"eSQ": 1,
+		"ft": 4096,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/README.md",
+		"oF": 1,
+		"oFM": 0,
+		"oS": 0,
+		"pHT": 0,
+		"pME": 1,
+		"rFN": 0,
+		"uCM": 0
+		},
+	"\/node_modules\/xhr\/test\/index.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/test\/index.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/node_modules\/xhr\/test\/mock-server.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/node_modules\/xhr\/test\/mock-server.js",
+		"oF": 1,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/node_modules\/xtend\/.jshintrc": {
 		"ft": 8192,
 		"oA": 1,
@@ -63569,9 +65104,9 @@
 		},
 	"\/sources\/manifest.json": {
 		"ft": 524288,
-		"oA": 1,
-		"oAP": "\/build\/manifest-min.json",
-		"oF": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/manifest.json",
+		"oF": 3,
 		"oO": 0,
 		"oS": 1
 		},
@@ -63581,17 +65116,17 @@
 		"mi": 1,
 		"oA": 0,
 		"oAP": "\/build\/sources\/scripts\/gvp.js",
-		"oF": 2,
+		"oF": 3,
 		"sC": 3,
 		"tS": 1
 		},
 	"\/sources\/scripts\/kwidget.getsources.js": {
 		"ft": 64,
 		"ma": 0,
-		"mi": 1,
-		"oA": 1,
-		"oAP": "\/build\/scripts\/min\/kwidget.getsources-min.js",
-		"oF": 1,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/kwidget.getsources.js",
+		"oF": 3,
 		"sC": 0,
 		"tS": 0
 		},
@@ -63608,12 +65143,423 @@
 	"\/sources\/scripts\/mwembedloader.js": {
 		"ft": 64,
 		"ma": 0,
-		"mi": 1,
-		"oA": 1,
-		"oAP": "\/build\/scripts\/min\/mwembedloader-min.js",
-		"oF": 1,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/mwembedloader.js",
+		"oF": 3,
 		"sC": 0,
 		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/font\/VideoJS.eot": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.eot",
+		"oF": 3
+		},
+	"\/sources\/scripts\/videojs\/font\/VideoJS.svg": {
+		"ft": 2097152,
+		"miP": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.svg",
+		"oF": 3,
+		"opt": 0,
+		"plM": 3758088159,
+		"prP": 0
+		},
+	"\/sources\/scripts\/videojs\/font\/VideoJS.ttf": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.ttf",
+		"oF": 3
+		},
+	"\/sources\/scripts\/videojs\/font\/VideoJS.woff": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.woff",
+		"oF": 3
+		},
+	"\/sources\/scripts\/videojs\/lang\/ar.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ar.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/ba.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ba.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/bg.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/bg.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/ca.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ca.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/cs.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/cs.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/da.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/da.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/de.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/de.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/el.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/el.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/en.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/en.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/es.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/es.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/fa.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fa.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/fi.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fi.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/fr.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fr.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/gl.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/gl.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/hr.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/hr.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/hu.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/hu.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/it.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/it.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/ja.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ja.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/ko.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ko.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/nb.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nb.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/nl.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nl.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/nn.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nn.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/pl.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pl.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/pt-BR.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pt-BR.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/pt-PT.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pt-PT.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/ru.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ru.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/sk.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sk.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/sr.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sr.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/sv.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sv.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/tr.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/tr.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/uk.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/uk.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/vi.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/vi.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/zh-CN.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/zh-CN.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/zh-TW.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/zh-TW.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/plugins\/resolution\/videojs-resolution-switcher.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 1,
+		"oAP": "\/build\/scripts\/videojs\/plugins\/resolution\/min\/videojs-resolution-switcher-min.js",
+		"oF": 0,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/video-js.css": {
+		"aP": 0,
+		"bl": 0,
+		"ft": 16,
+		"ma": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/video-js.css",
+		"oF": 3,
+		"oS": 3
+		},
+	"\/sources\/scripts\/videojs\/video.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 0,
+		"oAP": "\/build\/sources\/scripts\/videojs\/video.js",
+		"oF": 3,
+		"sC": 0,
+		"tS": 0
+		},
+	"\/sources\/scss\/gvp.scss": {
+		"aP": 0,
+		"bl": 0,
+		"dP": 10,
+		"dS": 0,
+		"ft": 4,
+		"ma": 1,
+		"oA": 0,
+		"oAP": "\/build\/sources\/css\/gvp.css",
+		"oF": 0,
+		"oS": 3,
+		"uL": 1
 		}
 	},
 "hooks": [
@@ -63632,6 +65578,14 @@
 			"position": 1,
 			"type": 0
 			}
+		],
+	"\/sources\/scripts\/videojs\/video.js": [
+		{
+			"followForSyntaxChecking": 0,
+			"linkedFileAbbreviatedPath": "\/sources\/scripts\/videojs\/plugins\/resolution\/videojs-resolution-switcher.js",
+			"position": 0,
+			"type": 1
+			}
 		]
 	},
 "projectAttributes": {
@@ -63639,7 +65593,7 @@
 	"displayValue": "gvp",
 	"displayValueWasSetByUser": 1,
 	"iconImageName": "meme-grumpy",
-	"lastBuiltDate": 525302709
+	"lastBuiltDate": 525737272
 	},
 "projectSettings": {
 	"abortBuildOnError": 1,
@@ -65032,7 +66986,7 @@
 	"externalServerAddress": "http:\/\/localhost:8888",
 	"gitIgnoreBuildFolder": 0,
 	"hideConfigFile": 0,
-	"jsCheckerReservedNamesString": "",
+	"jsCheckerReservedNamesString": "videojs,kWidget",
 	"jsHintFlags2": {
 		"asi": {
 			"active": 0,
@@ -65544,7 +67498,7 @@
 		"createSourceMap": 0,
 		"debugStyle": 0,
 		"decimalPrecision": 10,
-		"outputStyle": 0,
+		"outputStyle": 3,
 		"shouldRunAutoprefixer": 0,
 		"shouldRunBless": 0,
 		"useLibsass": 1

@@ -10,5 +10,6 @@ node_modules/
 .sass-cache
 **/.sass-cache
 
-# ignore ESLint hidden file
-.eslintrc
+# ignore video and vtt files in build directory
+build/*.mp4
+build/*.vtt

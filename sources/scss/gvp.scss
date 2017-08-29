@@ -1,0 +1,332 @@
+@import "compass/css3/animation";
+@import "compass/css3/flexbox";
+@import "compass/css3/images";
+@import "compass/css3/border-radius";
+@import "compass/css3/user-interface";
+
+$base: 16px;
+$gutter: 20px;
+$default-font-size: 16px;
+$default-bg-color: #EFEEE8;
+
+@function rem( $px ) {
+    @return $px / $default-font-size * 1rem;
+};
+
+/********************************* GVP CSS ************************************/
+
+html {
+    
+    font-size: $default-font-size;
+    height: 100%;
+    
+    body {
+        font-size: rem( $default-font-size );
+        margin: 0;
+        background-color: $default-bg-color;
+        color: #636266;
+        font-family: sans-serif;
+        height: 100%;
+    }
+    
+}
+
+#gvp-wrapper {
+    
+    position: relative;
+    height: 100%;
+    
+    .gvp-cover {
+        
+        @include display-flex();
+        @include align-items( center );
+        @include justify-content( center );
+        position: absolute;
+        width: 100%;
+        height: calc( 100% - #{$gutter} );
+        top: rem( $gutter );
+        left: 0;
+        background-color: $default-bg-color;
+        z-index: 99;
+        
+        .gvp-program-logo {
+            width: 340px;
+            height: 124px;
+            background-image: url( 'https://media.uwex.edu/content/media/storybook_support/logo/ceoel.svg' );
+            background-repeat: no-repeat;
+            @include user-select( none );
+        }
+        
+    }
+    
+    .gvp-gradient-bar {
+        
+        @include display-flex();
+        @include flex-flow( row nowrap );
+        
+        span {
+            @include flex( 1 0 auto );
+            height: rem( $gutter );
+            @include user-select( none );
+        }
+        
+        span:nth-child(1) {
+            background-color: #0a4a89;
+        }
+        
+        span:nth-child(2) {
+            background-color: #2a6b9f;
+        }
+        
+        span:nth-child(3) {
+            background-color: #578db5;
+        }
+        
+        span:nth-child(4) {
+            background-color: #88b1ce;
+        }
+        
+        span:nth-child(5) {
+            background-color: #c1d7e6;
+        }
+
+    }
+    
+    #gvp-light {
+        position: absolute;
+        font-weight: 100;
+        font-size: rem( 14px );
+        top: rem( 30px );
+        right: rem( 10px );
+        color: #ccc;
+        background-color: rgba( 0, 0, 0, 0.5 );
+        padding: rem( 5px ) rem( 10px );
+        @include border-radius( 20px );
+        cursor: pointer;
+        @include user-select( none );
+    }
+    
+    #gvp-light:hover {
+        background-color: rgba( 0, 0, 0, 0.75 );
+    }
+    
+    .gvp-title-bar {
+        padding: 0 rem( $gutter );
+    }
+    
+    .gvp-video-wrapper {
+        
+        position: relative;
+        margin-top: rem( $gutter );
+        margin-bottom: rem( $gutter );
+        padding: 0 rem( $gutter );
+        
+        .gvp-program-logo {
+            position: absolute;
+            bottom: rem( 10px );
+            right: rem( 10px );
+            width: 170px;
+            height: 62px;
+            background-image: url( 'https://media.uwex.edu/content/media/storybook_support/logo/ceoel.svg' );
+            background-repeat: no-repeat;
+            z-index: 1;
+            @include user-select( none );
+        }
+        
+    }
+    
+    .gvp-footer {
+        margin-top: rem( $gutter );
+        font-size: rem( 12px );
+        text-align: center;
+        padding: 0 rem( $gutter );
+    }
+        
+}
+
+body.light-off {
+        
+    @include animation-name( fadeToBlack );
+    @include animation-duration( 0.5s );
+    background-color: #000;
+    
+    #gvp-wrapper {
+        
+        .gvp-gradient-bar {
+            opacity: 0;
+        }
+        
+        .gvp-title-bar {
+            opacity: 0;
+        }
+        
+        .gvp-footer {
+            opacity: 0;
+        }
+        
+    }
+    
+}
+
+body.light-on {
+        
+    @include animation-name( fadeFromBlack );
+    @include animation-duration( 0.5s );
+    background-color: $default-bg-color;
+    
+}
+
+@media only screen 
+and (min-width : 1028px)
+and (min-device-width : 1028px) {
+    
+    #gvp-wrapper {
+        
+        .gvp-title-bar {
+            width: rem( 900px );
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+        }
+        
+        .gvp-video-wrapper {
+            
+            width: rem( 900px );
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
+        
+        }
+    
+    }
+    
+}
+
+/******************************* ANIMATIONS **********************************/
+
+@include keyframes( fadeToBlack ) {
+    from { background-color: $default-bg-color; }
+    to { background-color: #000; }
+};
+
+@include keyframes( fadeFromBlack ) {
+    from { background-color: #000; }
+    to { background-color: $default-bg-color; }
+};
+
+/******************************* VIDEOJS CSS **********************************/
+
+/*
+    Player Skin Designer for Video.js
+    http://videojs.com
+    
+    To customize the player skin edit 
+    the CSS below. Click "details" 
+    below to add comments or questions.
+    This file uses some SCSS. Learn more  
+    at http://sass-lang.com/guide)
+    
+    This designer can be linked to at:
+    https://codepen.io/heff/pen/EarCt/left/?editors=010
+*/
+
+// The color of icons, text, and the big play button border.
+$primary-foreground-color: #fff; // #fff default
+
+// The default color of control backgrounds is mostly black but with a little
+// bit of blue so it can still be seen on all-black video frames, which are common.
+$primary-background-color: #2B333F;  // #2B333F default
+$center-big-play-button: true; // true default
+
+.video-js {
+    /* The base font size controls the size of everything, not just text.
+    All dimensions use em-based sizes so that the scale along with the font size.*/
+    font-size: 12px;
+    
+    /* The main font color changes the ICON COLORS as well as the text */
+    color: $primary-foreground-color;
+}
+
+/* The "Big Play Button" is the play button that shows before the video plays.*/
+.vjs-default-skin .vjs-big-play-button {
+    /* The font size is what makes the big play button...big.*/
+    font-size: 4em;
+    $big-play-width: 3em; 
+    $big-play-height: 3em;
+    
+    line-height: $big-play-height;
+    height: $big-play-height;
+    width: $big-play-width;
+    
+    border: 0 solid $primary-foreground-color;
+    border-radius: 3em;
+    
+    @if $center-big-play-button {
+        /* Align center */
+        left: 50%;
+        top: 50%;
+        margin-left: -($big-play-width / 2);
+        margin-top: -($big-play-height / 2);   
+    } @else {
+        /* Align top left. 0.5em = 15px default */
+        left: 0.5em;
+        top: 0.5em;
+    }
+}
+
+.video-js .vjs-big-play-button.replay .vjs-icon-placeholder:before {
+    content: '\f116';
+}
+
+/* The default color of control backgrounds is mostly black but with a little
+bit of blue so it can still be seen on all-black video frames, which are common. */
+.video-js .vjs-control-bar,
+.video-js .vjs-big-play-button,
+.video-js .vjs-menu-button .vjs-menu-content {
+    /* IE8 - has no alpha support */
+    background-color: $primary-background-color;
+    /* Opacity: 1.0 = 100%, 0.0 = 0% */
+    background-color: rgba($primary-background-color, 0.7);
+}
+
+// Make a slightly lighter version of the main background
+// for the slider background.
+$slider-bg-color: lighten($primary-background-color, 33%);
+
+/* Slider - used for Volume bar and Progress bar */
+.video-js .vjs-slider {
+    background-color: $slider-bg-color;
+    background-color: rgba($slider-bg-color, 0.5);
+}
+
+/* The slider bar color is used for the progress bar and the volume bar
+(the first two can be removed after a fix that's coming) */
+.video-js .vjs-volume-level,
+.video-js .vjs-play-progress,
+.video-js .vjs-slider-bar {
+    background: $primary-foreground-color;
+}
+
+/* The main progress bar also has a bar that shows how much has been loaded. */
+.video-js .vjs-load-progress {
+    /* For IE8 we'll lighten the color */
+    background: lighten($slider-bg-color, 25%);
+    /* Otherwise we'll rely on stacked opacities */
+    background: rgba($slider-bg-color, 0.5);
+}
+
+/* The load progress bar also has internal divs that represent
+smaller disconnected loaded time ranges */
+.video-js .vjs-load-progress div {
+    /* For IE8 we'll lighten the color */
+    background: lighten($slider-bg-color, 50%);
+    /* Otherwise we'll rely on stacked opacities */
+    background: rgba($slider-bg-color, 0.75);
+}
+
+// resolution plugin
+                            
+.video-js .vjs-resolution-button .vjs-icon-placeholder:before {
+    font-family: VideoJS;
+    content: '\f110';
+}

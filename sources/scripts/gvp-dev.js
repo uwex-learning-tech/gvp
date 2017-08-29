@@ -38,6 +38,10 @@
 
 let manifest = {};
 let source = '';
+let kaltura = {};
+let file = {
+    kalturaIDFile: 'kaltura.txt'
+};
 
 ( function ready( fn ) {
     
@@ -57,13 +61,21 @@ function initGVP() {
         
         manifest = result;
         
+        if ( manifest.gvp_root_directory.length <= 0 ) {
+            manifest.gvp_root_directory = 'sources/';
+        }
+        
+        file.kalturaLib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
+        file.kalturaSource = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
+        
     } );
     
-    getFile( 'kaltura.txt' ).then( result => {
+    getFile( file.kalturaIDFile ).then( result => {
         
         if ( result ) {
             
             source = result;
+            getKalturaLibrary();
             
         } else {
             
@@ -78,10 +90,213 @@ function initGVP() {
     		
     		source = cleanArray( source.split( '/' ) );
     		source = source[source.length-1];
+    		
+    		loadVideoJS();
             
         }
         
     } );
+    
+    let lightOnOffBtn = document.getElementById( 'gvp-light' );
+    
+    lightOnOffBtn.addEventListener( 'click', function() {
+        
+        let body = document.getElementsByTagName( 'body' )[0];
+        let toggle = document.getElementsByClassName( 'gvp-toggle-control' )[0];
+        
+        if ( body.classList.contains( 'light-off' ) ) {
+            
+            body.classList.remove( 'light-off' );
+            body.classList.add( 'light-on' );
+            toggle.classList.remove( 'fa-toggle-off' );
+            toggle.classList.add( 'fa-toggle-on' );
+            this.setAttribute( 'title', 'Turn the light off' );
+            
+        } else {
+            
+            body.classList.remove( 'light-on' );
+            body.classList.add( 'light-off' );
+            toggle.classList.remove( 'fa-toggle-on' );
+            toggle.classList.add( 'fa-toggle-off' );
+            this.setAttribute( 'title', 'Turn the light on' );
+            
+        }
+        
+    } );
+    
+}
+
+function getKalturaLibrary() {
+
+    getScript( file.kalturaLib, false, false );
+    getScript( file.kalturaSource, false, loadLalturaSource );
+    
+}
+
+function getScript( file, isAsync = true, callback = false ) {
+    
+    let script = document.createElement( 'script' );
+    let head = document.getElementsByTagName( 'head' )[0];
+    
+    script.async = isAsync;
+    
+    if ( callback ) {
+        script.onload = callback;
+    }
+    
+    script.onerror = function() {
+        console.warn( 'Failed to load ' + file );
+    };
+    
+    script.src = file;
+    head.appendChild( script );
+    
+}
+
+function loadLalturaSource() {
+    
+    if ( kWidget ) {
+        
+        kWidget.getSources( {
+
+            'partnerId': manifest.gvp_kaltura.id,
+            'entryId': source,
+            'callback': function( data ) {
+                
+                kaltura = data;
+                kaltura.flavor = {};
+                
+                kaltura.sources.forEach( function( flavor ) {
+                    
+                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.low ) {
+                        kaltura.flavor.low = flavor.src;
+                        return;
+                    }
+                    
+                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.medium ) {
+                        kaltura.flavor.medium = flavor.src;
+                        return;
+                    }
+                    
+                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.normal ) {
+                        kaltura.flavor.normal = flavor.src;
+                        return;
+                    }
+                    
+                } );
+                
+                document.getElementsByTagName( 'title' )[0].innerHTML = data.name;
+                document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = data.name;
+                
+                loadVideoJS();
+                
+            }
+    
+        } );
+        
+    }
+    
+}
+
+function loadVideoJS() {
+    
+    let playerOptions = {
+        
+        techOrder: ['html5'],
+        controls: true,
+        autoplay: false,
+        preload: 'auto',
+        playbackRates: [0.5, 1, 1.5, 2],
+        fluid: true,
+        plugins: {}
+        
+    };
+    
+    if ( kaltura ) {
+        
+        Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
+        
+    }
+    
+    videojs( 'gvp-video', playerOptions, function() {
+        
+        let self = this;
+        
+        if ( kaltura ) {
+            
+            self.poster( kaltura.poster + '/width/900/quality/100' );
+            self.updateSrc( [
+                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
+                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
+                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
+            ] );
+            
+            if ( kaltura.captionId ) {
+                
+                self.addRemoteTextTrack( {
+            		kind: 'captions',
+            		language: 'en',
+            		label: 'English',
+            		src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+        		}, true );
+                
+            }
+            
+        }
+        
+        self.on( 'playing', function() {
+            let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+            logo.style.display = 'none';
+        } );
+        
+        self.on( 'ended', function() {
+            
+            let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+            logo.style.display = 'initial';
+            
+            self.bigPlayButton.el_.classList.add( 'replay' );
+            self.hasStarted( false );
+            
+        } );
+        
+    });
+    
+    hideCover();
+    
+}
+
+function hideCover() {
+    
+    setTimeout( function() {
+        
+        let cover = document.getElementsByClassName( 'gvp-cover' )[0];
+    
+        if ( cover.style.display !== 'none' ) {
+            
+            cover.style.opacity = 1;
+            
+            let last = +new Date();
+            let tick = function() {
+                
+                cover.style.opacity = +cover.style.opacity - ( new Date() - last ) / 500;
+                last = +new Date();
+                
+                if ( +cover.style.opacity > 0 && +cover.style.opacity <= 1 ) {
+                    (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 500);
+                }
+                
+                if ( +cover.style.opacity <= 0 ) {
+                    cover.style.opacity = 0;
+                    cover.style.display = 'none';
+                }
+                
+            };
+            
+            tick();
+
+        }
+        
+    }, 500 );
     
 }
 
