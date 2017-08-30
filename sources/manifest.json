@@ -20,8 +20,48 @@
     "gvp_custom_themes": [
         
         {
-            "logo": "Help",
-            "color": "help"
+            "name": "ceoel",
+            "colors": [ "#0a4a89", "#2a6b9f", "#578db5", "#88b1ce", "#c1d7e6" ]
+        },
+        
+        {
+            "name": "apc",
+            "colors": [ "#144B5F", "#2D8B91", "#8CB249", "#7DA7AA", "#144B5F" ]
+        },
+        
+        {
+            "name": "uls",
+            "colors": [ "#712453", "#461F4B", "#1C4D6C", "#428465", "#BD3E48" ]
+        },
+        
+        {
+            "name": "ds",
+            "colors": [ "#DC4031", "#ECB343", "#8BB341", "#DC4031", "#ECB343" ]
+        },
+        
+        {
+            "name": "flx",
+            "colors": [ "#A22E45", "#9ABB4E", "#F6BC4B", "#6DBCDE", "#56585A" ]
+        },
+        
+        {
+            "name": "hwm",
+            "colors": [ "#1C4D6D", "#7B9B39", "#594B98", "#276BA5", "#7B9B39" ]
+        },
+        
+        {
+            "name": "il",
+            "colors": [ "#377C8B", "#B60050", "#211C1B", "#72A1AB", "#D0D9DE" ]
+        },
+        
+        {
+            "name": "smgt",
+            "colors": [ "#617949", "#364852", "#6B7E82", "#7A9D43", "#7DA8AF" ]
+        },
+        
+        {
+            "name": "msmgt",
+            "colors": [ "#617949", "#364852", "#6B7E82", "#7A9D43", "#7DA8AF" ]
         }
         
     ]

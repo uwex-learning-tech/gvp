@@ -59,7 +59,7 @@ html {
         
     }
     
-    .gvp-gradient-bar {
+    .gvp-decoration-bar {
         
         @include display-flex();
         @include flex-flow( row nowrap );
@@ -68,28 +68,9 @@ html {
             @include flex( 1 0 auto );
             height: rem( $gutter );
             @include user-select( none );
+            background-color: rgb(10, 74, 137);
         }
         
-        span:nth-child(1) {
-            background-color: #0a4a89;
-        }
-        
-        span:nth-child(2) {
-            background-color: #2a6b9f;
-        }
-        
-        span:nth-child(3) {
-            background-color: #578db5;
-        }
-        
-        span:nth-child(4) {
-            background-color: #88b1ce;
-        }
-        
-        span:nth-child(5) {
-            background-color: #c1d7e6;
-        }
-
     }
     
     #gvp-light {

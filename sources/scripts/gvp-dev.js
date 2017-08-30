@@ -124,16 +124,42 @@ function getGVPTemplate() {
 
 function setGVPUI() {
     
-    // display logo
-    let logoName = '';
+    // get program name
+    let programName = '';
     
     if ( urn[3] === undefined ) {
-        logoName = manifest.gvp_logo_default;
+        programName = manifest.gvp_logo_default;
     } else {
-        logoName = urn[3];
+        programName = urn[3];
     }
     
-    let logoURL = manifest.gvp_logo_directory + logoName + '.svg';
+    // apply theme
+    if ( manifest.gvp_custom_themes ) {
+            
+        let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
+        
+        for ( let theme of manifest.gvp_custom_themes ) {
+            
+            if ( theme.name === programName ) {
+                
+                theme.colors.forEach( function( hex ) {
+                    
+                    let span = document.createElement( 'span' );
+                    span.style.backgroundColor = hex;
+                    decorationBar.appendChild(span);
+                    
+                } );
+                
+                break;
+                
+            }
+            
+        }
+        
+    }
+    
+    // display logo
+    let logoURL = manifest.gvp_logo_directory + programName + '.svg';
     
     fileExist( logoURL ).then( result => {
         
