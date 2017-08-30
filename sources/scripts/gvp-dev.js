@@ -247,10 +247,19 @@ function loadLalturaSource() {
                     
                 } );
                 
-                document.getElementsByTagName( 'title' )[0].innerHTML = data.name;
-                document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = data.name;
+                document.getElementsByTagName( 'title' )[0].innerHTML = kaltura.name;
+                document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = kaltura.name;
                 
                 loadVideoJS();
+                
+                // display download
+                let fileDownloads = document.getElementsByClassName( 'gvp-downloads' )[0];
+                let vidDownloadLink = document.createElement( 'a' );
+                
+                vidDownloadLink.href = kaltura.flavor.normal;
+                vidDownloadLink.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i><span>Video</span>';
+                vidDownloadLink.download = cleanString( kaltura.name ) + '.mp4';
+                fileDownloads.appendChild( vidDownloadLink );
                 
             }
     
@@ -464,4 +473,8 @@ function cleanArray( arr ) {
     
     return arr;
     
+}
+
+function cleanString( str ) {
+    return str.replace(/[^\w]/gi, '').toLowerCase();
 }

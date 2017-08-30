@@ -1,4 +1,5 @@
 @import "compass/css3/animation";
+@import "compass/css3/box-sizing";
 @import "compass/css3/flexbox";
 @import "compass/css3/images";
 @import "compass/css3/border-radius";
@@ -92,14 +93,19 @@ html {
     }
     
     .gvp-title-bar {
+        
         padding: 0 rem( $gutter );
+        
+        h1 {
+            font-size: rem( 28px );
+        }
+        
     }
     
     .gvp-video-wrapper {
         
         position: relative;
         margin-top: rem( $gutter );
-        margin-bottom: rem( $gutter );
         padding: 0 rem( $gutter );
         
         .gvp-program-logo {
@@ -116,6 +122,48 @@ html {
         
     }
     
+    .gvp-downloads {
+        
+        @include display-flex();
+        @include flex-flow( row nowrap );
+        @include justify-content( flex-end );
+        padding: 0 rem( $gutter );
+        
+        a {
+            
+            @include display-flex();
+            @include flex-flow( row nowrap );
+            @include align-items( center );
+            @include justify-content( center );
+            width: rem( 150px );
+            height: rem( 30px );
+            font-size: rem( 12px );
+            text-decoration: none;
+            color: #636266;
+            padding: rem( 10px );
+            border-bottom: rem( 1px ) solid transparent;
+            @include box-sizing( border-box );
+            background-color: #ebe7db;
+            @include animation-name( flashBorderOut );
+            @include animation-duration( 0.5s );
+            
+            span {
+                @include flex( 1 0 auto );
+                text-align: center;
+                text-transform: uppercase;
+            }
+            
+        }
+        
+        a:hover {
+            border-width: rem( 1px );
+            border-color: #cecbbd;
+            @include animation-name( flashBorderIn );
+            @include animation-duration( 0.5s );
+        }
+        
+    }
+
     .gvp-footer {
         margin-top: rem( $gutter );
         font-size: rem( 12px );
@@ -133,7 +181,7 @@ body.light-off {
     
     #gvp-wrapper {
         
-        .gvp-gradient-bar {
+        .gvp-decoration-bar {
             opacity: 0;
         }
         
@@ -141,8 +189,12 @@ body.light-off {
             opacity: 0;
         }
         
+        .gvp-downloads {
+            display: none;
+        }
+        
         .gvp-footer {
-            opacity: 0;
+            display: none;
         }
         
     }
@@ -171,12 +223,17 @@ and (min-device-width : 1028px) {
         }
         
         .gvp-video-wrapper {
-            
             width: rem( 900px );
             margin-left: auto;
             margin-right: auto;
             padding: 0;
+        }
         
+        .gvp-downloads {
+            width: rem( 900px );
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0;
         }
     
     }
@@ -193,6 +250,16 @@ and (min-device-width : 1028px) {
 @include keyframes( fadeFromBlack ) {
     from { background-color: #000; }
     to { background-color: $default-bg-color; }
+};
+
+@include keyframes( flashBorderIn ) {
+    from { border-color: $default-bg-color; }
+    to { border-color: #cecbbd; }
+};
+
+@include keyframes( flashBorderOut ) {
+    from { border-color: #cecbbd; }
+    to { border-color: $default-bg-color; }
 };
 
 /******************************* VIDEOJS CSS **********************************/
