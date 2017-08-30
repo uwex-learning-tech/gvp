@@ -52,8 +52,8 @@ html {
         .gvp-program-logo {
             width: 340px;
             height: 124px;
-            background-image: url( 'https://media.uwex.edu/content/media/storybook_support/logo/ceoel.svg' );
             background-repeat: no-repeat;
+            background-position: center center;
             @include user-select( none );
         }
         
@@ -127,8 +127,8 @@ html {
             right: rem( 10px );
             width: 170px;
             height: 62px;
-            background-image: url( 'https://media.uwex.edu/content/media/storybook_support/logo/ceoel.svg' );
             background-repeat: no-repeat;
+            background-position: center bottom;
             z-index: 1;
             @include user-select( none );
         }

@@ -37,6 +37,7 @@
  */
 
 let manifest = {};
+let urn = window.location.href;
 let source = '';
 let kaltura = {};
 let file = {
@@ -57,6 +58,17 @@ function initGVP() {
     
     let manifestURL = document.getElementById( 'gvp-manifest' ).href;
     
+    // parse directories from the URL
+    urn = urn.split( '?' );
+    urn = urn[0];
+    
+    if ( urn.lastIndexOf( '/' ) !== urn.length - 1 ) {
+		urn += '/';
+	}
+	
+	urn = cleanArray( urn.split( '/' ) );
+    
+    // get the data from the manifest file
     getFile( manifestURL, true ).then( result => {
         
         manifest = result;
@@ -67,9 +79,14 @@ function initGVP() {
         
         file.kalturaLib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
         file.kalturaSource = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
+        file.gvpTemplate = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
+        
+        getGVPTemplate();
         
     } );
     
+    // get the kaltura video id from kaltura.txt file
+    // otherwist default to URN
     getFile( file.kalturaIDFile ).then( result => {
         
         if ( result ) {
@@ -79,24 +96,63 @@ function initGVP() {
             
         } else {
             
-            let url = window.location.href;
-            
-    		source = url.split( '?' );
-    		source = source[0];
-    		
-    		if ( source.lastIndexOf( '/' ) !== source.length - 1 ) {
-        		source += '/';
-    		}
-    		
-    		source = cleanArray( source.split( '/' ) );
-    		source = source[source.length-1];
-    		
+    		source = urn[urn.length-1];
     		loadVideoJS();
             
         }
         
     } );
     
+}
+
+function getGVPTemplate() {
+    
+    getFile( file.gvpTemplate ).then( result => {
+        
+        if ( result ) {
+            
+            let gvpWrapper = document.getElementById( 'gvp-wrapper' );
+            
+            gvpWrapper.innerHTML = result;
+            setGVPUI();
+            
+        }
+        
+    } );
+    
+}
+
+function setGVPUI() {
+    
+    // display logo
+    let logoName = '';
+    
+    if ( urn[3] === undefined ) {
+        logoName = manifest.gvp_logo_default;
+    } else {
+        logoName = urn[3];
+    }
+    
+    let logoURL = manifest.gvp_logo_directory + logoName + '.svg';
+    
+    fileExist( logoURL ).then( result => {
+        
+        let programLogoDiv = document.getElementsByClassName( 'gvp-program-logo' );
+        let url = logoURL;
+        
+        if ( result ) {
+            url = logoURL;
+        } else {
+            url = manifest.gvp_logo_directory + manifest.gvp_logo_default + '.svg'
+        }
+        
+        for ( let i = 0; i < programLogoDiv.length; i++ ) {
+            programLogoDiv[i].style.backgroundImage = 'url(' + url + ')';
+        }
+        
+    } );
+    
+    // Toggle light button
     let lightOnOffBtn = document.getElementById( 'gvp-light' );
     
     lightOnOffBtn.addEventListener( 'click', function() {
@@ -130,26 +186,6 @@ function getKalturaLibrary() {
 
     getScript( file.kalturaLib, false, false );
     getScript( file.kalturaSource, false, loadLalturaSource );
-    
-}
-
-function getScript( file, isAsync = true, callback = false ) {
-    
-    let script = document.createElement( 'script' );
-    let head = document.getElementsByTagName( 'head' )[0];
-    
-    script.async = isAsync;
-    
-    if ( callback ) {
-        script.onload = callback;
-    }
-    
-    script.onerror = function() {
-        console.warn( 'Failed to load ' + file );
-    };
-    
-    script.src = file;
-    head.appendChild( script );
     
 }
 
@@ -300,6 +336,50 @@ function hideCover() {
     
 }
 
+/****** HELPER FUNCTIONS ******/
+
+function getScript( file, isAsync = true, callback = false ) {
+    
+    let script = document.createElement( 'script' );
+    let head = document.getElementsByTagName( 'head' )[0];
+    
+    script.async = isAsync;
+    
+    if ( callback ) {
+        script.onload = callback;
+    }
+    
+    script.onerror = function() {
+        console.warn( 'Failed to load ' + file );
+    };
+    
+    script.src = file;
+    head.appendChild( script );
+    
+}
+
+async function fileExist( file ) {
+    
+    let options = {
+        method: 'HEAD'
+    };
+    
+    try {
+        
+        let response = await fetch( file, options );
+        
+        if ( response.ok ) {
+            return true;
+        }
+        
+        return false;
+        
+    } catch ( e ) {
+        return false;
+    }
+    
+}
+
 async function getFile( file, isJson = false ) {
     
     let httpHeaders = new Headers();
@@ -351,6 +431,10 @@ function cleanArray( arr ) {
         }
         
     } );
+    
+    if ( ( /(\w*|(\w*\-\w*)*)\.\w*/ig ).test( arr[arr.length-1] ) ) {
+        arr.pop();
+    }
     
     return arr;
     

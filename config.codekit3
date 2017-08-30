@@ -65150,6 +65150,12 @@
 		"sC": 0,
 		"tS": 0
 		},
+	"\/sources\/scripts\/templates\/gvp.tpl": {
+		"ft": 8192,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/templates\/gvp.tpl",
+		"oF": 3
+		},
 	"\/sources\/scripts\/videojs\/font\/VideoJS.eot": {
 		"ft": 8192,
 		"oA": 2,
