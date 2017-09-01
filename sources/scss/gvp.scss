@@ -4,6 +4,7 @@
 @import "compass/css3/images";
 @import "compass/css3/border-radius";
 @import "compass/css3/user-interface";
+@import "compass/css3/filter";
 
 $base: 16px;
 $gutter: 20px;
@@ -118,6 +119,7 @@ html {
             background-position: center bottom;
             z-index: 1;
             @include user-select( none );
+            @include filter( invert(1) );
         }
         
     }
