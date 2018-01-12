@@ -65,7 +65,6 @@ html {
         
         @include display-flex();
         @include flex-flow( row nowrap );
-        background-color: $default-bg-color;
         
         span {
             @include flex( 1 0 auto );

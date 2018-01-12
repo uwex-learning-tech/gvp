@@ -114,6 +114,14 @@ function getGVPTemplate() {
             let gvpWrapper = document.getElementById( 'gvp-wrapper' );
             
             gvpWrapper.innerHTML = result;
+            
+            // get/set copyright year
+            let copyrightYearHolder = document.getElementsByClassName( 'gvp-copyright-year' )[0];
+            let date = new Date();
+            let year = date.getFullYear();
+            
+            copyrightYearHolder.innerHTML = year;
+            
             setGvpUi();
             
         }
@@ -124,8 +132,8 @@ function getGVPTemplate() {
 
 function setGvpUi() {
     
-    // get light on / off setting
-    let lightOn = getUrlParameter( "light" );
+    // get URL Query Parameters for settings
+    let settingsQuery = new URLSearchParams( location.search );
     
     // get program name
     let programName = '';
@@ -156,7 +164,7 @@ function setGvpUi() {
         
     } );
     
-    if ( lightOn === "1" ) {
+    if ( settingsQuery.has( 'light' ) && settingsQuery.get( "light" ) === '1' ) {
         
         let body = document.getElementsByTagName( 'body' )[0];
         
@@ -467,14 +475,5 @@ function cleanArray( arr ) {
 function cleanString( str ) {
     
     return str.replace(/[^\w]/gi, '').toLowerCase();
-    
-}
-
-function getUrlParameter( name ) {
-    
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     
 }
