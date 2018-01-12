@@ -9,7 +9,7 @@
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Storybook Plus is an web application that serves multimedia contents.
-    Copyright (C) 2013-2017  Ethan S. Lin, UWEX CEOEL Media Services
+    Copyright (C) 2013-2018  Ethan S. Lin, UWEX CEOEL Media Services
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ function getGVPTemplate() {
             let gvpWrapper = document.getElementById( 'gvp-wrapper' );
             
             gvpWrapper.innerHTML = result;
-            setGVPUI();
+            setGvpUi();
             
         }
         
@@ -122,7 +122,10 @@ function getGVPTemplate() {
     
 }
 
-function setGVPUI() {
+function setGvpUi() {
+    
+    // get light on / off setting
+    let lightOn = getUrlParameter( "light" );
     
     // get program name
     let programName = '';
@@ -131,31 +134,6 @@ function setGVPUI() {
         programName = manifest.gvp_logo_default;
     } else {
         programName = urn[3];
-    }
-    
-    // apply theme
-    if ( manifest.gvp_custom_themes ) {
-            
-        let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
-        
-        for ( let theme of manifest.gvp_custom_themes ) {
-            
-            if ( theme.name === programName ) {
-                
-                theme.colors.forEach( function( hex ) {
-                    
-                    let span = document.createElement( 'span' );
-                    span.style.backgroundColor = hex;
-                    decorationBar.appendChild(span);
-                    
-                } );
-                
-                break;
-                
-            }
-            
-        }
-        
     }
     
     // display logo
@@ -178,33 +156,44 @@ function setGVPUI() {
         
     } );
     
-    // Toggle light button
-    let lightOnOffBtn = document.getElementById( 'gvp-light' );
-    
-    lightOnOffBtn.addEventListener( 'click', function() {
+    if ( lightOn === "1" ) {
         
         let body = document.getElementsByTagName( 'body' )[0];
-        let toggle = document.getElementsByClassName( 'gvp-toggle-control' )[0];
         
-        if ( body.classList.contains( 'light-off' ) ) {
+        if ( !body.classList.contains( 'light-off' ) ) {
             
-            body.classList.remove( 'light-off' );
-            body.classList.add( 'light-on' );
-            toggle.classList.remove( 'fa-toggle-off' );
-            toggle.classList.add( 'fa-toggle-on' );
-            this.setAttribute( 'title', 'Turn the light off' );
-            
-        } else {
-            
-            body.classList.remove( 'light-on' );
             body.classList.add( 'light-off' );
-            toggle.classList.remove( 'fa-toggle-on' );
-            toggle.classList.add( 'fa-toggle-off' );
-            this.setAttribute( 'title', 'Turn the light on' );
             
         }
         
-    } );
+    } else {
+        
+        // apply theme
+        if ( manifest.gvp_custom_themes ) {
+                
+            let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
+            
+            for ( let theme of manifest.gvp_custom_themes ) {
+                
+                if ( theme.name === programName ) {
+                    
+                    theme.colors.forEach( function( hex ) {
+                        
+                        let span = document.createElement( 'span' );
+                        span.style.backgroundColor = hex;
+                        decorationBar.appendChild(span);
+                        
+                    } );
+                    
+                    break;
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
     
 }
 
@@ -476,5 +465,16 @@ function cleanArray( arr ) {
 }
 
 function cleanString( str ) {
+    
     return str.replace(/[^\w]/gi, '').toLowerCase();
+    
+}
+
+function getUrlParameter( name ) {
+    
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    
 }

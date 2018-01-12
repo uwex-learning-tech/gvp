@@ -1,6 +1,4 @@
 <div class="gvp-cover"><div class="gvp-program-logo"></div></div>
-        
-<div id="gvp-light" title="Turn the light off"><i class="fa fa-lightbulb-o fa-lg" aria-hidden="true"></i> <i class="fa fa-toggle-on fa-lg gvp-toggle-control" aria-hidden="true"></i></div>
 
 <div class="gvp-decoration-bar"></div>
 
@@ -18,5 +16,5 @@
 <div class="gvp-downloads"></div>
 
 <div class="gvp-footer">
-    <p>&copy; <span class="gvp-copyright-year">2017</span>. University of Wisconsin System and University of Wisconsin-Extension, Division of Continuing Education, Outreach, &amp; E-Learning. All rights reserved.</p>
+    <p>&copy; <span class="gvp-copyright-year">2018</span>. University of Wisconsin System and University of Wisconsin-Extension, Division of Continuing Education, Outreach, &amp; E-Learning. All rights reserved.</p>
 </div>

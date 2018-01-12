@@ -65,6 +65,7 @@ html {
         
         @include display-flex();
         @include flex-flow( row nowrap );
+        background-color: $default-bg-color;
         
         span {
             @include flex( 1 0 auto );
@@ -200,14 +201,6 @@ body.light-off {
         }
         
     }
-    
-}
-
-body.light-on {
-        
-    @include animation-name( fadeFromBlack );
-    @include animation-duration( 0.5s );
-    background-color: $default-bg-color;
     
 }
 
