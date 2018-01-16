@@ -40,6 +40,7 @@ let manifest = {};
 let urn = window.location.href;
 let source = '';
 let kaltura = {};
+let isLocal = false;
 let file = {
     kalturaIDFile: 'kaltura.txt'
 };
@@ -82,24 +83,6 @@ function initGVP() {
         file.gvpTemplate = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
         
         getGVPTemplate();
-        
-    } );
-    
-    // get the kaltura video id from kaltura.txt file
-    // otherwist default to URN
-    getFile( file.kalturaIDFile ).then( result => {
-        
-        if ( result ) {
-            
-            source = result;
-            getKalturaLibrary();
-            
-        } else {
-            
-    		source = urn[urn.length-1];
-    		loadVideoJS();
-            
-        }
         
     } );
     
@@ -203,6 +186,44 @@ function setGvpUi() {
         
     }
     
+    setVideo();
+    
+}
+
+function setVideo() {
+    
+    // get the kaltura video id from kaltura.txt file
+    // otherwist default to URN
+    getFile( file.kalturaIDFile ).then( result => {
+        
+        if ( result ) {
+            
+            source = result;
+            getKalturaLibrary();
+            isLocal = false;
+            
+        } else {
+            
+            isLocal = true;
+            
+            if ( urn[5] === undefined ) {
+                
+                source = "video";
+                
+            } else {
+                
+                source = urn[5];
+                
+            }
+    		
+    		setTitle();
+            loadVideoJS();
+            setDownloadables();
+            
+        }
+        
+    } );
+    
 }
 
 function getKalturaLibrary() {
@@ -244,19 +265,9 @@ function loadLalturaSource() {
                     
                 } );
                 
-                document.getElementsByTagName( 'title' )[0].innerHTML = kaltura.name;
-                document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = kaltura.name;
-                
+                setTitle();
                 loadVideoJS();
-                
-                // display download
-                let fileDownloads = document.getElementsByClassName( 'gvp-downloads' )[0];
-                let vidDownloadLink = document.createElement( 'a' );
-                
-                vidDownloadLink.href = kaltura.flavor.normal;
-                vidDownloadLink.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i><span>Video</span>';
-                vidDownloadLink.download = cleanString( kaltura.name ) + '.mp4';
-                fileDownloads.appendChild( vidDownloadLink );
+                setDownloadables();
                 
             }
     
@@ -267,6 +278,8 @@ function loadLalturaSource() {
 }
 
 function loadVideoJS() {
+    
+    // set player
     
     let playerOptions = {
         
@@ -280,8 +293,7 @@ function loadVideoJS() {
         
     };
     
-    if ( kaltura ) {
-        
+    if ( kaltura && isLocal === false ) {
         Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
         
     }
@@ -290,7 +302,7 @@ function loadVideoJS() {
         
         let self = this;
         
-        if ( kaltura ) {
+        if ( kaltura && isLocal === false ) {
             
             self.poster( kaltura.poster + '/width/900/quality/100' );
             self.updateSrc( [
@@ -308,6 +320,21 @@ function loadVideoJS() {
             		src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
         		}, true );
                 
+            }
+            
+        } else {
+            
+            self.src( source + '.mp4' );
+            
+            if ( fileExist( source + '.vtt' ) ) {
+                
+                self.addRemoteTextTrack( {
+            		kind: 'captions',
+            		language: 'en',
+            		label: 'English',
+            		src: source + '.vtt'
+        		}, true );
+        		
             }
             
         }
@@ -330,6 +357,52 @@ function loadVideoJS() {
     });
     
     hideCover();
+    
+}
+
+function setTitle() {
+    
+    let name = "";
+    
+    if ( kaltura && isLocal === false ) {
+        name = kaltura.name;
+    }
+    
+    // set title and downloadables
+    document.getElementsByTagName( 'title' )[0].innerHTML = name;
+    document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = name;
+    
+}
+
+function setDownloadables() {
+    
+    let name = source + '.mp4';
+    let url = name;
+    
+    if ( kaltura && isLocal === false ) {
+        
+        name = cleanString( kaltura.name ) + ".mp4";
+        url = kaltura.flavor.normal;
+        
+    } else {
+        
+        if ( urn[5] !== undefined ) {
+            
+            name = urn[5] + ".mp4";
+            url = name;
+            
+        }
+        
+    }
+    
+    // display download
+    let fileDownloads = document.getElementsByClassName( 'gvp-downloads' )[0];
+    let vidDownloadLink = document.createElement( 'a' );
+    
+    vidDownloadLink.href = url;
+    vidDownloadLink.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i><span>Video</span>';
+    vidDownloadLink.download = name;
+    fileDownloads.appendChild( vidDownloadLink );
     
 }
 
