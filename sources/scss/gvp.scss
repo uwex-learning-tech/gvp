@@ -350,6 +350,10 @@ $slider-bg-color: lighten($primary-background-color, 33%);
     background-color: rgba($slider-bg-color, 0.5);
 }
 
+.video-js .vjs-play-control {
+    cursor: pointer;
+}
+
 /* The slider bar color is used for the progress bar and the volume bar
 (the first two can be removed after a fix that's coming) */
 .video-js .vjs-volume-level,

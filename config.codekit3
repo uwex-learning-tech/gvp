@@ -65604,14 +65604,14 @@
 		"ft": 8192,
 		"oA": 2,
 		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.eot",
-		"oF": 3
+		"oF": 2
 		},
 	"\/sources\/scripts\/videojs\/font\/VideoJS.svg": {
 		"ft": 2097152,
 		"miP": 0,
 		"oA": 2,
 		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.svg",
-		"oF": 3,
+		"oF": 2,
 		"opt": 0,
 		"plM": 3758088159,
 		"prP": 0
@@ -65621,23 +65621,23 @@
 		"ft": 8192,
 		"oA": 2,
 		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.ttf",
-		"oF": 3
+		"oF": 2
 		},
 	"\/sources\/scripts\/videojs\/font\/VideoJS.woff": {
 		"cB": 0,
 		"ft": 8192,
 		"oA": 2,
 		"oAP": "\/build\/sources\/scripts\/videojs\/font\/VideoJS.woff",
-		"oF": 3
+		"oF": 2
 		},
 	"\/sources\/scripts\/videojs\/lang\/ar.js": {
 		"ft": 64,
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ar.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ar-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/ba.js": {
@@ -65645,9 +65645,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ba.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ba-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/bg.js": {
@@ -65655,9 +65655,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/bg.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/bg-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/ca.js": {
@@ -65665,9 +65665,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ca.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ca-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/cs.js": {
@@ -65675,9 +65675,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/cs.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/cs-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/da.js": {
@@ -65685,9 +65685,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/da.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/da-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/de.js": {
@@ -65695,9 +65695,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/de.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/de-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/el.js": {
@@ -65705,9 +65705,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/el.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/el-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/en.js": {
@@ -65715,9 +65715,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/en.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/en-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/es.js": {
@@ -65725,9 +65725,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/es.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/es-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/fa.js": {
@@ -65735,9 +65735,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fa.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fa-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/fi.js": {
@@ -65745,9 +65745,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fi.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fi-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/fr.js": {
@@ -65755,9 +65755,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fr.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/fr-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/gl.js": {
@@ -65765,9 +65765,19 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/gl.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/gl-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
+		"tS": 0
+		},
+	"\/sources\/scripts\/videojs\/lang\/he.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 0,
+		"oA": 2,
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/he-min.js",
+		"oF": 3,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/hr.js": {
@@ -65775,9 +65785,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/hr.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/hr-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/hu.js": {
@@ -65785,9 +65795,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/hu.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/hu-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/it.js": {
@@ -65795,9 +65805,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/it.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/it-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/ja.js": {
@@ -65805,9 +65815,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ja.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ja-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/ko.js": {
@@ -65815,9 +65825,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ko.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ko-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/nb.js": {
@@ -65825,9 +65835,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nb.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nb-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/nl.js": {
@@ -65835,9 +65845,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nl.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nl-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/nn.js": {
@@ -65845,9 +65855,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nn.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/nn-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/pl.js": {
@@ -65855,9 +65865,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pl.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pl-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/pt-BR.js": {
@@ -65865,9 +65875,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pt-BR.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pt-BR-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/pt-PT.js": {
@@ -65875,9 +65885,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pt-PT.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/pt-PT-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/ru.js": {
@@ -65885,9 +65895,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ru.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/ru-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/sk.js": {
@@ -65895,9 +65905,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sk.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sk-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/sr.js": {
@@ -65905,9 +65915,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sr.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sr-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/sv.js": {
@@ -65915,9 +65925,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sv.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/sv-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/tr.js": {
@@ -65925,9 +65935,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/tr.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/tr-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/uk.js": {
@@ -65935,9 +65945,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/uk.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/uk-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/vi.js": {
@@ -65945,9 +65955,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/vi.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/vi-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/zh-CN.js": {
@@ -65955,9 +65965,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/zh-CN.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/zh-CN-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/lang\/zh-TW.js": {
@@ -65965,9 +65975,9 @@
 		"ma": 0,
 		"mi": 0,
 		"oA": 2,
-		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/zh-TW.js",
+		"oAP": "\/build\/sources\/scripts\/videojs\/lang\/zh-TW-min.js",
 		"oF": 3,
-		"sC": 0,
+		"sC": 1,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/plugins\/resolution\/videojs-resolution-switcher.js": {
