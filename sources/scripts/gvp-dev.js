@@ -37,6 +37,7 @@
  */
 
 let manifest = {};
+let program = {};
 let urn = window.location.href;
 let urlParams = new URLSearchParams( window.location.search );
 let source = '';
@@ -83,13 +84,34 @@ function initGVP() {
         file.kalturaSource = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
         file.gvpTemplate = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
         
-        getGVPTemplate();
+        setProgram();
+        setGvpTemplate();
         
     } );
     
 }
 
-function getGVPTemplate() {
+function setProgram() {
+    
+    if ( manifest.gvp_custom_themes ) {
+
+        program = manifest.gvp_custom_themes.find( function (obj) {
+            return obj.name === urn[3];
+        } );
+        
+        if ( program === undefined ) {
+            
+            program = manifest.gvp_custom_themes.find( function (obj) {
+                return obj.name === manifest.gvp_logo_default;
+            } );
+            
+        }
+        
+    }
+    
+}
+
+function setGvpTemplate() {
     
     getFile( file.gvpTemplate ).then( result => {
         
@@ -116,17 +138,8 @@ function getGVPTemplate() {
 
 function setGvpUi() {
     
-    // get program name
-    let programName = '';
-    
-    if ( urn[3] === undefined ) {
-        programName = manifest.gvp_logo_default;
-    } else {
-        programName = urn[3];
-    }
-    
     // display logo
-    let logoURL = manifest.gvp_logo_directory + programName + '.svg';
+    let logoURL = manifest.gvp_logo_directory + program.name + '.svg';
     
     fileExist( logoURL ).then( result => {
         
@@ -155,36 +168,24 @@ function setGvpUi() {
             
         }
         
-    } else {
-        
-        // apply theme
-        if ( manifest.gvp_custom_themes ) {
-                
-            let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
-            
-            for ( let theme of manifest.gvp_custom_themes ) {
-                
-                if ( theme.name === programName ) {
-                    
-                    theme.colors.forEach( function( hex ) {
-                        
-                        let span = document.createElement( 'span' );
-                        span.style.backgroundColor = hex;
-                        decorationBar.appendChild(span);
-                        
-                    } );
-                    
-                    break;
-                    
-                }
-                
-            }
-            
-        }
-        
     }
     
+    setProgramTheme()
     setVideo();
+    
+}
+
+function setProgramTheme() {
+    
+    let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
+    
+    program.colors.forEach( function( hex ) {
+                    
+        let span = document.createElement( 'span' );
+        span.style.backgroundColor = hex;
+        decorationBar.appendChild(span);
+        
+    } );
     
 }
 
@@ -300,7 +301,6 @@ function loadVideoJS() {
     
     if ( kaltura && isLocal === false ) {
         Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
-        
     }
     
     videojs( 'gvp-video', playerOptions, function() {
@@ -359,7 +359,7 @@ function loadVideoJS() {
             
         } );
         
-    });
+    } );
     
     hideCover();
     
