@@ -38,6 +38,7 @@
 
 let manifest = {};
 let urn = window.location.href;
+let urlParams = new URLSearchParams( window.location.search );
 let source = '';
 let kaltura = {};
 let isLocal = false;
@@ -115,9 +116,6 @@ function getGVPTemplate() {
 
 function setGvpUi() {
     
-    // get URL Query Parameters for settings
-    let settingsQuery = new URLSearchParams( location.search );
-    
     // get program name
     let programName = '';
     
@@ -147,7 +145,7 @@ function setGvpUi() {
         
     } );
     
-    if ( settingsQuery.has( 'light' ) && settingsQuery.get( "light" ) === '1' ) {
+    if ( urlParams.has( 'light' ) && urlParams.get( "light" ) === '1' ) {
         
         let body = document.getElementsByTagName( 'body' )[0];
         
@@ -279,13 +277,20 @@ function loadLalturaSource() {
 
 function loadVideoJS() {
     
-    // set player
+    
+    let isAutoplay = false;
+    
+    if ( urlParams.has( 'autoplay' ) && urlParams.get( 'autoplay' ) === '1' ) {
+        
+        isAutoplay = true;
+        
+    }
     
     let playerOptions = {
         
         techOrder: ['html5'],
         controls: true,
-        autoplay: false,
+        autoplay: isAutoplay,
         preload: 'auto',
         playbackRates: [0.5, 1, 1.5, 2],
         fluid: true,
@@ -365,7 +370,17 @@ function setTitle() {
     let name = "";
     
     if ( kaltura && isLocal === false ) {
+        
         name = kaltura.name;
+        
+    } else {
+        
+        if ( urlParams.has( 'title' ) ) {
+            
+            name = urlParams.get( 'title' );
+            
+        }
+        
     }
     
     // set title and downloadables
