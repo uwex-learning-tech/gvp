@@ -5,12 +5,16 @@
   "main": "",
   "author": "Ethan Lin",
   "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oel-mediateam/gvp.git"
+  },
   "devDependencies": {
-    "babel-eslint": "^7.2.3",
-    "babel-plugin-transform-async-to-generator": "^6.24.1",
-    "eslint": "^3.19.0"
+    "babel-eslint": "^8.2.1",
+    "babel-plugin-transform-async-to-generator": ">=6.24.1",
+    "eslint": "^4.15.0"
   },
   "dependencies": {
-    "babel-polyfill": "^6.26.0"
+    "babel-polyfill": ">=6.26.0"
   }
 }
