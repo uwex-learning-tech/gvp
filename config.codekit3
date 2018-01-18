@@ -58616,11 +58616,11 @@
 		"sC": 1,
 		"tS": 0
 		},
-	"\/node_modules\/video.js\/dist\/video-js-6.6.0.zip": {
+	"\/node_modules\/video.js\/dist\/video-js-6.6.2.zip": {
 		"cB": 0,
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/build\/node_modules\/video.js\/dist\/video-js-6.6.0.zip",
+		"oAP": "\/build\/node_modules\/video.js\/dist\/video-js-6.6.2.zip",
 		"oF": 0
 		},
 	"\/node_modules\/video.js\/dist\/video-js.css": {
