@@ -46,6 +46,7 @@ let isLocal = false;
 let file = {
     kalturaIDFile: 'kaltura.txt'
 };
+let isIframe = false;
 
 ( function ready( fn ) {
     
@@ -70,6 +71,14 @@ function initGVP() {
 	}
 	
 	urn = cleanArray( urn.split( '/' ) );
+	
+	// if inside an iframe
+	if ( window.self != window.top ) {
+    	
+    	isIframe = true;
+    	console.log("iFramed");
+    	
+	}
     
     // get the data from the manifest file
     getFile( manifestURL, true ).then( result => {
@@ -121,13 +130,21 @@ function setGvpTemplate() {
             
             gvpWrapper.innerHTML = result;
             
-            // get/set copyright year
-            let copyrightYearHolder = document.getElementsByClassName( 'gvp-copyright-year' )[0];
-            let date = new Date();
-            let year = date.getFullYear();
-            
-            copyrightYearHolder.innerHTML = year;
-            
+            if ( !isIframe ) {
+                
+                // get/set copyright year
+                let copyrightYearHolder = document.getElementsByClassName( 'gvp-copyright-year' )[0];
+                let date = new Date();
+                let year = date.getFullYear();
+                
+                copyrightYearHolder.innerHTML = year;
+                
+            } else {
+                
+                gvpWrapper.classList.add( "embedded" );
+                
+            }
+
             setGvpUi();
             
         }
@@ -158,19 +175,24 @@ function setGvpUi() {
         
     } );
     
-    if ( urlParams.has( 'light' ) && urlParams.get( "light" ) === '1' ) {
+    if ( !isIframe ) {
         
-        let body = document.getElementsByTagName( 'body' )[0];
-        
-        if ( !body.classList.contains( 'light-off' ) ) {
+        if ( urlParams.has( 'light' ) && urlParams.get( "light" ) === '1' ) {
             
-            body.classList.add( 'light-off' );
+            let body = document.getElementsByTagName( 'body' )[0];
+            
+            if ( !body.classList.contains( 'light-off' ) ) {
+                
+                body.classList.add( 'light-off' );
+                
+            }
             
         }
         
+        setProgramTheme();
+        
     }
     
-    setProgramTheme()
     setVideo();
     
 }
@@ -345,14 +367,26 @@ function loadVideoJS() {
         }
         
         self.on( 'playing', function() {
+            
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
             logo.style.display = 'none';
+            
+            if ( isIframe ) {
+                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                titleBar.style.display = 'none';
+            }
+            
         } );
         
         self.on( 'ended', function() {
             
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
             logo.style.display = 'initial';
+            
+            if ( isIframe ) {
+                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                titleBar.style.display = 'block';
+            }
             
             self.bigPlayButton.el_.classList.add( 'replay' );
             self.hasStarted( false );
@@ -452,7 +486,7 @@ function hideCover() {
 
         }
         
-    }, 500 );
+    }, 250 );
     
 }
 
