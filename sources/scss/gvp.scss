@@ -134,15 +134,11 @@ html {
         @include justify-content( flex-end );
         padding: 0 rem( $gutter );
         
-        a {
-            
-            @include display-flex();
-            @include flex-flow( row nowrap );
-            @include align-items( center );
-            @include justify-content( center );
+        a { 
             width: rem( 150px );
             height: rem( 30px );
             font-size: rem( 12px );
+            text-align: center;
             text-decoration: none;
             color: $body-bgcolor;
             padding: rem( 10px );
@@ -151,13 +147,6 @@ html {
             background-color: #ebe7db;
             @include animation-name( flashBorderOut );
             @include animation-duration( 0.5s );
-            
-            span {
-                @include flex( 1 0 auto );
-                text-align: center;
-                text-transform: uppercase;
-            }
-            
         }
         
         a:hover {

@@ -449,7 +449,7 @@ function setDownloadables() {
     let vidDownloadLink = document.createElement( 'a' );
     
     vidDownloadLink.href = url;
-    vidDownloadLink.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i><span>Video</span>';
+    vidDownloadLink.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i> Video';
     vidDownloadLink.download = name;
     fileDownloads.appendChild( vidDownloadLink );
     
