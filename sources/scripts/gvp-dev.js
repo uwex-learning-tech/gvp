@@ -138,6 +138,10 @@ function setGvpTemplate() {
                 
                 copyrightYearHolder.innerHTML = year;
                 
+                // set copyright notice
+                let noticeHolder = document.getElementById( 'gvp_notice' );
+                noticeHolder.innerHTML = manifest.gvp_copyright;
+                
             } else {
                 
                 gvpWrapper.classList.add( "embedded" );

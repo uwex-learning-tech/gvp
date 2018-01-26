@@ -16,5 +16,5 @@
 <div class="gvp-downloads"></div>
 
 <div class="gvp-footer">
-    <p>&copy; <span class="gvp-copyright-year"></span>. University of Wisconsin System and University of Wisconsin-Extension, Division of Continuing Education, Outreach, &amp; E-Learning. All rights reserved.</p>
+    <p>&copy; <span class="gvp-copyright-year"></span>. <span id="gvp_notice"></span></p>
 </div>
