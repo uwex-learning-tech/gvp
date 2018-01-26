@@ -76,7 +76,6 @@ function initGVP() {
 	if ( window.self != window.top ) {
     	
     	isIframe = true;
-    	console.log("iFramed");
     	
 	}
     
@@ -417,7 +416,7 @@ function setTitle() {
         
     }
     
-    // set title and downloadables
+    // set title
     document.getElementsByTagName( 'title' )[0].innerHTML = name;
     document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = name;
     
@@ -425,33 +424,67 @@ function setTitle() {
 
 function setDownloadables() {
     
-    let name = source + '.mp4';
-    let url = name;
+    let supportedFiles = manifest.gvp_download_files;
+    let fileName = source;
     
-    if ( kaltura && isLocal === false ) {
+    supportedFiles.forEach( function( file ) {
         
-        name = cleanString( kaltura.name ) + ".mp4";
-        url = kaltura.flavor.normal;
+        let label = file.label;
+        let ext = file.format;
+        let filePath = cleanString( fileName ) + '.' + ext;
         
-    } else {
-        
-        if ( urn[5] !== undefined ) {
+        // video
+        if ( ext === "mp4" ) {
             
-            name = urn[5] + ".mp4";
-            url = name;
+            let dwnldName = fileName;
+            let dwnldPath = filePath;
+            
+            if ( kaltura && isLocal === false ) {
+        
+                dwnldName = kaltura.name;
+                dwnldPath = kaltura.flavor.normal;
+                
+            } else {
+                
+                if ( urn[5] !== undefined ) {
+                    
+                    dwnldName = urn[5];
+                    dwnldPath = cleanString( dwnldName ) + '.' + ext;
+                    
+                }
+                
+            }
+            
+            createDownloadLink( dwnldName, dwnldPath, label );
+            
+            return;
             
         }
         
-    }
+        fileExist( filePath ).then( result => {
+            
+            if ( result ) {
+                
+                createDownloadLink( fileName, filePath, label );
+                
+            }
+            
+        } );
+        
+    } );
     
-    // display download
-    let fileDownloads = document.getElementsByClassName( 'gvp-downloads' )[0];
-    let vidDownloadLink = document.createElement( 'a' );
+}
+
+function createDownloadLink( name, path, label ) {
     
-    vidDownloadLink.href = url;
-    vidDownloadLink.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i> Video';
-    vidDownloadLink.download = name;
-    fileDownloads.appendChild( vidDownloadLink );
+    let downloads = document.getElementsByClassName( 'gvp-downloads' )[0];
+    let link = document.createElement( 'a' );
+    
+    link.href = path;
+    link.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i> ' + label;
+    link.download = name;
+    
+    downloads.appendChild( link );
     
 }
 

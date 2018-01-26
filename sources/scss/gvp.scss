@@ -142,18 +142,12 @@ html {
             text-decoration: none;
             color: $body-bgcolor;
             padding: rem( 10px );
-            border-bottom: rem( 1px ) solid transparent;
             @include box-sizing( border-box );
             background-color: #ebe7db;
-            @include animation-name( flashBorderOut );
-            @include animation-duration( 0.5s );
         }
         
         a:hover {
-            border-width: rem( 1px );
-            border-color: #cecbbd;
-            @include animation-name( flashBorderIn );
-            @include animation-duration( 0.5s );
+            background-color: #dfded9;
         }
         
     }
@@ -280,16 +274,6 @@ and (min-device-width : 900px) {
 @include keyframes( fadeFromBlack ) {
     from { background-color: #000; }
     to { background-color: $default-bg-color; }
-};
-
-@include keyframes( flashBorderIn ) {
-    from { border-color: $default-bg-color; }
-    to { border-color: #cecbbd; }
-};
-
-@include keyframes( flashBorderOut ) {
-    from { border-color: #cecbbd; }
-    to { border-color: $default-bg-color; }
 };
 
 /******************************* VIDEOJS CSS **********************************/
