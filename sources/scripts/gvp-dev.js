@@ -42,11 +42,13 @@ let urn = window.location.href;
 let urlParams = new URLSearchParams( window.location.search );
 let source = '';
 let kaltura = {};
-let isLocal = false;
 let file = {
     kalturaIDFile: 'kaltura.txt'
 };
-let isIframe = false;
+let flags = {
+    isLocal: false,
+    isIframe: false
+};
 
 ( function ready( fn ) {
     
@@ -75,7 +77,13 @@ function initGVP() {
 	// if inside an iframe
 	if ( window.self != window.top ) {
     	
-    	isIframe = true;
+    	flags.isIframe = true;
+    	
+    	if ( String( window.location.hash ).indexOf( 'sbplus' ) === 1 ) {
+        	
+        	flags.isInsideSBPlus = true;
+        	
+    	}
     	
 	}
     
@@ -129,7 +137,7 @@ function setGvpTemplate() {
             
             gvpWrapper.innerHTML = result;
             
-            if ( !isIframe ) {
+            if ( !flags.isIframe ) {
                 
                 // get/set copyright year
                 let copyrightYearHolder = document.getElementsByClassName( 'gvp-copyright-year' )[0];
@@ -178,7 +186,7 @@ function setGvpUi() {
         
     } );
     
-    if ( !isIframe ) {
+    if ( !flags.isIframe ) {
         
         if ( urlParams.has( 'light' ) && urlParams.get( "light" ) === '1' ) {
             
@@ -224,11 +232,11 @@ function setVideo() {
             
             source = result;
             getKalturaLibrary();
-            isLocal = false;
+            flags.isLocal = false;
             
         } else {
             
-            isLocal = true;
+            flags.isLocal = true;
             
             if ( urn[5] === undefined ) {
                 
@@ -241,8 +249,8 @@ function setVideo() {
             }
     		
     		setTitle();
-            loadVideoJS();
             setDownloadables();
+            loadVideoJS();
             
         }
         
@@ -290,8 +298,8 @@ function loadLalturaSource() {
                 } );
                 
                 setTitle();
-                loadVideoJS();
                 setDownloadables();
+                loadVideoJS();
                 
             }
     
@@ -303,102 +311,153 @@ function loadLalturaSource() {
 
 function loadVideoJS() {
     
+    setTimeout( function() {
+        
+        let isAutoplay = false;
     
-    let isAutoplay = false;
-    
-    if ( urlParams.has( 'autoplay' ) && urlParams.get( 'autoplay' ) === '1' ) {
-        
-        isAutoplay = true;
-        
-    }
-    
-    let playerOptions = {
-        
-        techOrder: ['html5'],
-        controls: true,
-        autoplay: isAutoplay,
-        preload: 'auto',
-        playbackRates: [0.5, 1, 1.5, 2],
-        fluid: true,
-        plugins: {}
-        
-    };
-    
-    if ( kaltura && isLocal === false ) {
-        Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
-    }
-    
-    videojs( 'gvp-video', playerOptions, function() {
-        
-        let self = this;
-        
-        if ( kaltura && isLocal === false ) {
+        if ( urlParams.has( 'autoplay' ) && urlParams.get( 'autoplay' ) === '1' ) {
             
-            self.poster( kaltura.poster + '/width/900/quality/100' );
-            self.updateSrc( [
-                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
-                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
-                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
-            ] );
-            
-            if ( kaltura.captionId ) {
-                
-                self.addRemoteTextTrack( {
-            		kind: 'captions',
-            		language: 'en',
-            		label: 'English',
-            		src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
-        		}, true );
-                
-            }
-            
-        } else {
-            
-            self.src( source + '.mp4' );
-            
-            if ( fileExist( source + '.vtt' ) ) {
-                
-                self.addRemoteTextTrack( {
-            		kind: 'captions',
-            		language: 'en',
-            		label: 'English',
-            		src: source + '.vtt'
-        		}, true );
-        		
-            }
+            isAutoplay = true;
             
         }
         
-        self.on( 'playing', function() {
+        let playerOptions = {
             
-            let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
-            logo.style.display = 'none';
+            techOrder: ['html5'],
+            controls: true,
+            autoplay: isAutoplay,
+            preload: 'auto',
+            playbackRates: [0.5, 1, 1.5, 2],
+            fluid: true,
+            plugins: {}
             
-            if ( isIframe ) {
-                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                titleBar.style.display = 'none';
+        };
+        
+        if ( kaltura && flags.isLocal === false ) {
+            Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
+        }
+        
+        videojs( 'gvp-video', playerOptions, function() {
+            
+            let self = this;
+            
+            if ( kaltura && flags.isLocal === false ) {
+                
+                self.poster( kaltura.poster + '/width/900/quality/100' );
+                self.updateSrc( [
+                    { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
+                    { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
+                    { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
+                ] );
+                
+                if ( kaltura.captionId ) {
+                    
+                    self.addRemoteTextTrack( {
+                		kind: 'captions',
+                		language: 'en',
+                		label: 'English',
+                		src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+            		}, true );
+                    
+                }
+                
+            } else {
+                
+                self.src( source + '.mp4' );
+                
+                if ( fileExist( source + '.vtt' ) ) {
+                    
+                    self.addRemoteTextTrack( {
+                		kind: 'captions',
+                		language: 'en',
+                		label: 'English',
+                		src: source + '.vtt'
+            		}, true );
+            		
+                }
+                
             }
             
-        } );
-        
-        self.on( 'ended', function() {
-            
-            let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
-            logo.style.display = 'initial';
-            
-            if ( isIframe ) {
-                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                titleBar.style.display = 'block';
+/*
+            if ( urlParams.has( 'start' ) ) {
+                console.log( toSeconds( urlParams.get( 'start' ) ) );
             }
             
-            self.bigPlayButton.el_.classList.add( 'replay' );
-            self.hasStarted( false );
+            if ( urlParams.has( 'end' ) ) {
+                
+                console.log( toSeconds( urlParams.get( 'end' ) ) );
+                
+            }
             
-        } );
-        
-    } );
+            self.on( 'play', function() {
+                
+                if ( urlParams.has( 'start' ) ) {
+                    self.currentTime( toSeconds( urlParams.get( 'start' ) ) );
+                }
+                
+            } );
+*/
+            
+            // event listeners
+            
+            self.on( 'playing', function() {
+                
+                let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+                logo.style.display = 'none';
+                
+                if ( flags.isIframe ) {
+                    let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                    titleBar.style.display = 'none';
+                }
+                
+            } );
+            
+            self.on( 'ended', function() {
+                
+                let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+                logo.style.display = 'initial';
+                
+                if ( flags.isIframe ) {
+                    let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                    titleBar.style.display = 'block';
+                }
+                
+                self.bigPlayButton.el_.classList.add( 'replay' );
+                self.hasStarted( false );
+                
+            } );
+            
+            // add download button
+            let MenuButton = videojs.getComponent("MenuButton");
+            let downloadButton = videojs.extend(MenuButton, {
+                constructor: function(player, options) {
+                    
+                    MenuButton.call(this, player, options);
+                    this.el().setAttribute('aria-label','Downloads');
+                    this.controlText( "Downloads" );
     
-    hideCover();
+                },
+                createItems: function() {
+                    
+                    return downloadables(this.player_);
+
+                },
+                handleClick: function() {
+                    // do something but nothing in this case
+                },
+                buildCSSClass: function() {
+                    return "vjs-downloads-button";
+                } 
+            });
+    
+            videojs.registerComponent("DownloadButton", downloadButton);
+            self.getChild('controlBar').addChild('DownloadButton', {}, 13);
+            
+        } );
+        
+        hideCover();
+        
+    }, 1000 );
     
 }
 
@@ -406,7 +465,7 @@ function setTitle() {
     
     let name = "";
     
-    if ( kaltura && isLocal === false ) {
+    if ( kaltura && flags.isLocal === false ) {
         
         name = kaltura.name;
         
@@ -426,6 +485,46 @@ function setTitle() {
     
 }
 
+function downloadables(playObj) {
+    
+    let files = document.getElementsByClassName( 'gvp-downloads' )[0].childNodes;
+    let items = [];
+    
+    let MenuItem = videojs.getComponent('MenuItem');
+    
+    let DownloadMenuItem = videojs.extend(MenuItem, {
+      constructor: function(player, options){
+        options.selectable = true;
+        MenuItem.call(this, player, options);
+        this.src = options.src;
+      }
+    } );
+    
+    DownloadMenuItem.prototype.handleClick = function(){
+      document.getElementById(this.options_.id).click();
+    };
+    
+    MenuItem.registerComponent('DownloadMenuItem', DownloadMenuItem);
+    
+    for ( let i = 0; i < files.length; i++ ) {
+        
+        let fileLabel = files[i].childNodes[0].nodeValue;
+        let fileId = files[i].id;
+        
+        items.push( new DownloadMenuItem(
+            playObj,
+            {
+                label: fileLabel,
+                id: fileId
+            }
+        ) );
+        
+    }
+    
+    return items;
+    
+}
+
 function setDownloadables() {
     
     let supportedFiles = manifest.gvp_download_files;
@@ -433,7 +532,7 @@ function setDownloadables() {
     
     supportedFiles.forEach( function( file ) {
         
-        let label = file.label;
+        let fileLabel = file.label;
         let ext = file.format;
         let filePath = cleanString( fileName ) + '.' + ext;
         
@@ -443,7 +542,7 @@ function setDownloadables() {
             let dwnldName = fileName;
             let dwnldPath = filePath;
             
-            if ( kaltura && isLocal === false ) {
+            if ( kaltura && flags.isLocal === false ) {
         
                 dwnldName = kaltura.name;
                 dwnldPath = kaltura.flavor.normal;
@@ -459,17 +558,17 @@ function setDownloadables() {
                 
             }
             
-            createDownloadLink( dwnldName, dwnldPath, label );
+            createDownloadLink( dwnldName, dwnldPath, fileLabel );
             
             return;
             
         }
         
         fileExist( filePath ).then( result => {
-            
+                
             if ( result ) {
                 
-                createDownloadLink( fileName, filePath, label );
+                createDownloadLink( fileName, filePath, fileLabel );
                 
             }
             
@@ -484,8 +583,9 @@ function createDownloadLink( name, path, label ) {
     let downloads = document.getElementsByClassName( 'gvp-downloads' )[0];
     let link = document.createElement( 'a' );
     
+    link.id = label.toLowerCase() + "Dl";
     link.href = path;
-    link.innerHTML = '<i class="fa fa-cloud-download fa-lg"></i> ' + label;
+    link.innerHTML = label;
     link.download = name;
     
     downloads.appendChild( link );
@@ -636,3 +736,68 @@ function cleanString( str ) {
     return str.replace(/[^\w]/gi, '').toLowerCase();
     
 }
+
+/*
+function toSeconds( str ) {
+    
+    let hrIndex = str.indexOf('h');
+    let minIndex = str.indexOf('m');
+    let secIndex = str.indexOf('s');
+    
+    let hr = 0;
+    let min = 0;
+    let sec = 0;
+    
+    if ( hrIndex ) {
+        
+        hr = Number( str.substring( 0, hrIndex ) );
+        
+    }
+    
+    if ( minIndex ) {
+        
+        if ( hrIndex ) {
+            
+            min = Number( str.substring( hrIndex + 1, minIndex ) );
+            
+        } else {
+            
+            min = Number( str.substring( 0, minIndex ) );
+            
+        }
+        
+        if ( min >= 60 ) {
+            
+            min = 59;
+            
+        }
+
+    }
+    
+    if ( secIndex ) {
+        
+        if ( minIndex ) {
+            
+            sec = Number( str.substring( minIndex + 1, secIndex ) );
+            
+        } else {
+            
+            sec = Number( str.substring( 0, minIndex ) );
+            
+        }
+        
+        if ( sec >= 60 ) {
+            
+            sec = 59;
+            
+        }
+
+    }
+    
+    hr = hr * 60 * 60;
+    min = min * 60;
+    
+    return hr + min + sec;
+    
+}
+*/

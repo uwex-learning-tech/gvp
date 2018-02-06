@@ -128,28 +128,7 @@ html {
     }
     
     .gvp-downloads {
-        
-        @include display-flex();
-        @include flex-flow( row nowrap );
-        @include justify-content( flex-end );
-        padding: 0 rem( $gutter );
-        
-        a { 
-            width: rem( 150px );
-            height: rem( 30px );
-            font-size: rem( 12px );
-            text-align: center;
-            text-decoration: none;
-            color: $body-bgcolor;
-            padding: rem( 10px );
-            @include box-sizing( border-box );
-            background-color: #ebe7db;
-        }
-        
-        a:hover {
-            background-color: #dfded9;
-        }
-        
+        display: none;
     }
 
     .gvp-footer {
@@ -177,11 +156,14 @@ html {
     .gvp-title-bar {
         
         position: absolute;
+        width: 100%;
+        @include box-sizing( border-box );
         top: 0;
         left: 0;
         z-index: 1;
+        padding: 0;
         background-color: rgba( $default-bg-color, 0.75 );
-          
+        
         h1 {
             font-size: rem( 16px );
             //color: #fff;
@@ -190,6 +172,10 @@ html {
             padding: rem(14px);
         }
         
+    }
+    
+    .gvp-video-wrapper {
+        padding: 0;
     }
     
     .gvp-footer {
@@ -212,10 +198,6 @@ body.light-off {
         
         .gvp-title-bar {
             opacity: 0;
-        }
-        
-        .gvp-downloads {
-            display: none;
         }
         
         .gvp-footer {
@@ -252,13 +234,6 @@ and (min-device-width : 900px) {
             }
             
         }
-        
-        .gvp-downloads {
-            width: rem( 900px );
-            margin-left: auto;
-            margin-right: auto;
-            padding: 0;
-        }
     
     }
     
@@ -275,6 +250,26 @@ and (min-device-width : 900px) {
     from { background-color: #000; }
     to { background-color: $default-bg-color; }
 };
+
+/* VIDEOJS DOWNLOADS BUTTON */
+.video-js .vjs-control-bar {
+    
+    .vjs-menu-button {
+        
+        .vjs-downloads-button:before {
+            font-family: "FontAwesome";
+            content: "\f019";
+            font-size: 150%;
+            vertical-align: text-bottom;
+        }
+        
+        .vjs-downloads-button {
+            cursor: pointer;
+        }
+        
+    }
+    
+}
 
 /******************************* VIDEOJS CSS **********************************/
 
