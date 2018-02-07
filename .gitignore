@@ -13,3 +13,12 @@ node_modules/
 # ignore video and vtt files in build directory
 build/*.mp4
 build/*.vtt
+build/*.pdf
+build/*.zip
+build/*.mp3
+
+# ignore .map files
+.map
+**/.map
+build/sources/css/*.map
+build/sources/scripts/*.map
