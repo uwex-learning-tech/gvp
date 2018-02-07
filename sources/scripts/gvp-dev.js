@@ -376,30 +376,41 @@ function loadVideoJS() {
             
         }
         
-/*
+        // queried event listeners
+        
         if ( urlParams.has( 'start' ) ) {
-            console.log( toSeconds( urlParams.get( 'start' ) ) );
+            
+            self.on( 'play', function() {
+            
+                if ( self.played().length === 0 ) {
+                    
+                    self.currentTime( toSeconds( urlParams.get( 'start' ) ) );
+                    
+                }
+                
+            } );
+            
         }
         
         if ( urlParams.has( 'end' ) ) {
-            
-            console.log( toSeconds( urlParams.get( 'end' ) ) );
+
+            self.on( 'timeupdate', function() {
+                
+                if ( self.currentTime() >= toSeconds( urlParams.get( 'end' ) ) ) {
+                    
+                    self.pause();
+                    self.off( 'timeupdate' );
+                    
+                }
+                
+            } );
             
         }
-        
-        self.on( 'play', function() {
-            
-            if ( urlParams.has( 'start' ) ) {
-                self.currentTime( toSeconds( urlParams.get( 'start' ) ) );
-            }
-            
-        } );
-*/
         
         // event listeners
         
         self.on( 'playing', function() {
-            
+
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
             logo.style.display = 'none';
             
@@ -424,6 +435,9 @@ function loadVideoJS() {
             self.hasStarted( false );
             
         } );
+        
+        // add forward 10 seconds button
+        addForwardTenSecButton( self );
         
         // add download button
         addDownloadFilesButton( self );
@@ -489,6 +503,42 @@ function hideCover() {
         }
         
     }, 250 );
+    
+}
+
+function addForwardTenSecButton( vjs ) {
+    
+    let Button = videojs.getComponent( 'Button' );
+    let forwardTenBtn = videojs.extend( Button, {
+        constructor: function( player, options ) {
+            
+            Button.call( this, player, options );
+            this.el().setAttribute( 'aria-label','Fast Forward 10 Seconds' );
+            this.controlText( 'Fast Forward 10 Seconds' );
+
+        },
+        handleClick: function() {
+            
+            if ( vjs.seekable() ) {
+                
+                let seekTime = vjs.currentTime() + 10;
+                
+                if ( seekTime >= vjs.duration() ) {
+                    seekTime = vjs.duration();
+                }
+                
+                vjs.currentTime( seekTime );
+                
+            }
+            
+        },
+        buildCSSClass: function() {
+            return 'vjs-forwardten-button vjs-control vjs-button';
+        } 
+    } );
+
+    videojs.registerComponent( 'ForwardTenBtn', forwardTenBtn );
+    vjs.getChild( 'controlBar' ).addChild( 'ForwardTenBtn', {}, 1 );
     
 }
 
@@ -748,26 +798,25 @@ function cleanString( str ) {
     
 }
 
-/*
 function toSeconds( str ) {
     
-    let hrIndex = str.indexOf('h');
-    let minIndex = str.indexOf('m');
-    let secIndex = str.indexOf('s');
+    let hrIndex = str.indexOf( 'h' );
+    let minIndex = str.indexOf( 'm' );
+    let secIndex = str.indexOf( 's' );
     
     let hr = 0;
     let min = 0;
     let sec = 0;
     
-    if ( hrIndex ) {
+    if ( hrIndex != -1 ) {
         
         hr = Number( str.substring( 0, hrIndex ) );
         
     }
     
-    if ( minIndex ) {
+    if ( minIndex != -1 ) {
         
-        if ( hrIndex ) {
+        if ( hrIndex != -1 ) {
             
             min = Number( str.substring( hrIndex + 1, minIndex ) );
             
@@ -785,15 +834,16 @@ function toSeconds( str ) {
 
     }
     
-    if ( secIndex ) {
+    if ( secIndex != -1 ) {
         
-        if ( minIndex ) {
+        
+        if ( minIndex != -1 ) {
             
             sec = Number( str.substring( minIndex + 1, secIndex ) );
             
         } else {
             
-            sec = Number( str.substring( 0, minIndex ) );
+            sec = Number( str.substring( 0, secIndex ) );
             
         }
         
@@ -811,4 +861,3 @@ function toSeconds( str ) {
     return hr + min + sec;
     
 }
-*/

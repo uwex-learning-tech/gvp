@@ -271,6 +271,27 @@ and (min-device-width : 900px) {
     
 }
 
+/* VIDEOJS FORWARD TEN SECONDS BUTTON */
+
+.video-js .vjs-control-bar {
+    
+    .vjs-forwardten-button:before {
+        font-family: "FontAwesome";
+        content: "\f050";
+        font-size: 130%;
+        vertical-align: text-bottom;
+    }
+    
+    .vjs-forwardten-button:hover::before {
+        text-shadow: none;
+    }
+    
+    .vjs-forwardten-button {
+        cursor: pointer
+    }
+    
+}
+
 /******************************* VIDEOJS CSS **********************************/
 
 /*
