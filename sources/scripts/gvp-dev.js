@@ -38,12 +38,25 @@
 
 let manifest = {};
 let program = {};
-let urn = window.location.href;
-let urlParams = new URLSearchParams( window.location.search );
-let source = '';
-let kaltura = {};
-let file = {
-    kalturaIDFile: 'kaltura.txt'
+let reference = {
+    names: window.location.href,
+    params:new URLSearchParams( window.location.search )
+};
+let gvp = {
+    source: '',
+    template: null
+};
+let kaltura = {
+    lib: null,
+    widget: null
+};
+let xml = {
+    file: 'gvp.xml',
+    doc: null,
+    titleTag: null,
+    kalturaTag: null,
+    fileNameTag: null,
+    markersTag: null
 };
 let flags = {
     isLocal: false,
@@ -65,14 +78,14 @@ function initGVP() {
     let manifestURL = document.getElementById( 'gvp-manifest' ).href;
     
     // parse directories from the URL
-    urn = urn.split( '?' );
-    urn = urn[0];
+    reference.names = reference.names.split( '?' );
+    reference.names = reference.names[0];
     
-    if ( urn.lastIndexOf( '/' ) !== urn.length - 1 ) {
-		urn += '/';
+    if ( reference.names.lastIndexOf( '/' ) !== reference.names.length - 1 ) {
+		reference.names += '/';
 	}
 	
-	urn = cleanArray( urn.split( '/' ) );
+	reference.names = cleanArray( reference.names.split( '/' ) );
 	
 	// if inside an iframe
 	if ( window.self != window.top ) {
@@ -96,9 +109,9 @@ function initGVP() {
             manifest.gvp_root_directory = 'sources/';
         }
         
-        file.kalturaLib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
-        file.kalturaSource = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
-        file.gvpTemplate = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
+        kaltura.lib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
+        kaltura.widget = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
+        gvp.template = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
         
         setProgram();
         setGvpTemplate();
@@ -112,7 +125,7 @@ function setProgram() {
     if ( manifest.gvp_custom_themes ) {
 
         program = manifest.gvp_custom_themes.find( function (obj) {
-            return obj.name === urn[3];
+            return obj.name === reference.names[3];
         } );
         
         if ( program === undefined ) {
@@ -129,7 +142,7 @@ function setProgram() {
 
 function setGvpTemplate() {
     
-    getFile( file.gvpTemplate ).then( result => {
+    getFile( gvp.template ).then( result => {
         
         if ( result ) {
             
@@ -188,7 +201,7 @@ function setGvpUi() {
     
     if ( !flags.isIframe ) {
         
-        if ( urlParams.has( 'light' ) && urlParams.get( "light" ) === '1' ) {
+        if ( reference.params.has( 'light' ) && reference.params.get( "light" ) === '1' ) {
             
             let body = document.getElementsByTagName( 'body' )[0];
             
@@ -204,7 +217,7 @@ function setGvpUi() {
         
     }
     
-    setVideo();
+    getVideoSource();
     
 }
 
@@ -222,46 +235,92 @@ function setProgramTheme() {
     
 }
 
-function setVideo() {
-    
-    // get the kaltura video id from kaltura.txt file
+function getVideoSource() {
+
+    // get the kaltura video id from gvp.xml file
     // otherwist default to URN
-    getFile( file.kalturaIDFile ).then( result => {
+    getFile( xml.file ).then( result => {
         
         if ( result ) {
             
-            source = result;
-            getKalturaLibrary();
-            flags.isLocal = false;
+            // parse the xml
+            let xmlParser = new DOMParser();
+            
+            xml.doc = xmlParser.parseFromString( result, 'text/xml' );
+            
+            // see if kalturaId tag is specified
+            xml.kalturaTag = xml.doc.getElementsByTagName( 'kalturaId' )[0];
+            
+            if ( xml.kalturaTag !== undefined ) {
+                
+                if ( xml.kalturaTag.childNodes[0] !== undefined
+                     && xml.kalturaTag.childNodes[0].nodeValue.trim() != '' ) {
+                    
+                    gvp.source = xml.kalturaTag.childNodes[0].nodeValue.trim();
+                
+                    flags.isLocal = false;
+                    getKalturaLibrary();
+                    return;
+                    
+                }
+                
+            }
+            
+            // see if fileName tag is specified
+            xml.fileNameTag = xml.doc.getElementsByTagName( 'fileName' )[0];
+            
+            if ( xml.fileNameTag !== undefined ) {
+                
+                if ( xml.fileNameTag.childNodes[0] !== undefined
+                     && xml.fileNameTag.childNodes[0].nodeValue.trim() != '' ) {
+                     
+                    gvp.source = xml.fileNameTag.childNodes[0].nodeValue;
+                    flags.isLocal = true;
+                    return;
+                
+                }
+                
+            }
+            
+            // default to 'video' if both tags are not found/available
+            gvp.source = 'video';
+            flags.isLocal = true;
             
         } else {
             
             flags.isLocal = true;
             
-            if ( urn[5] === undefined ) {
+            if ( reference.names[5] === undefined ) {
                 
-                source = "video";
+                gvp.source = "video";
                 
             } else {
                 
-                source = urn[5];
+                gvp.source = reference.names[5];
                 
             }
-    		
-    		setTitle();
-            setDownloadables();
-            loadVideoJS();
             
         }
+        
+        setVideoJs();
+
         
     } );
     
 }
 
+function setVideoJs() {
+    
+    setTitle();
+    loadVideoJS();
+    setDownloadables();
+    
+}
+
 function getKalturaLibrary() {
 
-    getScript( file.kalturaLib, false, false );
-    getScript( file.kalturaSource, false, loadLalturaSource );
+    getScript( kaltura.lib, false, false );
+    getScript( kaltura.widget, false, loadLalturaSource );
     
 }
 
@@ -270,9 +329,9 @@ function loadLalturaSource() {
     if ( kWidget ) {
         
         kWidget.getSources( {
-
+            
             'partnerId': manifest.gvp_kaltura.id,
-            'entryId': source,
+            'entryId': gvp.source,
             'callback': function( data ) {
                 
                 kaltura = data;
@@ -297,9 +356,12 @@ function loadLalturaSource() {
                     
                 } );
                 
-                setTitle();
-                setDownloadables();
-                loadVideoJS();
+                if ( kaltura.sources.length === 0 ) {
+                    showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
+                    return;
+                }
+                
+                setVideoJs();
                 
             }
     
@@ -312,8 +374,10 @@ function loadLalturaSource() {
 function loadVideoJS() {
         
     let isAutoplay = false;
+    let player = null;
+    let markersCollection = [];
 
-    if ( urlParams.has( 'autoplay' ) && urlParams.get( 'autoplay' ) === '1' ) {
+    if ( reference.params.has( 'autoplay' ) && reference.params.get( 'autoplay' ) === '1' ) {
         
         isAutoplay = true;
         
@@ -335,7 +399,7 @@ function loadVideoJS() {
         Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
     }
     
-    videojs( 'gvp-video', playerOptions, function() {
+    player = videojs( 'gvp-video', playerOptions, function() {
         
         let self = this;
         
@@ -361,15 +425,15 @@ function loadVideoJS() {
             
         } else {
             
-            self.src( source + '.mp4' );
+            self.src( gvp.source + '.mp4' );
             
-            if ( fileExist( source + '.vtt' ) ) {
+            if ( fileExist( gvp.source + '.vtt' ) ) {
                 
                 self.addRemoteTextTrack( {
             		kind: 'captions',
             		language: 'en',
             		label: 'English',
-            		src: source + '.vtt'
+            		src: gvp.source + '.vtt'
         		}, true );
         		
             }
@@ -378,13 +442,13 @@ function loadVideoJS() {
         
         // queried event listeners
         
-        if ( urlParams.has( 'start' ) ) {
+        if ( reference.params.has( 'start' ) ) {
             
             self.on( 'play', function() {
             
                 if ( self.played().length === 0 ) {
                     
-                    self.currentTime( toSeconds( urlParams.get( 'start' ) ) );
+                    self.currentTime( queryToSeconds( reference.params.get( 'start' ) ) );
                     
                 }
                 
@@ -392,11 +456,11 @@ function loadVideoJS() {
             
         }
         
-        if ( urlParams.has( 'end' ) ) {
+        if ( reference.params.has( 'end' ) ) {
 
             self.on( 'timeupdate', function() {
                 
-                if ( self.currentTime() >= toSeconds( urlParams.get( 'end' ) ) ) {
+                if ( self.currentTime() >= queryToSeconds( reference.params.get( 'end' ) ) ) {
                     
                     self.pause();
                     self.off( 'timeupdate' );
@@ -436,39 +500,121 @@ function loadVideoJS() {
             
         } );
         
+        self.on( 'error', function() {
+            
+            let msg = 'Please double check the file name.<br>Expecting: ' + self.currentSrc() + '<br><br>';
+            showErrorMsgOnCover( msg + self.error_.message  );
+            
+        } );
+        
         // add forward 10 seconds button
         addForwardTenSecButton( self );
         
         // add download button
         addDownloadFilesButton( self );
         
+        self.on( 'canplay', function() {
+            hideCover();
+        } );
+        
     } );
     
-    hideCover();
-    
-}
-
-function setTitle() {
-    
-    let name = "";
-    
-    if ( kaltura && flags.isLocal === false ) {
+    // check to see is there are markers
+    if ( xml.doc != null ) {
         
-        name = kaltura.name;
+        xml.markersTag = xml.doc.getElementsByTagName( 'markers' )[0];
         
-    } else {
-        
-        if ( urlParams.has( 'title' ) ) {
+        if ( xml.markersTag !== undefined ) {
             
-            name = urlParams.get( 'title' );
+            if ( xml.markersTag.children.length ) {
+                
+                let markerTag = xml.doc.getElementsByTagName( 'marker' );
+                
+                for ( var i = 0; i < markerTag.length; i++ ) {
+                    
+                    let marker = {
+                        time: toSeconds( markerTag[i].attributes.timecode.nodeValue ),
+                        text: markerTag[i].childNodes[0].nodeValue
+                    };
+                    
+                    markersCollection.push( marker );
+
+                }
+                
+                player.markers( {
+                    
+                    markerStyle: {
+                        'background-color': 'rgb(166, 231, 141)'
+                    },
+                    markers: markersCollection
+                    
+                } );
+                
+            }
             
         }
         
     }
     
-    document.getElementsByTagName( 'title' )[0].innerHTML = name;
-    document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = name;
+}
+
+function setTitle() {
     
+    let title = "";
+    
+    // see if title tag is specified
+    if ( xml.doc !== null ) {
+        
+        xml.titleTag = xml.doc.getElementsByTagName( 'title' )[0];
+        
+        if ( xml.titleTag !== undefined ) {
+            
+            if (  xml.titleTag.childNodes[0] !== undefined
+                  &&  xml.titleTag.childNodes[0].nodeValue.trim() !== '' ) {
+                
+                title = xml.titleTag.childNodes[0].nodeValue.trim();
+                
+            } else {
+                
+                title = setDefaultTitle();
+                
+            }
+            
+        } else {
+            
+            title = setDefaultTitle();
+            
+        }
+
+    } else {
+        
+        title = setDefaultTitle();
+        
+    }
+    
+    document.getElementsByTagName( 'title' )[0].innerHTML = title;
+    document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = title;
+    
+}
+
+function setDefaultTitle() {
+    
+    if ( kaltura && flags.isLocal === false ) {
+        
+        return kaltura.name;
+        
+    } else {
+        
+        if ( reference.params.has( 'title' ) ) {
+            
+            return reference.params.get( 'title' );
+            
+        }
+        
+    }
+    
+    return '';
+        
 }
 
 function hideCover() {
@@ -624,7 +770,7 @@ function downloadables( vjs ) {
 function setDownloadables() {
     
     let supportedFiles = manifest.gvp_download_files;
-    let fileName = source;
+    let fileName = gvp.source;
     
     supportedFiles.forEach( function( file ) {
         
@@ -645,9 +791,9 @@ function setDownloadables() {
                 
             } else {
                 
-                if ( urn[5] !== undefined ) {
+                if ( reference.names[5] !== undefined ) {
                     
-                    dwnldName = urn[5];
+                    dwnldName = reference.names[5];
                     dwnldPath = cleanString( dwnldName ) + '.' + ext;
                     
                 }
@@ -798,7 +944,7 @@ function cleanString( str ) {
     
 }
 
-function toSeconds( str ) {
+function queryToSeconds( str ) {
     
     let hrIndex = str.indexOf( 'h' );
     let minIndex = str.indexOf( 'm' );
@@ -859,5 +1005,26 @@ function toSeconds( str ) {
     min = min * 60;
     
     return hr + min + sec;
+    
+}
+
+function toSeconds( str ) {
+    
+    let arr = str.split( ':' );
+    
+    if ( arr.length >= 3 ) {
+        return Number( arr[0] * 60 ) * 60 + Number( arr[1] * 60 ) + Number( arr[2] );
+    } else {
+        return Number( arr[0] * 60 ) + Number( arr[1] );
+    }
+    
+}
+
+function showErrorMsgOnCover( str ) {
+    
+    let msg = document.getElementsByClassName( 'gvp-error-msg' )[0];
+    
+    msg.innerHTML = str;
+    msg.style.display = 'block';
     
 }

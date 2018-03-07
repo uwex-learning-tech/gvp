@@ -1,4 +1,7 @@
-<div class="gvp-cover"><div class="gvp-program-logo"></div></div>
+<div class="gvp-cover">
+    <div class="gvp-program-logo"></div>
+    <div class="gvp-error-msg"></div>
+</div>
 
 <div class="gvp-decoration-bar"></div>
 
@@ -7,10 +10,8 @@
 </div>
 
 <div class="gvp-video-wrapper">
-    
     <video id="gvp-video" class="video-js vjs-default-skin"></video>
     <div class="gvp-program-logo"></div>
-
 </div>
 
 <div class="gvp-downloads"></div>

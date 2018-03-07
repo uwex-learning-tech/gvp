@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gvp>
+    
+    <!--########################## READ ME: SETTINGS ###########################
+        Settings element is optional unless the video is from Kaltura.
+         * title element is optional but can be used to override the value from
+           URL string parameter or Kaltrua.
+         * fileName element is optional
+            - use for setting a different file name rather than parsing
+              the name from the URL
+         * kalturaId element is required for video hosted on Kaltura.
+         
+         Correct Usage:
+         
+         <settings>                                 <settings>
+            <title></title>                             <title></title>
+            <kalturaId></kalturaId>      ~ OR ~         <fileName></fileName>
+         </settings>                                </settings>
+         
+         ~ OR ~
+         
+         <settings>
+            <kalturaId></kalturaId>
+         </settings>
+    #########################################################################-->
+    
+    <settings>
+        <kalturaId>0_f2jmp3gg</kalturaId>
+    </settings>
+    
+    <!--########################## READ ME: MARKERS ############################
+        Markers element (parent) is optional.
+         * Must have at least one Marker element (child) with required timecode
+           attribute. Timecode value must be in hh:mm:ss or mm:ss format.
+         * The texts between the open and close maker tag will be displayed.
+         * Remove all if will be not be used.
+         
+         Usage:
+         
+         <markers>
+            <marker timecode="00:30">How to write XML!</marker>
+         </markers>
+         
+    #########################################################################-->
+    
+    <markers>
+        <marker timecode="00:18">Null Hypothesis</marker>
+        <marker timecode="00:55">Pearson Correlation Test</marker>
+        <marker timecode="01:30">Coefficient of Determination</marker>
+        <marker timecode="02:18">Look Out!</marker>
+    </markers>
+    
+</gvp>

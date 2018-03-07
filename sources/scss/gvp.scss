@@ -3,6 +3,7 @@
 @import "compass/css3/flexbox";
 @import "compass/css3/images";
 @import "compass/css3/border-radius";
+@import "compass/css3/transform";
 @import "compass/css3/user-interface";
 @import "compass/css3/filter";
 @import "compass/css3/text-shadow";
@@ -59,6 +60,17 @@ html {
             background-repeat: no-repeat;
             background-position: center center;
             @include user-select( none );
+        }
+        
+        .gvp-error-msg {
+            display: none;
+            position: absolute;
+            max-width: rem( 350px );
+            background-color: #ff3636;
+            padding: rem( $gutter / 2);
+            font-size: rem( 14px );
+            color: #fff;
+            top: rem( $gutter * 2 );
         }
         
     }
@@ -389,6 +401,10 @@ $slider-bg-color: lighten($primary-background-color, 33%);
     background: $primary-foreground-color;
 }
 
+.video-js .vjs-play-progress::before {
+    z-index: 2;
+}
+
 /* The main progress bar also has a bar that shows how much has been loaded. */
 .video-js .vjs-load-progress {
     /* For IE8 we'll lighten the color */
@@ -411,4 +427,70 @@ smaller disconnected loaded time ranges */
 .video-js .vjs-resolution-button .vjs-icon-placeholder:before {
     font-family: VideoJS;
     content: '\f110';
+}
+
+// markers plugin
+.vjs-progress-control:hover {
+    
+    .vjs-marker {
+        top: -2px;
+    }
+    
+}
+           
+.vjs-marker {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  bottom: 0em;
+  opacity: 1;
+  height: 10px;
+  transition: opacity .2s ease;
+  -webkit-transition: opacity .2s ease;
+  -moz-transition: opacity .2s ease;
+  z-index: 1;
+}
+.vjs-marker:hover {
+  cursor: pointer;
+  @include scale(1.8);
+}
+.vjs-tip {
+  visibility: hidden;
+  display: block;
+  opacity: 0.8;
+  padding: 5px;
+  font-size: 14px;
+  position: absolute;
+  bottom: 14px;
+  z-index: 100000;
+}
+.vjs-tip .vjs-tip-arrow {
+  background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==) no-repeat top left;
+  bottom: 0;
+  left: 50%;
+  margin-left: -4px;
+  background-position: bottom left;
+  position: absolute;
+  width: 9px;
+  height: 5px;
+}
+.vjs-tip .vjs-tip-inner {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  padding: 5px 8px 4px 8px;
+  background-color: black;
+  color: white;
+  max-width: 200px;
+  text-align: center;
+}
+.vjs-break-overlay {
+  visibility: hidden;
+  position: absolute;
+  z-index: 100000;
+  top: 0;
+}
+.vjs-break-overlay .vjs-break-overlay-text {
+  padding: 9px;
+  text-align: center;
 }
