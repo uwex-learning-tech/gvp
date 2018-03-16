@@ -507,8 +507,9 @@ function loadVideoJS() {
             
         } );
         
-        // add forward 10 seconds button
-        addForwardTenSecButton( self );
+        // add forward and backward seconds button
+        addForwardButton( self );
+        addBackwardButton( self );
         
         // add download button
         addDownloadFilesButton( self );
@@ -652,22 +653,25 @@ function hideCover() {
     
 }
 
-function addForwardTenSecButton( vjs ) {
+function addForwardButton( vjs ) {
     
+    let secToSkip = 5;
     let Button = videojs.getComponent( 'Button' );
     let forwardTenBtn = videojs.extend( Button, {
         constructor: function( player, options ) {
             
             Button.call( this, player, options );
-            this.el().setAttribute( 'aria-label','Fast Forward 10 Seconds' );
-            this.controlText( 'Fast Forward 10 Seconds' );
+            this.el().setAttribute( 'aria-label','Skip Forward' );
+            this.controlText( 'Skip Forward' );
 
         },
         handleClick: function() {
             
             if ( vjs.seekable() ) {
                 
-                let seekTime = vjs.currentTime() + 10;
+                secToSkip = getSecToSkip( vjs.duration() );
+                
+                let seekTime = vjs.currentTime() + secToSkip;
                 
                 if ( seekTime >= vjs.duration() ) {
                     seekTime = vjs.duration();
@@ -679,13 +683,94 @@ function addForwardTenSecButton( vjs ) {
             
         },
         buildCSSClass: function() {
-            return 'vjs-forwardten-button vjs-control vjs-button';
+            return 'vjs-forward-button vjs-control vjs-button';
         } 
     } );
 
-    videojs.registerComponent( 'ForwardTenBtn', forwardTenBtn );
-    vjs.getChild( 'controlBar' ).addChild( 'ForwardTenBtn', {}, 1 );
+    videojs.registerComponent( 'ForwardBtn', forwardTenBtn );
+    vjs.getChild( 'controlBar' ).addChild( 'ForwardBtn', {}, 1 );
     
+    vjs.on( 'play', function() {
+        
+        secToSkip = getSecToSkip( vjs.duration() );
+        document.getElementsByClassName('vjs-forward-button')[0].classList.add( 'sec' + secToSkip );
+        
+    } );
+    
+}
+
+function addBackwardButton( vjs ) {
+    
+    let secToSkip = 5;
+    let Button = videojs.getComponent( 'Button' );
+    let forwardTenBtn = videojs.extend( Button, {
+        constructor: function( player, options ) {
+            
+            Button.call( this, player, options );
+            this.el().setAttribute( 'aria-label','Skip Backward' );
+            this.controlText( 'Skip Backward' );
+
+        },
+        handleClick: function() {
+            
+            if ( vjs.seekable() ) {
+                
+                secToSkip = getSecToSkip( vjs.duration() );
+                
+                let seekTime = vjs.currentTime() - secToSkip;
+                
+                if ( seekTime <= 0 ) {
+                    seekTime = 0;
+                }
+                
+                vjs.currentTime( seekTime );
+                
+            }
+            
+        },
+        
+        buildCSSClass: function() {
+            return 'vjs-backward-button vjs-control vjs-button';
+        }
+        
+    } );
+
+    videojs.registerComponent( 'BackwardBtn', forwardTenBtn );
+    vjs.getChild( 'controlBar' ).addChild( 'BackwardBtn', {}, 1 );
+    
+    vjs.on( 'play', function() {
+       
+        secToSkip = getSecToSkip( vjs.duration() );
+        document.getElementsByClassName('vjs-backward-button')[0].classList.add( 'sec' + secToSkip );
+        
+    } );
+    
+}
+
+function getSecToSkip( duration ) {
+    
+    if ( isNaN( duration ) ) {
+        
+        return 0;
+        
+    }
+    
+    if ( duration >= 120 && duration < 180 ) {
+            
+        return 10;
+        
+    } else if ( duration >= 180 && duration < 300 ) {
+        
+        return 15;
+        
+    } else if ( duration >= 300 ) {
+        
+        return 30;
+        
+    }
+    
+    return 0;
+        
 }
 
 function addDownloadFilesButton( vjs ) {
