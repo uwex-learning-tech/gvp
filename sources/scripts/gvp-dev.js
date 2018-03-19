@@ -826,8 +826,46 @@ function downloadables( vjs ) {
     } );
     
     DownloadMenuItem.prototype.handleClick = function() {
-        
-      document.getElementById( this.options_.id ).click();
+
+      if ( this.options_.kaltura === true ) {
+          
+          if ( this.options_.id === 'videoDl' ) {
+              
+              let videoUrl = document.getElementById( this.options_.id ).href;
+              let xhr = new XMLHttpRequest();
+              
+              xhr.open( 'GET', videoUrl );
+              xhr.responseType = 'arraybuffer';
+              xhr.send( null );
+              
+              xhr.onload = function() {
+                  
+                  if ( this.status === 200 ) {
+                      
+                      let blob = new Blob( [this.response], { type: 'octet/stream' } );
+                      let url = window.URL.createObjectURL( blob );
+                      let link = document.getElementById( 'videoDl' );
+                      
+                      link.href = url;
+                      link.download += '.mp4';
+                      link.click();
+                      window.URL.revokeObjectURL( url );
+                      
+                  }
+                  
+              };
+              
+          } else {
+              
+              document.getElementById( this.options_.id ).click();
+              
+          }
+          
+      } else {
+          
+          document.getElementById( this.options_.id ).click();
+          
+      }
       
     };
     
@@ -837,12 +875,18 @@ function downloadables( vjs ) {
         
         let fileLabel = files[i].childNodes[0].nodeValue;
         let fileId = files[i].id;
+        let isKaltura = false;
+        
+        if ( !flags.isLocal ) {
+            isKaltura = true;
+        }
         
         items.push( new DownloadMenuItem(
             vjs,
             {
                 label: fileLabel,
-                id: fileId
+                id: fileId,
+                kaltura: isKaltura
             }
         ) );
         
@@ -870,15 +914,23 @@ function setDownloadables() {
             let dwnldPath = filePath;
             
             if ( kaltura && flags.isLocal === false ) {
-        
-                dwnldName = kaltura.name;
+                
                 dwnldPath = kaltura.flavor.normal;
+                
+                if ( reference.names[5] !== undefined ) {
+                    
+                    dwnldName = reference.names[5];
+                    
+                } else {
+                    
+                    dwnldName = cleanString( kaltura.name );
+                    
+                }
                 
             } else {
                 
                 if ( reference.names[5] !== undefined ) {
                     
-                    dwnldName = reference.names[5];
                     dwnldPath = cleanString( dwnldName ) + '.' + ext;
                     
                 }
