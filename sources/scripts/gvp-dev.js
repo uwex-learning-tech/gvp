@@ -8,7 +8,8 @@
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
-    Storybook Plus is an web application that serves multimedia contents.
+    Generic Video Player is a video player build on top of VideoJS to serve
+    video contents.
     Copyright (C) 2013-2018  Ethan S. Lin, UWEX CEOEL Media Services
 
     This program is free software: you can redistribute it and/or modify
@@ -23,8 +24,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- *
  
     WARNING:
     This JavaScript file uses features from ECMAScript 2015, 2016, and 2017.
@@ -35,6 +34,8 @@
  
  *
  */
+
+/**** GLOBAL VARIABLES ****/
 
 let manifest = {};
 let program = {};
@@ -63,15 +64,23 @@ let flags = {
     isIframe: false
 };
 
+/**** ON DOM READY ****/
+
 ( function ready( fn ) {
     
     if ( document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading' ) {
+        
         fn();
+        
     } else {
+        
         document.addEventListener( 'DOMContentLoaded', fn );
+        
     }
     
 } )( initGVP );
+
+/**** CORE FUNCTIONS ****/
 
 function initGVP() {
     
