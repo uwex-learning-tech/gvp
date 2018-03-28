@@ -498,6 +498,9 @@ smaller disconnected loaded time ranges */
   bottom: 0em;
   opacity: 1;
   height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background-color: rgb(166, 231, 141);
   transition: opacity .2s ease;
   -webkit-transition: opacity .2s ease;
   -moz-transition: opacity .2s ease;
@@ -505,7 +508,7 @@ smaller disconnected loaded time ranges */
 }
 .vjs-marker:hover {
   cursor: pointer;
-  @include scale(1.8);
+  @include scale(1.7);
 }
 .vjs-tip {
   visibility: hidden;

@@ -44,10 +44,10 @@
     #########################################################################-->
     
     <markers>
-        <marker timecode="00:18">Null Hypothesis</marker>
-        <marker timecode="00:55">Pearson Correlation Test</marker>
-        <marker timecode="01:30">Coefficient of Determination</marker>
-        <marker timecode="02:18">Look Out!</marker>
+        <marker timecode="00:18" color="#f00">Null Hypothesis</marker>
+        <marker timecode="00:55" color="#0f0">Pearson Correlation Test</marker>
+        <marker timecode="01:30" color="#00f">Coefficient of Determination</marker>
+        <marker timecode="02:18" color="">Look Out!</marker>
     </markers>
     
 </gvp>

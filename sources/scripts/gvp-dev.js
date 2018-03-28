@@ -542,9 +542,20 @@ function loadVideoJS() {
                 
                 for ( var i = 0; i < markerTag.length; i++ ) {
                     
+                    let markerColor = '';
+                    
+                    if ( markerTag[i].attributes.color !== undefined ) {
+
+                        if ( markerTag[i].attributes.color.nodeValue.trim() !== '' ) {
+                            markerColor = markerTag[i].attributes.color.nodeValue.trim();
+                        }
+                        
+                    }
+                    
                     let marker = {
                         time: toSeconds( markerTag[i].attributes.timecode.nodeValue ),
-                        text: markerTag[i].childNodes[0].nodeValue
+                        text: markerTag[i].childNodes[0].nodeValue,
+                        color: markerColor
                     };
                     
                     markersCollection.push( marker );
@@ -553,9 +564,6 @@ function loadVideoJS() {
                 
                 player.markers( {
                     
-                    markerStyle: {
-                        'background-color': 'rgb(166, 231, 141)'
-                    },
                     markers: markersCollection
                     
                 } );

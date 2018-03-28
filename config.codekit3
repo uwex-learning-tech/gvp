@@ -114327,6 +114327,16 @@
 		"sC": 0,
 		"tS": 0
 		},
+	"\/sources\/scripts\/playerClass.js": {
+		"ft": 64,
+		"ma": 1,
+		"mi": 1,
+		"oA": 0,
+		"oAP": "\/build\/sources\/scripts\/playerClass-min.js",
+		"oF": 2,
+		"sC": 3,
+		"tS": 1
+		},
 	"\/sources\/scripts\/templates\/gvp.tpl": {
 		"cB": 0,
 		"ft": 8192,
@@ -114715,14 +114725,14 @@
 		"sC": 1,
 		"tS": 0
 		},
-	"\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers.min.js": {
+	"\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers.js": {
 		"ft": 64,
 		"ma": 0,
 		"mi": 1,
 		"oA": 1,
-		"oAP": "\/build\/scripts\/videojs\/plugins\/markers\/min\/videojs-markers.min-min.js",
-		"oF": 0,
-		"sC": 1,
+		"oAP": "\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers-min.js",
+		"oF": 2,
+		"sC": 0,
 		"tS": 0
 		},
 	"\/sources\/scripts\/videojs\/plugins\/resolution\/videojs-resolution-switcher.js": {
@@ -114748,7 +114758,7 @@
 	"\/sources\/scripts\/videojs\/video.js": {
 		"ft": 64,
 		"ma": 0,
-		"mi": 0,
+		"mi": 1,
 		"oA": 0,
 		"oAP": "\/build\/sources\/scripts\/videojs\/video.js",
 		"oF": 3,
@@ -114798,6 +114808,32 @@
 			"type": 0
 			}
 		],
+	"\/sources\/scripts\/playerClass.js": [
+		{
+			"followForSyntaxChecking": 0,
+			"linkedFileAbbreviatedPath": "\/sources\/scripts\/modernizr.js",
+			"position": 0,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 0,
+			"linkedFileAbbreviatedPath": "\/node_modules\/whatwg-fetch\/fetch.js",
+			"position": 1,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 0,
+			"linkedFileAbbreviatedPath": "\/node_modules\/url-search-params\/build\/url-search-params.js",
+			"position": 2,
+			"type": 0
+			},
+		{
+			"followForSyntaxChecking": 0,
+			"linkedFileAbbreviatedPath": "\/node_modules\/babel-polyfill\/dist\/polyfill.min.js",
+			"position": 3,
+			"type": 0
+			}
+		],
 	"\/sources\/scripts\/videojs\/video.js": [
 		{
 			"followForSyntaxChecking": 0,
@@ -114806,8 +114842,8 @@
 			"type": 1
 			},
 		{
-			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers.min.js",
+			"followForSyntaxChecking": 1,
+			"linkedFileAbbreviatedPath": "\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers.js",
 			"position": 1,
 			"type": 1
 			}
