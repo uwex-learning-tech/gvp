@@ -57,10 +57,13 @@ let xml = {
     titleTag: null,
     kalturaTag: null,
     fileNameTag: null,
-    markersTag: null
+    markersTag: null,
+    markersCollection: []
 };
 let flags = {
     isLocal: false,
+    isYouTube: false,
+    isKaltura: false,
     isIframe: false
 };
 
@@ -257,6 +260,45 @@ function getVideoSource() {
             
             xml.doc = xmlParser.parseFromString( result, 'text/xml' );
             
+            // check to see is there are markers
+            if ( xml.doc != null ) {
+                
+                xml.markersTag = xml.doc.getElementsByTagName( 'markers' )[0];
+                
+                if ( xml.markersTag !== undefined ) {
+                    
+                    if ( xml.markersTag.children.length ) {
+                        
+                        let markerTag = xml.doc.getElementsByTagName( 'marker' );
+                        
+                        for ( var i = 0; i < markerTag.length; i++ ) {
+                            
+                            let markerColor = '';
+                            
+                            if ( markerTag[i].attributes.color !== undefined ) {
+        
+                                if ( markerTag[i].attributes.color.nodeValue.trim() !== '' ) {
+                                    markerColor = markerTag[i].attributes.color.nodeValue.trim();
+                                }
+                                
+                            }
+                            
+                            let marker = {
+                                time: toSeconds( markerTag[i].attributes.timecode.nodeValue ),
+                                text: markerTag[i].childNodes[0].nodeValue,
+                                color: markerColor
+                            };
+                            
+                            xml.markersCollection.push( marker );
+        
+                        }
+                        
+                    }
+                    
+                }
+                
+            }
+            
             // see if kalturaId tag is specified
             xml.kalturaTag = xml.doc.getElementsByTagName( 'kalturaId' )[0];
             
@@ -268,7 +310,27 @@ function getVideoSource() {
                     gvp.source = xml.kalturaTag.childNodes[0].nodeValue.trim();
                 
                     flags.isLocal = false;
+                    flags.isKaltura = true;
                     getKalturaLibrary();
+                    return;
+                    
+                }
+                
+            }
+            
+            // see if youtubeId tag is specified
+            xml.youtubeTag = xml.doc.getElementsByTagName( 'youtubeId' )[0];
+            
+            if ( xml.youtubeTag !== undefined ) {
+                
+                if ( xml.youtubeTag.childNodes[0] !== undefined
+                     && xml.youtubeTag.childNodes[0].nodeValue.trim() != '' ) {
+                    
+                    gvp.source = xml.youtubeTag.childNodes[0].nodeValue.trim();
+                
+                    flags.isLocal = false;
+                    flags.isYouTube = true;
+                    setVideoJs();
                     return;
                     
                 }
@@ -285,6 +347,7 @@ function getVideoSource() {
                      
                     gvp.source = xml.fileNameTag.childNodes[0].nodeValue;
                     flags.isLocal = true;
+                    setVideoJs();
                     return;
                 
                 }
@@ -319,7 +382,6 @@ function getVideoSource() {
 }
 
 function setVideoJs() {
-    
     setTitle();
     loadVideoJS();
     setDownloadables();
@@ -327,10 +389,8 @@ function setVideoJs() {
 }
 
 function getKalturaLibrary() {
-
     getScript( kaltura.lib, false, false );
     getScript( kaltura.widget, false, loadLalturaSource );
-    
 }
 
 function loadLalturaSource() {
@@ -381,10 +441,9 @@ function loadLalturaSource() {
 }
 
 function loadVideoJS() {
-        
+    
     let isAutoplay = false;
     let player = null;
-    let markersCollection = [];
 
     if ( reference.params.has( 'autoplay' ) && reference.params.get( 'autoplay' ) === '1' ) {
         
@@ -404,7 +463,17 @@ function loadVideoJS() {
         
     };
     
-    if ( kaltura && flags.isLocal === false ) {
+    if ( flags.isYouTube && flags.isLocal === false ) {
+        playerOptions.techOrder = ['youtube'];
+        playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
+        playerOptions.youtube = {
+            'cc_load_policy': 1,
+            'modestbranding': 1,
+            'iv_load_policy' : 3
+        }
+    }
+    
+    if ( ( flags.isYouTube || flags.isKaltura ) && flags.isLocal === false ) {
         Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
     }
     
@@ -412,8 +481,7 @@ function loadVideoJS() {
         
         let self = this;
         
-        if ( kaltura && flags.isLocal === false ) {
-            
+        if ( flags.isKaltura && flags.isLocal === false ) {
             self.poster( kaltura.poster + '/width/900/quality/100' );
             self.updateSrc( [
                 { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
@@ -431,6 +499,10 @@ function loadVideoJS() {
         		}, true );
                 
             }
+            
+        } else if ( flags.isYouTube && flags.isLocal === false ) {
+            
+            // do nothing
             
         } else {
             
@@ -465,6 +537,8 @@ function loadVideoJS() {
             
         }
         
+        
+        
         if ( reference.params.has( 'end' ) ) {
 
             self.on( 'timeupdate', function() {
@@ -483,7 +557,7 @@ function loadVideoJS() {
         // event listeners
         
         self.on( 'playing', function() {
-
+            
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
             logo.style.display = 'none';
             
@@ -523,56 +597,39 @@ function loadVideoJS() {
         // add download button
         addDownloadFilesButton( self );
         
+        // add markers if any
+        setupMarkers( player );
+        
+        // hide cover
         self.on( 'canplay', function() {
             hideCover();
         } );
         
-    } );
-    
-    // check to see is there are markers
-    if ( xml.doc != null ) {
-        
-        xml.markersTag = xml.doc.getElementsByTagName( 'markers' )[0];
-        
-        if ( xml.markersTag !== undefined ) {
+        // if youtube, hide cover on ready and reset markers
+        if ( flags.isYouTube ) {
             
-            if ( xml.markersTag.children.length ) {
-                
-                let markerTag = xml.doc.getElementsByTagName( 'marker' );
-                
-                for ( var i = 0; i < markerTag.length; i++ ) {
-                    
-                    let markerColor = '';
-                    
-                    if ( markerTag[i].attributes.color !== undefined ) {
-
-                        if ( markerTag[i].attributes.color.nodeValue.trim() !== '' ) {
-                            markerColor = markerTag[i].attributes.color.nodeValue.trim();
-                        }
-                        
-                    }
-                    
-                    let marker = {
-                        time: toSeconds( markerTag[i].attributes.timecode.nodeValue ),
-                        text: markerTag[i].childNodes[0].nodeValue,
-                        color: markerColor
-                    };
-                    
-                    markersCollection.push( marker );
-
-                }
-                
-                player.markers( {
-                    
-                    markers: markersCollection
-                    
-                } );
-                
-            }
+            self.on( 'ready', function() {
+                hideCover();
+            } );
+            
+            self.on( 'play', function() {
+                player.markers.reset(xml.markersCollection);
+            } );
             
         }
         
-    }
+    } );
+
+}
+
+function setupMarkers( player ) {
+    
+    // add markers
+    player.markers( {
+                    
+        markers: xml.markersCollection
+        
+    } );
     
 }
 
@@ -617,7 +674,7 @@ function setTitle() {
 
 function setDefaultTitle() {
     
-    if ( kaltura && flags.isLocal === false ) {
+    if ( flags.isKaltura && flags.isLocal === false ) {
         
         return kaltura.name;
         
@@ -925,12 +982,12 @@ function setDownloadables() {
         let filePath = cleanString( fileName ) + '.' + ext;
         
         // video
-        if ( ext === "mp4" ) {
+        if ( ext === "mp4" && flags.isYouTube === false ) {
             
             let dwnldName = fileName;
             let dwnldPath = filePath;
             
-            if ( kaltura && flags.isLocal === false ) {
+            if ( flags.isKaltura && flags.isLocal === false ) {
                 
                 dwnldPath = kaltura.flavor.normal;
                 

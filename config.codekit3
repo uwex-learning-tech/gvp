@@ -114745,6 +114745,16 @@
 		"sC": 0,
 		"tS": 0
 		},
+	"\/sources\/scripts\/videojs\/plugins\/youtube\/youtube.min.js": {
+		"ft": 64,
+		"ma": 0,
+		"mi": 1,
+		"oA": 1,
+		"oAP": "\/build\/scripts\/videojs\/plugins\/youtube\/min\/youtube.min-min.js",
+		"oF": 0,
+		"sC": 1,
+		"tS": 0
+		},
 	"\/sources\/scripts\/videojs\/video-js.css": {
 		"aP": 0,
 		"bl": 0,
@@ -114845,6 +114855,12 @@
 			"followForSyntaxChecking": 1,
 			"linkedFileAbbreviatedPath": "\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers.js",
 			"position": 1,
+			"type": 1
+			},
+		{
+			"followForSyntaxChecking": 0,
+			"linkedFileAbbreviatedPath": "\/sources\/scripts\/videojs\/plugins\/youtube\/youtube.min.js",
+			"position": 2,
 			"type": 1
 			}
 		]
