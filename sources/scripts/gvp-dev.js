@@ -468,7 +468,6 @@ function loadVideoJS() {
         playerOptions.techOrder = ['youtube'];
         playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
         playerOptions.youtube = {
-            'cc_load_policy': 1,
             'modestbranding': 1,
             'iv_load_policy' : 3
         }
@@ -616,6 +615,29 @@ function loadVideoJS() {
         
         // if youtube, hide cover on ready and reset markers
         if ( flags.isYouTube ) {
+            
+            let ytCaption = 'https://www.youtube.com/api/timedtext?fmt=vtt&v=' + gvp.source + '&lang=en';
+            
+            let ytPromise = new Promise( ( resolve ) => {
+                
+                resolve( remoteYTCaptionExist( ytCaption ) );
+                
+            } );
+            
+            ytPromise.then( ( result ) => {
+                
+                if ( result.length > 0 ) {
+                    
+                    self.addRemoteTextTrack( {
+                        kind: 'captions',
+                        label: 'English',
+                        srclang: 'en',
+                        src: ytCaption
+                    }, false );
+                    
+                }
+                
+            } );
             
             self.on( 'play', function() {
                 player.markers.reset(xml.markersCollection);
@@ -1084,6 +1106,28 @@ async function fileExist( file ) {
         
         if ( response.ok ) {
             return true;
+        }
+        
+        return false;
+        
+    } catch ( e ) {
+        return false;
+    }
+    
+}
+
+async function remoteYTCaptionExist( file ) {
+    
+    let options = {
+        method: 'GET'
+    };
+    
+    try {
+        
+        let response = await fetch( file, options );
+        
+        if ( response.ok ) {
+            return response.text();
         }
         
         return false;
