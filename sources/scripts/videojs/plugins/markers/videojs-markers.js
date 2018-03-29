@@ -205,11 +205,13 @@
       
       if (marker.duration) {
         markerDiv.style.width = marker.duration / player.duration() * 100 + '%';
-        markerDiv.style.marginLeft = '0px';
-      } else {
+        //markerDiv.style.marginLeft = '0px';
+      } /*
+else {
         var markerDivBounding = getElementBounding(markerDiv);
         markerDiv.style.marginLeft = markerDivBounding.width / 2 + 'px';
       }
+*/
       
       if ( setting.markerTip.color(marker) !== '' ) {
           markerDiv.style.backgroundColor = setting.markerTip.color(marker);
