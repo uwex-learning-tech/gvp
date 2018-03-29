@@ -4,7 +4,7 @@
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
  * @version: 4.0.0
- * Released pending
+ * Released 03/30/2018
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
@@ -64,7 +64,8 @@ let flags = {
     isLocal: false,
     isYouTube: false,
     isKaltura: false,
-    isIframe: false
+    isIframe: false,
+    played: false
 };
 
 /**** ON DOM READY ****/
@@ -526,7 +527,17 @@ function loadVideoJS() {
         if ( reference.params.has( 'start' ) ) {
             
             self.on( 'play', function() {
-            
+                
+                if ( flags.played === false ) {
+                    
+                    if ( flags.isYouTube ) {
+                        self.currentTime( queryToSeconds( reference.params.get( 'start' ) ) );
+                    }
+                    
+                    flags.played = true;
+                    
+                }
+                
                 if ( self.played().length === 0 ) {
                     
                     self.currentTime( queryToSeconds( reference.params.get( 'start' ) ) );
@@ -537,10 +548,8 @@ function loadVideoJS() {
             
         }
         
-        
-        
         if ( reference.params.has( 'end' ) ) {
-
+            
             self.on( 'timeupdate', function() {
                 
                 if ( self.currentTime() >= queryToSeconds( reference.params.get( 'end' ) ) ) {
@@ -607,10 +616,6 @@ function loadVideoJS() {
         
         // if youtube, hide cover on ready and reset markers
         if ( flags.isYouTube ) {
-            
-            self.on( 'ready', function() {
-                hideCover();
-            } );
             
             self.on( 'play', function() {
                 player.markers.reset(xml.markersCollection);
