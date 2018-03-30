@@ -1,7 +1,28 @@
-# ingore bower components
+# ignore bower components
 bower_components/
 **/bower_components
 
-# ingore SASS cache hidden directory
+# ignore node modules
+node_modules/
+**/node_modules
+
+# ignore SASS cache hidden directory
 .sass-cache
 **/.sass-cache
+
+# ignore video and vtt files in build directory
+build/*.mp4
+build/*.vtt
+build/*.pdf
+build/*.zip
+build/*.mp3
+
+# ignore .map files
+.map
+**/.map
+build/sources/css/*.map
+build/sources/scripts/*.map
+
+# ignore other experimental dev files
+build/sources/scripts/playerClass-min.js
+sources/scripts/playerClass.js

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gvp>
+    
+    <!--########################## READ ME: SETTINGS ###########################
+        Settings tag is optional unless the video is from Kaltura.
+         * title tag is optional but can be used to override the value/title
+           from URL string parameter or Kaltrua.
+         * fileName tag is optional
+            - use for setting a different file name rather than parsing
+              the name from the URL
+         * kalturaId tag is required for video hosted on Kaltura.
+         * youtubeId tag is required for video hosted on YouTube.
+         
+         !!! kalturaId has higher priority over youtubeId if both tag exists !!!
+         
+         Correct Usage:
+         
+         <settings>                                 <settings>
+            <title></title>                             <title></title>
+            <kalturaId></kalturaId>     ~ OR ~          <fileName></fileName>
+         </settings>                                </settings>
+         
+         ~ OR ~
+         
+         <settings>                                 <settings>
+            <kalturaId></kalturaId>     ~ OR ~          <youtubeId></youtubeId>
+         </settings>                                </settings> 
+    #########################################################################-->
+    
+    <settings>
+        <title>Final Fantasy XIV: Job Actions</title>
+        <youtubeId>fSdfPXFGuw0</youtubeId>
+<!--         <kalturaId>0_f2jmp3gg</kalturaId> 8R9tDfUwX2A-->
+    </settings>
+    
+    <!--########################## READ ME: MARKERS ############################
+        Markers tag (parent) is optional.
+         * Must have at least one Marker tag (child) with required timecode
+           attribute. Timecode value must be in hh:mm:ss or mm:ss format.
+         * The texts between the open and close maker tag will be displayed.
+         * Remove all if will be not be used.
+         * Color attribute is optional and must be in HEX or RGB(A) string value
+         
+         Usage:
+         
+         <markers>
+            <marker timecode="00:30" color="">How to write XML!</marker>
+         </markers>
+         
+    #########################################################################-->
+    
+    <markers>
+        <marker timecode="00:24" color="#8D3235">Red Mage</marker>
+        <marker timecode="01:09" color="#819FE5">Dragoon</marker>
+        <marker timecode="01:49" color="#756360">Dark Knight</marker>
+        <marker timecode="02:33" color="#6EA73D">Bard</marker>
+        <marker timecode="03:14" color="#7069B6">Scholar</marker>
+        <marker timecode="03:48" color="#3A2E36">Ninja</marker>
+        <marker timecode="04:34" color="#9FEBFA">Machinist</marker>
+        <marker timecode="05:15" color="#8E2B25">Warrior</marker>
+        <marker timecode="06:00" color="#4E753B">Summoner</marker>
+        <marker timecode="06:50" color="#DDE0DA">White Mage</marker>
+        <marker timecode="07:35" color="#413C66">Black Mage</marker>
+        <marker timecode="08:25" color="#E7BF36">Astrologian</marker>
+        <marker timecode="09:04" color="#ECC727">Monk</marker>
+        <marker timecode="09:45" color="#ABADAA">Samurai</marker>
+        <marker timecode="10:30" color="#9FB4CF">Paladin</marker>
+    </markers>
+    
+</gvp>
