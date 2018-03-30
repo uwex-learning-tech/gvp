@@ -249,7 +249,7 @@ function setProgramTheme() {
 }
 
 function getVideoSource() {
-
+    
     // get the kaltura video id from gvp.xml file
     // otherwist default to URN
     getFile( xml.file ).then( result => {
@@ -267,8 +267,8 @@ function getVideoSource() {
                 xml.markersTag = xml.doc.getElementsByTagName( 'markers' )[0];
                 
                 if ( xml.markersTag !== undefined ) {
-                    
-                    if ( xml.markersTag.children.length ) {
+
+                    if ( xml.doc.getElementsByTagName( 'markers' )[0].querySelectorAll('marker').length ) {
                         
                         let markerTag = xml.doc.getElementsByTagName( 'marker' );
                         
@@ -300,39 +300,48 @@ function getVideoSource() {
                 
             }
             
-            // see if kalturaId tag is specified
-            xml.kalturaTag = xml.doc.getElementsByTagName( 'kalturaId' )[0];
             
-            if ( xml.kalturaTag !== undefined ) {
+            // see if kalturaId tag is specified
+            if ( xml.doc.getElementsByTagName( 'kalturaId' )[0] !== undefined ) {
                 
-                if ( xml.kalturaTag.childNodes[0] !== undefined
-                     && xml.kalturaTag.childNodes[0].nodeValue.trim() != '' ) {
+                xml.kalturaTag = xml.doc.getElementsByTagName( 'kalturaId' )[0];
+
+                if ( xml.kalturaTag !== undefined ) {
                     
-                    gvp.source = xml.kalturaTag.childNodes[0].nodeValue.trim();
-                
-                    flags.isLocal = false;
-                    flags.isKaltura = true;
-                    getKalturaLibrary();
-                    return;
+                    if ( xml.kalturaTag.childNodes[0] !== undefined
+                         && xml.kalturaTag.childNodes[0].nodeValue.trim() != '' ) {
+                        
+                        gvp.source = xml.kalturaTag.childNodes[0].nodeValue.trim();
+                    
+                        flags.isLocal = false;
+                        flags.isKaltura = true;
+                        getKalturaLibrary();
+                        return;
+                        
+                    }
                     
                 }
                 
             }
             
             // see if youtubeId tag is specified
-            xml.youtubeTag = xml.doc.getElementsByTagName( 'youtubeId' )[0];
-            
-            if ( xml.youtubeTag !== undefined ) {
-                
-                if ( xml.youtubeTag.childNodes[0] !== undefined
-                     && xml.youtubeTag.childNodes[0].nodeValue.trim() != '' ) {
+            if ( xml.doc.getElementsByTagName( 'youtubeId' )[0] !== undefined ) {
+
+                xml.youtubeTag = xml.doc.getElementsByTagName( 'youtubeId' )[0];
+    
+                if ( xml.youtubeTag !== undefined ) {
                     
-                    gvp.source = xml.youtubeTag.childNodes[0].nodeValue.trim();
-                
-                    flags.isLocal = false;
-                    flags.isYouTube = true;
-                    setVideoJs();
-                    return;
+                    if ( xml.youtubeTag.childNodes[0] !== undefined
+                         && xml.youtubeTag.childNodes[0].nodeValue.trim() != '' ) {
+                        
+                        gvp.source = xml.youtubeTag.childNodes[0].nodeValue.trim();
+                    
+                        flags.isLocal = false;
+                        flags.isYouTube = true;
+                        setVideoJs();
+                        return;
+                        
+                    }
                     
                 }
                 
@@ -386,7 +395,6 @@ function setVideoJs() {
     setTitle();
     loadVideoJS();
     setDownloadables();
-    
 }
 
 function getKalturaLibrary() {
@@ -608,32 +616,32 @@ function loadVideoJS() {
         // add markers if any
         setupMarkers( player );
         
-        // hide cover
-        self.on( 'canplay', function() {
-            hideCover();
-        } );
-        
         // if youtube, hide cover on ready and reset markers
         if ( flags.isYouTube ) {
             
             let ytCaption = 'https://www.youtube.com/api/timedtext?fmt=vtt&v=' + gvp.source + '&lang=en';
             
-            let ytPromise = new Promise( ( resolve ) => {
+            let ytPromise = new Promise( ( resolve, reject ) => {
                 
                 resolve( remoteYTCaptionExist( ytCaption ) );
+                reject( noYTCaptionExist() );
                 
             } );
             
             ytPromise.then( ( result ) => {
                 
-                if ( result.length > 0 ) {
+                if ( result !== null || result !== undefined ) {
                     
-                    self.addRemoteTextTrack( {
-                        kind: 'captions',
-                        label: 'English',
-                        srclang: 'en',
-                        src: ytCaption
-                    }, false );
+                    if ( result.length > 0 ) {
+                    
+                        self.addRemoteTextTrack( {
+                            kind: 'captions',
+                            label: 'English',
+                            srclang: 'en',
+                            src: ytCaption
+                        }, false );
+                        
+                    }
                     
                 }
                 
@@ -644,6 +652,9 @@ function loadVideoJS() {
             } );
             
         }
+        
+        // hide cover
+        hideCover();
         
     } );
 
@@ -1002,6 +1013,32 @@ function setDownloadables() {
     let supportedFiles = manifest.gvp_download_files;
     let fileName = gvp.source;
     
+    if ( flags.isYouTube ) {
+        
+        if ( reference.names[5] !== undefined ) {
+                    
+            fileName = reference.names[5];
+            
+        } else {
+            
+            fileName = 'video';
+            
+        }
+        
+    } else if ( flags.isKaltura ) {
+        
+        if ( reference.names[5] !== undefined ) {
+                    
+            fileName = reference.names[5];
+            
+        } else {
+            
+            fileName = cleanString( kaltura.name );
+            
+        }
+        
+    }
+    
     supportedFiles.forEach( function( file ) {
         
         let fileLabel = file.label;
@@ -1009,36 +1046,27 @@ function setDownloadables() {
         let filePath = cleanString( fileName ) + '.' + ext;
         
         // video
-        if ( ext === "mp4" && flags.isYouTube === false ) {
-            
-            let dwnldName = fileName;
+        if ( ext === "mp4" ) {
+
             let dwnldPath = filePath;
             
             if ( flags.isKaltura && flags.isLocal === false ) {
                 
                 dwnldPath = kaltura.flavor.normal;
                 
-                if ( reference.names[5] !== undefined ) {
-                    
-                    dwnldName = reference.names[5];
-                    
-                } else {
-                    
-                    dwnldName = cleanString( kaltura.name );
-                    
-                }
-                
             } else {
                 
                 if ( reference.names[5] !== undefined ) {
                     
-                    dwnldPath = cleanString( dwnldName ) + '.' + ext;
+                    dwnldPath = cleanString( fileName ) + '.' + ext;
                     
                 }
                 
             }
             
-            createDownloadLink( dwnldName, dwnldPath, fileLabel );
+            if ( flags.isYouTube === false ) {
+                createDownloadLink( fileName, dwnldPath, fileLabel );
+            }
             
             return;
             
@@ -1135,6 +1163,12 @@ async function remoteYTCaptionExist( file ) {
     } catch ( e ) {
         return false;
     }
+    
+}
+
+function noYTCaptionExist() {
+    
+    console.warn("YouTube caption failed to retreive or not found.");
     
 }
 

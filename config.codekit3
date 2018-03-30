@@ -66,7 +66,8 @@
 		"uCM": 0
 		},
 	"\/config.rb": {
-		"ft": 131072,
+		"cB": 0,
+		"ft": 8192,
 		"oA": 0,
 		"oAP": "\/config.rb",
 		"oF": 0
@@ -113932,8 +113933,8 @@
 		},
 	"\/sources\/scripts\/gvp-dev.js": {
 		"ft": 64,
-		"ma": 1,
-		"mi": 1,
+		"ma": 0,
+		"mi": 0,
 		"oA": 0,
 		"oAP": "\/build\/sources\/scripts\/gvp.js",
 		"oF": 3,
@@ -114424,7 +114425,7 @@
 		"dP": 10,
 		"dS": 0,
 		"ft": 4,
-		"ma": 1,
+		"ma": 0,
 		"oA": 0,
 		"oAP": "\/build\/sources\/css\/gvp.css",
 		"oF": 0,
@@ -114444,19 +114445,19 @@
 			},
 		{
 			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "\/node_modules\/babel-polyfill\/dist\/polyfill.js",
+			"linkedFileAbbreviatedPath": "\/node_modules\/whatwg-fetch\/fetch.js",
 			"position": 1,
 			"type": 0
 			},
 		{
 			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "\/node_modules\/whatwg-fetch\/fetch.js",
+			"linkedFileAbbreviatedPath": "\/node_modules\/url-search-params\/build\/url-search-params.js",
 			"position": 2,
 			"type": 0
 			},
 		{
 			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "\/node_modules\/url-search-params\/build\/url-search-params.js",
+			"linkedFileAbbreviatedPath": "\/node_modules\/babel-polyfill\/dist\/polyfill.js",
 			"position": 3,
 			"type": 0
 			}
@@ -114495,7 +114496,7 @@
 			"type": 1
 			},
 		{
-			"followForSyntaxChecking": 1,
+			"followForSyntaxChecking": 0,
 			"linkedFileAbbreviatedPath": "\/sources\/scripts\/videojs\/plugins\/markers\/videojs-markers.js",
 			"position": 1,
 			"type": 1
