@@ -1,7 +1,23 @@
 # Version Change Log
 
 **4.0.0**
-_pending ... currently in development_
+* New manifest file to hold global settings and access shared centralized resources
+* Removed jQuery dependency
+* Rewrote core script
+* Updated program themes
+* New index.html file
+* New program themes can be specified in manifest file and recognized by player automatically
+* New file download format can be specified in manifest file and recognized by player automatically
+* Updated VideoJS to version 6.6.2
+* Removed intro videos
+* Download file links are now part of the player controls a download list button
+* Kaltura video download are now download as a file rather than opening a new browser tab/window
+* Replaced kaltura.txt with gvp.xml file
+* New Feature: Markers (and ability to change individual marker color)
+* New Feature: YouTube video support (including caption)
+* New "Feature": Embed as an HTML page type in Storybook+
+* New Feature: Start and End URL string query
+* New Feature: Skip forward and backward buttons on player controls (seconds to skip depends on the length of the video)
 
 **3.3.3** (02-04-2016)  
 * Added DS program logo

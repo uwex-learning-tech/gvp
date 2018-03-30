@@ -1,7 +1,7 @@
 # Generic Video Player
-**_version 4.0.0 (in development)_**
+**_version 4.0.0_**
 
-Generic video player is utilizing VideoJS, a HTML5 video player, to deliver video contents.
+Generic video player is utilizing and built upon VideoJS, a HTML5 video player, to deliver video contents.
 
 ---
 ### Minimum Supported Web Browsers
@@ -9,12 +9,12 @@ Generic video player is utilizing VideoJS, a HTML5 video player, to deliver vide
 * Mozilla Firefox 45+
 * Apple Safari 11+
 * Opera 29+
-* Internet Explorer 11 (unstable)
+* Internet Explorer 11
 * Microsoft Edge 24+
 
 *Latest stable version is always recommended.*
 
-For documentation, please visit https://media.uwex.edu/resources/documentation/generic-video-player-v3/
+For documentation, please visit https://media.uwex.edu/resources/documentation/generic-video-player-v4/
 
 ---
 ### Bug Reporting and Questions
@@ -28,4 +28,4 @@ See [CHANGELOG](https://github.com/oel-mediateam/gvp/blob/dev/CHANGELOG.md) for 
 
 ---
 ### License & Copyright
-Generic Video Player (GVP) is licensed under [GNU v3](https://github.com/oel-mediateam/gvp/blob/dev/LICENSE) license. (c) 2012 - 2017. Ethan Lin, [Media Services](https://media.uwex.edu), and [University of Wisconsin-Extension, Division of Continuing Education, Outreach & E-Learning](http://ce.uwex.edu/). All rights reserved. [Video.js](http://videojs.com/) is a free and open source HTML5 video player, copyright by [Brightcove, Inc.](https://www.brightcove.com/en/) and licensed under the [Apache License](https://github.com/videojs/video.js/blob/master/LICENSE), Version 2.0.
+Generic Video Player (GVP) is licensed under [GNU v3](https://github.com/oel-mediateam/gvp/blob/dev/LICENSE) license. (c) 2012 - 2018. Ethan Lin, [Media Services](https://media.uwex.edu), and [University of Wisconsin-Extension, Division of Continuing Education, Outreach & E-Learning](http://ce.uwex.edu/). All rights reserved. [Video.js](http://videojs.com/) is a free and open source HTML5 video player, copyright by [Brightcove, Inc.](https://www.brightcove.com/en/) and licensed under the [Apache License](https://github.com/videojs/video.js/blob/master/LICENSE), Version 2.0.
