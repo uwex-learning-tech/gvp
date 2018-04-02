@@ -585,12 +585,8 @@ function loadVideoJS() {
             
             if ( flags.isIframe ) {
                 
-                if ( flags.sbplusEmbed !== undefined && flags.sbplusEmbed !== true ) {
-                    
-                    let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                    titleBar.style.display = 'none';
-                    
-                }
+                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                titleBar.style.display = 'none';
                 
             }
             
@@ -600,7 +596,7 @@ function loadVideoJS() {
             
             if ( flags.isIframe ) {
                 
-                if ( flags.sbplusEmbed !== undefined && flags.sbplusEmbed !== true ) {
+                if ( flags.sbplusEmbed === undefined && flags.sbplusEmbed !== true ) {
                     
                     let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
                     logo.style.display = 'initial';
