@@ -105,12 +105,6 @@ function initGVP() {
     	
     	flags.isIframe = true;
     	
-    	if ( String( window.location.hash ).indexOf( 'sbplus' ) === 1 ) {
-        	
-        	flags.isInsideSBPlus = true;
-        	
-    	}
-    	
 	}
     
     // get the data from the manifest file
@@ -179,6 +173,18 @@ function setGvpTemplate() {
             } else {
                 
                 gvpWrapper.classList.add( "embedded" );
+                
+                if ( window.parent.SBPLUS !== undefined ) {
+        	
+                	gvpWrapper.classList.add( 'sbplus-embed' );
+                	
+                	let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                	titleBar.style.display = 'none';
+                	
+                	flags.sbplusEmbed = true;
+                	
+            	}
+                
                 
             }
 
@@ -578,20 +584,32 @@ function loadVideoJS() {
             logo.style.display = 'none';
             
             if ( flags.isIframe ) {
-                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                titleBar.style.display = 'none';
+                
+                if ( flags.sbplusEmbed !== undefined && flags.sbplusEmbed !== true ) {
+                    
+                    let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                    titleBar.style.display = 'none';
+                    
+                }
+                
             }
             
         } );
         
         self.on( 'ended', function() {
             
-            let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
-            logo.style.display = 'initial';
-            
             if ( flags.isIframe ) {
-                let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                titleBar.style.display = 'block';
+                
+                if ( flags.sbplusEmbed !== undefined && flags.sbplusEmbed !== true ) {
+                    
+                    let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+                    logo.style.display = 'initial';
+                    
+                    let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                    titleBar.style.display = 'block';
+                    
+                }
+                
             }
             
             self.bigPlayButton.el_.classList.add( 'replay' );
@@ -606,11 +624,12 @@ function loadVideoJS() {
             
         } );
         
-        // add forward and backward seconds button
+        // add forward and backward seconds button if video is longer than 1 minutes
+
         addForwardButton( self );
         addBackwardButton( self );
         
-        // add download button
+        // add download button if it is not indside
         addDownloadFilesButton( self );
         
         // add markers if any
@@ -769,7 +788,7 @@ function addForwardButton( vjs ) {
     
     let secToSkip = 5;
     let Button = videojs.getComponent( 'Button' );
-    let forwardTenBtn = videojs.extend( Button, {
+    let forwardBtn = videojs.extend( Button, {
         constructor: function( player, options ) {
             
             Button.call( this, player, options );
@@ -799,7 +818,7 @@ function addForwardButton( vjs ) {
         } 
     } );
 
-    videojs.registerComponent( 'ForwardBtn', forwardTenBtn );
+    videojs.registerComponent( 'ForwardBtn', forwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'ForwardBtn', {}, 1 );
     
     vjs.on( 'play', function() {
@@ -815,7 +834,7 @@ function addBackwardButton( vjs ) {
     
     let secToSkip = 5;
     let Button = videojs.getComponent( 'Button' );
-    let forwardTenBtn = videojs.extend( Button, {
+    let backwardBtn = videojs.extend( Button, {
         constructor: function( player, options ) {
             
             Button.call( this, player, options );
@@ -847,14 +866,14 @@ function addBackwardButton( vjs ) {
         
     } );
 
-    videojs.registerComponent( 'BackwardBtn', forwardTenBtn );
+    videojs.registerComponent( 'BackwardBtn', backwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'BackwardBtn', {}, 1 );
     
     vjs.on( 'play', function() {
        
         secToSkip = getSecToSkip( vjs.duration() );
         document.getElementsByClassName('vjs-backward-button')[0].classList.add( 'sec' + secToSkip );
-        
+       
     } );
     
 }
@@ -887,34 +906,38 @@ function getSecToSkip( duration ) {
 
 function addDownloadFilesButton( vjs ) {
     
-    setTimeout( function() {
-            
-        let MenuButton = videojs.getComponent( 'MenuButton' );
-        let downloadButton = videojs.extend( MenuButton, {
-            constructor: function( player, options ) {
-                
-                MenuButton.call( this, player, options );
-                this.el().setAttribute( 'aria-label','Downloads' );
-                this.controlText( 'Downloads' );
-
-            },
-            createItems: function() {
-                
-                return downloadables( vjs );
-
-            },
-            handleClick: function() {
-                // do something but nothing in this case
-            },
-            buildCSSClass: function() {
-                return 'vjs-downloads-button';
-            } 
-        } );
-
-        videojs.registerComponent( 'DownloadButton', downloadButton );
-        vjs.getChild( 'controlBar' ).addChild( 'DownloadButton', {}, 13 );
+    if ( flags. sbplusEmbed === undefined ) {
         
-    }, 1000 );
+        setTimeout( function() {
+            
+            let MenuButton = videojs.getComponent( 'MenuButton' );
+            let downloadButton = videojs.extend( MenuButton, {
+                constructor: function( player, options ) {
+                    
+                    MenuButton.call( this, player, options );
+                    this.el().setAttribute( 'aria-label','Downloads' );
+                    this.controlText( 'Downloads' );
+    
+                },
+                createItems: function() {
+                    
+                    return downloadables( vjs );
+    
+                },
+                handleClick: function() {
+                    // do something but nothing in this case
+                },
+                buildCSSClass: function() {
+                    return 'vjs-downloads-button';
+                } 
+            } );
+    
+            videojs.registerComponent( 'DownloadButton', downloadButton );
+            vjs.getChild( 'controlBar' ).addChild( 'DownloadButton', {}, 13 );
+            
+        }, 1000 );
+        
+    }
     
 }
 

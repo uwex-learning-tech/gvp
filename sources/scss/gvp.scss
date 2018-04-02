@@ -196,6 +196,26 @@ html {
     
 }
 
+#gvp-wrapper.sbplus-embed {
+    
+    overflow: hidden;
+    
+    .gvp-video-wrapper {
+        
+        height: 100%;
+        
+        .video-js.vjs-fluid {
+            height: 100%;
+        }
+        
+        .gvp-video-dimensions.vjs-fluid {
+            padding-top: 0;
+        }
+        
+    }
+    
+}
+
 body.light-off {
         
     @include animation-name( fadeToBlack );
@@ -337,6 +357,10 @@ and (min-device-width : 900px) {
     
     .vjs-backward-button {
         cursor: pointer
+    }
+    
+    .sec0 {
+        display: none;
     }
     
     .sec5:before {
