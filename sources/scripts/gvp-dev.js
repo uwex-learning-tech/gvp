@@ -608,9 +608,13 @@ function loadVideoJS() {
                 
             }
             
-            self.bigPlayButton.el_.classList.add( 'replay' );
-            self.hasStarted( false );
-            
+            if ( flags.sbplusEmbed === undefined && flags.sbplusEmbed !== true ) {
+                
+                self.bigPlayButton.el_.classList.add( 'replay' );
+                self.hasStarted( false );
+                
+            }
+
         } );
         
         self.on( 'error', function() {
