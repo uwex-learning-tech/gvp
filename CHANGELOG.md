@@ -1,5 +1,13 @@
 # Version Change Log
 
+**4.0.1**
+* Fixed CSS issues when embedded inside a Storybook Plus presentation
+* Full screen button is removed when embedded inside a Storybook Plus presentation
+* Download button is removed when embedded inside a Storybook Plus presentation
+* Minor code adjustments for embedding in Storybook Plus presentation
+* Video less than one minute will not have skip forward and backward buttons
+* Minor fixes and updates
+
 **4.0.0**
 * New manifest file to hold global settings and access shared centralized resources
 * Removed jQuery dependency
