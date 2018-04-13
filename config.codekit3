@@ -7,7 +7,7 @@
 		"uuidString": "7C3CCAFF-ECCD-4703-9ED2-A4709F7D4E3C"
 		}
 	],
-"creatorBuild": "26330",
+"creatorBuild": "26680",
 "files": {
 	"\/.eslintrc": {
 		"cB": 0,
@@ -66,7 +66,8 @@
 		"uCM": 0
 		},
 	"\/config.rb": {
-		"ft": 131072,
+		"cB": 0,
+		"ft": 8192,
 		"oA": 0,
 		"oAP": "\/config.rb",
 		"oF": 0
@@ -114513,6 +114514,7 @@
 	"displayValue": "gvp",
 	"displayValueWasSetByUser": 1,
 	"iconImageName": "meme-grumpy",
+	"iconImageWasSetByUser": 0,
 	"lastBuiltDate": 525737272
 	},
 "projectSettings": {
@@ -116316,6 +116318,7 @@
 		"autoOutputPathReplace1": "",
 		"autoOutputPathReplace2": "",
 		"autoOutputPathStyle": 0,
+		"outputFormat": 0,
 		"quality": 100
 		},
 	"languageDefaultsJS": {

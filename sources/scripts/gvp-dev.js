@@ -3,8 +3,8 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.0
- * Released 03/30/2018
+ * @version: 4.0.2
+ * Released 04/13/2018
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
@@ -174,17 +174,24 @@ function setGvpTemplate() {
                 
                 gvpWrapper.classList.add( "embedded" );
                 
-                if ( window.parent.SBPLUS !== undefined ) {
+                try {
+                    
+                    if ( window.parent.SBPLUS !== undefined ) {
         	
-                	gvpWrapper.classList.add( 'sbplus-embed' );
-                	
-                	let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                	titleBar.style.display = 'none';
-                	
-                	flags.sbplusEmbed = true;
-                	
-            	}
-                
+                    	gvpWrapper.classList.add( 'sbplus-embed' );
+                    	
+                    	let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
+                    	titleBar.style.display = 'none';
+                    	
+                    	flags.sbplusEmbed = true;
+                    	
+                	}
+                    
+                } catch( e ) {
+                    
+                    flags.sbplusEmbed = false;
+                    
+                }
                 
             }
 

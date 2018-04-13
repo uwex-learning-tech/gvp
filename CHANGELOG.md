@@ -1,5 +1,8 @@
 # Version Change Log
 
+**4.0.2**
+* Fixed an issue where embedded is not working outside of SB+ presentation
+
 **4.0.1**
 * Fixed CSS issues when embedded inside a Storybook Plus presentation
 * Full screen button is removed when embedded inside a Storybook Plus presentation

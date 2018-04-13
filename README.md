@@ -1,5 +1,5 @@
 # Generic Video Player
-**_version 4.0.1_**
+**_version 4.0.2_**
 
 Generic video player is utilizing and built upon VideoJS, a HTML5 video player, to deliver video contents.
 
@@ -24,8 +24,8 @@ For questions, please also post them under the "**[Issues](https://github.com/oe
 
 ---
 ### Version Change Log
-See [CHANGELOG](https://github.com/oel-mediateam/gvp/blob/dev/CHANGELOG.md) for detailed version changes.
+See [CHANGELOG](https://github.com/oel-mediateam/gvp/blob/master/CHANGELOG.md) for detailed version changes.
 
 ---
 ### License & Copyright
-Generic Video Player (GVP) is licensed under [GNU v3](https://github.com/oel-mediateam/gvp/blob/dev/LICENSE) license. (c) 2012 - 2018. Ethan Lin, [Media Services](https://media.uwex.edu), and [University of Wisconsin-Extension, Division of Continuing Education, Outreach & E-Learning](http://ce.uwex.edu/). All rights reserved. [Video.js](http://videojs.com/) is a free and open source HTML5 video player, copyright by [Brightcove, Inc.](https://www.brightcove.com/en/) and licensed under the [Apache License](https://github.com/videojs/video.js/blob/master/LICENSE), Version 2.0.
+Generic Video Player (GVP) is licensed under [GNU v3](https://github.com/oel-mediateam/gvp/blob/master/LICENSE) license. (c) 2012 - 2018. Ethan Lin, [Media Services](https://media.uwex.edu), and [University of Wisconsin-Extension, Division of Continuing Education, Outreach & E-Learning](http://ce.uwex.edu/). All rights reserved. [Video.js](http://videojs.com/) is a free and open source HTML5 video player, copyright by [Brightcove, Inc.](https://www.brightcove.com/en/) and licensed under the [Apache License](https://github.com/videojs/video.js/blob/master/LICENSE), Version 2.0.
