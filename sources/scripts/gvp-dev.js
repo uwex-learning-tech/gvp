@@ -588,7 +588,10 @@ function loadVideoJS() {
         self.on( 'playing', function() {
             
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+            let splashDwnldBtn = document.getElementsByClassName( 'gvp-download-btn' )[0];
+            
             logo.style.display = 'none';
+            splashDwnldBtn.style.display = 'none';
             
             if ( flags.isIframe ) {
                 
@@ -601,11 +604,14 @@ function loadVideoJS() {
         
         self.on( 'ended', function() {
             
+            document.getElementsByClassName( 'gvp-download-btn' )[0].style.display = 'initial';
+            
             if ( flags.isIframe ) {
                 
                 if ( flags.sbplusEmbed === undefined && flags.sbplusEmbed !== true ) {
                     
                     let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+                    
                     logo.style.display = 'initial';
                     
                     let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
@@ -950,7 +956,7 @@ function addDownloadFilesButton( vjs ) {
 
 function downloadables( vjs ) {
     
-    let files = document.getElementsByClassName( 'gvp-downloads' )[0].childNodes;
+    let files = document.getElementsByClassName( 'gvp-download-list' )[0].childNodes;
     let items = [];
     
     let MenuItem = videojs.getComponent( 'MenuItem' );
@@ -972,30 +978,8 @@ function downloadables( vjs ) {
       if ( this.options_.kaltura === true ) {
           
           if ( this.options_.id === 'videoDl' ) {
-              
-              let videoUrl = document.getElementById( this.options_.id ).href;
-              let xhr = new XMLHttpRequest();
-              
-              xhr.open( 'GET', videoUrl );
-              xhr.responseType = 'arraybuffer';
-              xhr.send( null );
-              
-              xhr.onload = function() {
-                  
-                  if ( this.status === 200 ) {
-                      
-                      let blob = new Blob( [this.response], { type: 'octet/stream' } );
-                      let url = window.URL.createObjectURL( blob );
-                      let link = document.getElementById( 'videoDl' );
-                      
-                      link.href = url;
-                      link.download += '.mp4';
-                      link.click();
-                      window.URL.revokeObjectURL( url );
-                      
-                  }
-                  
-              };
+
+                downloadKalVid( this.options_.id );
               
           } else {
               
@@ -1043,7 +1027,17 @@ function setDownloadables() {
     let supportedFiles = manifest.gvp_download_files;
     let fileName = gvp.source;
     
-    let lastIndex = reference.names.length - 1;
+    let lastIndex = reference.names.length;
+    
+    if ( lastIndex <= 2 ) {
+        
+        lastIndex = -1;
+        
+    } else {
+        
+        lastIndex--;
+        
+    }
     
     if ( flags.isYouTube ) {
         
@@ -1065,7 +1059,7 @@ function setDownloadables() {
             
         } else {
             
-            fileName = cleanString( kaltura.name );
+            fileName = 'video';
             
         }
         
@@ -1088,7 +1082,7 @@ function setDownloadables() {
                 
             } else {
                 
-                if ( reference.names[5] !== undefined ) {
+                if ( reference.names[lastIndex] !== undefined ) {
                     
                     dwnldPath = cleanString( fileName ) + '.' + ext;
                     
@@ -1116,19 +1110,109 @@ function setDownloadables() {
         
     } );
     
+    let downloadList =  document.getElementsByClassName( 'gvp-download-list' )[0];
+    let anywhere = document.getElementsByTagName( 'body' )[0];
+    
+    if ( downloadList.childNodes.length ) {
+        
+        let downloadBtn = document.getElementsByClassName( 'gvp-download-btn' )[0];
+        
+        downloadBtn.style.display = 'block';
+        
+        downloadBtn.addEventListener( 'click', function() {
+            
+            if ( downloadList.style.display == 'block' ) {
+                
+                downloadList.style.display = 'none';
+                downloadBtn.classList.remove( 'active' );
+                
+            } else {
+                
+                downloadList.style.display = 'block';
+                downloadBtn.classList.add( 'active' );
+                
+            }
+            
+        } );
+        
+        anywhere.addEventListener( 'click', function( evt ) {
+            
+            if ( !evt.target.classList.contains( 'gvp-download-btn' ) ) {
+                
+                if ( downloadList.style.display == 'block' ) {
+                
+                    downloadList.style.display = 'none';
+                    downloadBtn.classList.remove( 'active' );
+                    
+                }
+                
+            }
+
+        } );
+        
+        if ( flags.isKaltura ) {
+    
+            let vidDwnldLink = document.getElementById( 'videoDl' );
+            
+            vidDwnldLink.addEventListener( 'click', function( evt ) {
+                downloadKalVid( 'videoDl' );
+                evt.preventDefault();
+            } );
+            
+        }
+        
+    }
+    
 }
 
 function createDownloadLink( name, path, label ) {
     
-    let downloads = document.getElementsByClassName( 'gvp-downloads' )[0];
+    let downloads = document.getElementsByClassName( 'gvp-download-list' )[0];
     let link = document.createElement( 'a' );
     
     link.id = label.toLowerCase() + "Dl";
     link.href = path;
     link.innerHTML = label;
     link.download = name;
+    link.target = '_blank';
     
     downloads.appendChild( link );
+    
+}
+
+function downloadKalVid( id ) {
+    
+    let videoUrl = document.getElementById( id ).href;
+    let xhr = new XMLHttpRequest();
+    
+    xhr.open( 'GET', videoUrl );
+    xhr.responseType = 'arraybuffer';
+    xhr.send( null );
+    
+    xhr.onload = function() {
+      
+      if ( this.status === 200 ) {
+          
+          let blob = new Blob( [this.response], { type: 'octet/stream' } );
+          let url = window.URL.createObjectURL( blob );
+          let link = document.getElementById( 'videoDl' );
+          let dlLink = document.createElement( 'a' );
+          let body = document.getElementsByTagName( 'body' )[0];
+          
+          dlLink.style.display = 'none';
+          dlLink.href = url;
+          dlLink.download = link.download + '.mp4';
+          
+          body.appendChild( dlLink );
+          
+          dlLink.click();
+          
+          window.URL.revokeObjectURL( url );
+          dlLink.parentNode.removeChild( dlLink );
+          
+      }
+      
+    };
     
 }
 

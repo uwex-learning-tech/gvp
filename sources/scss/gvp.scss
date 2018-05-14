@@ -139,8 +139,47 @@ html {
         
     }
     
-    .gvp-downloads {
-        display: none;
+    .gvp-splash-download-wrapper {
+    
+        position: absolute;
+        top: rem( 16px );
+        right: rem( 16px );
+        z-index: 1;
+        
+        .gvp-download-btn {
+            display: none;
+            border: none;
+            background-color: rgba( 0, 0, 0, 0.65 );
+            color: #fff;
+            padding: rem( 8px );
+            cursor: pointer;
+        }
+        
+        .gvp-download-btn:hover,
+        .gvp-download-btn.active {
+            background-color: rgba( 0, 0, 0, 0.95 );
+        }
+        
+        .gvp-download-list {
+            
+            display: none;
+            border-top: rem( 1px ) solid #888;
+            background-color: rgba( 0, 0, 0, 0.65 );
+            
+            a {
+                display: block;
+                padding: rem( 8px );
+                color: #fff;
+                font-size: rem( 12px );
+                text-decoration: none;
+            }
+            
+            a:hover {
+                background-color: rgba( 0, 0, 0, 0.95 );
+            }
+            
+        }
+        
     }
 
     .gvp-footer {
@@ -174,12 +213,11 @@ html {
         left: 0;
         z-index: 1;
         padding: 0;
-        background-color: rgba( $default-bg-color, 0.75 );
+        background-color: rgba( 0,0,0, 0.65 );
         
         h1 {
             font-size: rem( 16px );
-            //color: #fff;
-            @include single-text-shadow( 0, 0, rem(3px), 0, #fff );
+            color: #fff;
             margin: 0;
             padding: rem(14px);
         }
@@ -187,7 +225,13 @@ html {
     }
     
     .gvp-video-wrapper {
+        
         padding: 0;
+        
+        .gvp-splash-download-wrapper {
+            top: rem( 58px );
+        }
+        
     }
     
     .gvp-footer {
