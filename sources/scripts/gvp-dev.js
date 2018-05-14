@@ -177,7 +177,7 @@ function setGvpTemplate() {
                 try {
                     
                     if ( window.parent.SBPLUS !== undefined ) {
-        	
+                        
                     	gvpWrapper.classList.add( 'sbplus-embed' );
                     	
                     	let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
@@ -1043,11 +1043,13 @@ function setDownloadables() {
     let supportedFiles = manifest.gvp_download_files;
     let fileName = gvp.source;
     
+    let lastIndex = reference.names.length - 1;
+    
     if ( flags.isYouTube ) {
         
-        if ( reference.names[5] !== undefined ) {
+        if ( reference.names[lastIndex] !== undefined ) {
                     
-            fileName = reference.names[5];
+            fileName = reference.names[lastIndex];
             
         } else {
             
@@ -1057,9 +1059,9 @@ function setDownloadables() {
         
     } else if ( flags.isKaltura ) {
         
-        if ( reference.names[5] !== undefined ) {
+        if ( reference.names[lastIndex] !== undefined ) {
                     
-            fileName = reference.names[5];
+            fileName = reference.names[lastIndex];
             
         } else {
             
