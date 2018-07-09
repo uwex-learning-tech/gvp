@@ -329,6 +329,14 @@ and (min-device-width : 900px) {
     
     }
     
+    #gvp-wrapper.embedded {
+        
+        .gvp-video-wrapper {
+            width: unset;
+        }
+        
+    }
+    
 }
 
 /******************************* ANIMATIONS **********************************/
