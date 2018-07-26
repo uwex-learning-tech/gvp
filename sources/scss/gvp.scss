@@ -137,45 +137,45 @@ html {
             @include filter( invert(1) );
         }
         
-    }
+        .gvp-splash-download-wrapper {
     
-    .gvp-splash-download-wrapper {
-    
-        position: absolute;
-        top: rem( 16px );
-        right: rem( 16px );
-        z-index: 1;
-        
-        .gvp-download-btn {
-            display: none;
-            border: none;
-            background-color: rgba( 0, 0, 0, 0.65 );
-            color: #fff;
-            padding: rem( 8px );
-            cursor: pointer;
-        }
-        
-        .gvp-download-btn:hover,
-        .gvp-download-btn.active {
-            background-color: rgba( 0, 0, 0, 0.95 );
-        }
-        
-        .gvp-download-list {
+            position: absolute;
+            top: rem( 16px );
+            right: rem( 36px );
+            z-index: 1;
             
-            display: none;
-            border-top: rem( 1px ) solid #888;
-            background-color: rgba( 0, 0, 0, 0.65 );
-            
-            a {
-                display: block;
-                padding: rem( 8px );
+            .gvp-download-btn {
+                display: none;
+                border: none;
+                background-color: rgba( 0, 0, 0, 0.65 );
                 color: #fff;
-                font-size: rem( 12px );
-                text-decoration: none;
+                padding: rem( 8px );
+                cursor: pointer;
             }
             
-            a:hover {
+            .gvp-download-btn:hover,
+            .gvp-download-btn.active {
                 background-color: rgba( 0, 0, 0, 0.95 );
+            }
+            
+            .gvp-download-list {
+                
+                display: none;
+                border-top: rem( 1px ) solid #888;
+                background-color: rgba( 0, 0, 0, 0.65 );
+                
+                a {
+                    display: block;
+                    padding: rem( 8px );
+                    color: #fff;
+                    font-size: rem( 12px );
+                    text-decoration: none;
+                }
+                
+                a:hover {
+                    background-color: rgba( 0, 0, 0, 0.95 );
+                }
+                
             }
             
         }
@@ -319,6 +319,10 @@ and (min-device-width : 900px) {
             margin-left: auto;
             margin-right: auto;
             padding: 0;
+            
+            .gvp-splash-download-wrapper {
+                right: rem( 16px );
+            }
             
             .gvp-program-logo {
                 bottom: rem( 10px );

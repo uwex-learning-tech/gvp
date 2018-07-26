@@ -1091,7 +1091,7 @@ function setDownloadables() {
             }
             
             if ( flags.isYouTube === false ) {
-                createDownloadLink( fileName, dwnldPath, fileLabel );
+                createDownloadLink( dwnldPath, fileLabel );
             }
             
             return;
@@ -1102,7 +1102,7 @@ function setDownloadables() {
                 
             if ( result ) {
                 
-                createDownloadLink( fileName, filePath, fileLabel );
+                createDownloadLink( filePath, fileLabel );
                 
             }
             
@@ -1165,7 +1165,7 @@ function setDownloadables() {
     
 }
 
-function createDownloadLink( name, path, label ) {
+function createDownloadLink( path, label ) {
     
     let downloads = document.getElementsByClassName( 'gvp-download-list' )[0];
     let link = document.createElement( 'a' );
@@ -1173,7 +1173,7 @@ function createDownloadLink( name, path, label ) {
     link.id = label.toLowerCase() + "Dl";
     link.href = path;
     link.innerHTML = label;
-    link.download = name;
+    link.download = path;
     link.target = '_blank';
     
     downloads.appendChild( link );
@@ -1350,7 +1350,7 @@ function cleanArray( arr ) {
 
 function cleanString( str ) {
     
-    return str.replace(/[^\w]/gi, '').toLowerCase();
+    return str.replace(/[^\w-]/gi, '').toLowerCase();
     
 }
 
