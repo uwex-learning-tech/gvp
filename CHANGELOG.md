@@ -3,6 +3,7 @@
 **Pending...**
 * Added a download file button to the splash screen and updated colors (#33)
 * Fixed an issue where other downloadable files are not recognized
+* Added GET requests to Kaltura Analytics for play, impression, and reached 100% event
 
 **4.0.2**
 * Fixed an issue where embedded is not working outside of SB+ presentation
