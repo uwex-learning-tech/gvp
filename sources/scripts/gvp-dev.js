@@ -585,6 +585,23 @@ function loadVideoJS() {
         
         // event listeners
         
+        self.on( 'ready', function() {
+            
+            if ( flags.isKaltura ) {
+                
+                let timestamp = + new Date();
+                
+                let loadedUrl = 'http://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=2&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                
+                let statHttp = new XMLHttpRequest();
+                
+                statHttp.open( 'GET', loadedUrl, true );
+                statHttp.send( null );
+                
+            }
+            
+        } );
+        
         self.on( 'playing', function() {
             
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
@@ -597,6 +614,19 @@ function loadVideoJS() {
                 
                 let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
                 titleBar.style.display = 'none';
+                
+            }
+            
+            if ( flags.isKaltura ) {
+                
+                let timestamp = + new Date();
+                
+                let playUrl = 'http://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=3&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                
+                let statHttp = new XMLHttpRequest();
+                
+                statHttp.open( 'GET', playUrl, true );
+                statHttp.send( null );
                 
             }
             
@@ -618,6 +648,19 @@ function loadVideoJS() {
                     titleBar.style.display = 'block';
                     
                 }
+                
+            }
+            
+            if ( flags.isKaltura ) {
+                
+                let timestamp = + new Date();
+                
+                let statEnedUrl = 'http://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=7&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                
+                let statHttp = new XMLHttpRequest();
+                
+                statHttp.open( 'GET', statEnedUrl, true );
+                statHttp.send( null );
                 
             }
             
@@ -1415,6 +1458,16 @@ function queryToSeconds( str ) {
     min = min * 60;
     
     return hr + min + sec;
+    
+}
+
+function guid() {
+    
+    function s4() {
+        return Math.floor( ( 1 + Math.random() ) * 0x10000 ).toString( 16 ).substring (1 );
+    }
+    
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     
 }
 
