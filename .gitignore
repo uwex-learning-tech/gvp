@@ -26,3 +26,5 @@ build/sources/scripts/*.map
 # ignore other experimental dev files
 build/sources/scripts/playerClass-min.js
 sources/scripts/playerClass.js
+
+**/.DS_Store

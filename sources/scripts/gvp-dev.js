@@ -503,6 +503,7 @@ function loadVideoJS() {
         let self = this;
         
         if ( flags.isKaltura && flags.isLocal === false ) {
+            
             self.poster( kaltura.poster + '/width/900/quality/100' );
             self.updateSrc( [
                 { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
@@ -585,18 +586,48 @@ function loadVideoJS() {
         
         // event listeners
         
-        self.on( 'ready', function() {
+        self.on( 'loadedmetadata', function() {
             
             if ( flags.isKaltura ) {
                 
                 let timestamp = + new Date();
                 
-                let loadedUrl = 'http://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=2&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                let loadedUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=2&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
                 
                 let statHttp = new XMLHttpRequest();
                 
                 statHttp.open( 'GET', loadedUrl, true );
                 statHttp.send( null );
+                
+                if ( playerOptions.autoplay ) {
+                
+                    let timestamp = + new Date();
+                    
+                    let playUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=3&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                    
+                    let statHttp = new XMLHttpRequest();
+                    
+                    statHttp.open( 'GET', playUrl, true );
+                    statHttp.send( null );
+                    
+                } else {
+                    
+                    let bigPlayBtn = document.getElementsByClassName( 'vjs-big-play-button' )[0];
+                    
+                    bigPlayBtn.addEventListener( 'click', function() {
+                        
+                        let timestamp = + new Date();
+                    
+                        let playUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=3&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                        
+                        let statHttp = new XMLHttpRequest();
+                        
+                        statHttp.open( 'GET', playUrl, true );
+                        statHttp.send( null );
+                        
+                    }, {once: true} );
+                    
+                }
                 
             }
             
@@ -614,19 +645,6 @@ function loadVideoJS() {
                 
                 let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
                 titleBar.style.display = 'none';
-                
-            }
-            
-            if ( flags.isKaltura ) {
-                
-                let timestamp = + new Date();
-                
-                let playUrl = 'http://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=3&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
-                
-                let statHttp = new XMLHttpRequest();
-                
-                statHttp.open( 'GET', playUrl, true );
-                statHttp.send( null );
                 
             }
             
@@ -655,7 +673,7 @@ function loadVideoJS() {
                 
                 let timestamp = + new Date();
                 
-                let statEnedUrl = 'http://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=7&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                let statEnedUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=7&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
                 
                 let statHttp = new XMLHttpRequest();
                 
