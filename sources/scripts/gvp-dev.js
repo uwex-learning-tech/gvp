@@ -1245,10 +1245,21 @@ function downloadKalVid( id ) {
     
     let videoUrl = document.getElementById( id ).href;
     let xhr = new XMLHttpRequest();
+    let fileName = "";
     
     xhr.open( 'GET', videoUrl );
     xhr.responseType = 'arraybuffer';
     xhr.send( null );
+    
+    if ( reference.names[reference.names.length] ) {
+        
+        fileName = cleanString( reference.names[reference.names.length] );
+        
+    } else {
+        
+        fileName = cleanString(kaltura.name);
+        
+    }
     
     xhr.onload = function() {
       
@@ -1256,13 +1267,12 @@ function downloadKalVid( id ) {
           
           let blob = new Blob( [this.response], { type: 'octet/stream' } );
           let url = window.URL.createObjectURL( blob );
-          let link = document.getElementById( 'videoDl' );
           let dlLink = document.createElement( 'a' );
           let body = document.getElementsByTagName( 'body' )[0];
           
           dlLink.style.display = 'none';
           dlLink.href = url;
-          dlLink.download = link.download + '.mp4';
+          dlLink.download = fileName + '.mp4';
           
           body.appendChild( dlLink );
           
