@@ -656,7 +656,7 @@ function loadVideoJS() {
             
             if ( flags.isIframe ) {
                 
-                if ( flags.sbplusEmbed === undefined && flags.sbplusEmbed !== true ) {
+                if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false ) {
                     
                     let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
                     
@@ -682,7 +682,7 @@ function loadVideoJS() {
                 
             }
             
-            if ( flags.sbplusEmbed === undefined && flags.sbplusEmbed !== true ) {
+            if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false) {
                 
                 self.bigPlayButton.el_.classList.add( 'replay' );
                 self.hasStarted( false );
