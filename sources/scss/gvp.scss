@@ -300,6 +300,7 @@ body.light-off {
     
 }
 
+// when screen is larger than 900
 @media only screen 
 and (min-width : 900px)
 and (min-device-width : 900px) {
@@ -438,6 +439,7 @@ and (min-device-width : 900px) {
     }
     
     .vjs-forward-button {
+        display: none;
         cursor: pointer
     }
     
@@ -461,6 +463,7 @@ and (min-device-width : 900px) {
     }
     
     .vjs-backward-button {
+        display: none;
         cursor: pointer
     }
     
@@ -606,9 +609,23 @@ smaller disconnected loaded time ranges */
 
 // resolution plugin
                             
-.video-js .vjs-resolution-button .vjs-icon-placeholder:before {
-    font-family: VideoJS;
-    content: '\f110';
+.video-js { 
+    
+    .vjs-menu-button-popup[aria-label="Quality"] {
+        display: none;
+    }
+    
+    .vjs-resolution-button {
+        
+        .vjs-icon-placeholder:before {
+            
+            font-family: VideoJS;
+            content: '\f110';
+        
+        }
+        
+    }
+    
 }
 
 // markers plugin
@@ -675,4 +692,36 @@ smaller disconnected loaded time ranges */
 .vjs-break-overlay .vjs-break-overlay-text {
     padding: 9px;
     text-align: center;
+}
+
+@media only screen 
+and (min-width : 530px)
+and (min-device-width : 530px) {
+    
+    .video-js .vjs-control-bar {
+        
+        .vjs-forward-button {
+            display: inline-block;
+        }
+        
+        .vjs-menu-button-popup[aria-label="Quality"] {
+            display: inline-block;
+        }
+        
+    }
+    
+}
+
+@media only screen 
+and (min-width : 680px)
+and (min-device-width : 680px) {
+    
+    .video-js .vjs-control-bar {
+        
+        .vjs-backward-button {
+            display: inline-block;
+        }
+        
+    }
+    
 }
