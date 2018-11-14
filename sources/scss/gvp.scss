@@ -355,6 +355,39 @@ and (min-device-width : 900px) {
     to { background-color: $default-bg-color; }
 };
 
+
+/* VIDEOJS CONTROL BAR */
+.video-js .vjs-control-bar {
+    
+    bottom: 2%;
+    left: 1%;
+    right: unset;
+    @include border-radius(rem(5px));
+    width: 98%;
+    
+    .vjs-menu-button {
+        
+        .vjs-menu-content {
+            
+            overflow: hidden;
+            border: solid #ccc rem( 1px );
+            border-bottom: none;
+            
+            .vjs-texttrack-settings {
+                
+                .vjs-menu-item-text {
+                    font-size: rem( 12px );
+                    font-weight: bold;
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
 /* VIDEOJS DOWNLOADS BUTTON */
 .video-js .vjs-control-bar {
     
