@@ -3,6 +3,9 @@
 **Pending...**
 _none_
 
+**4.0.4**
+* Hide title bar in iframe embedded mode
+
 **4.0.3**
 * Added a download file button to the splash screen and updated colors (#33)
 * Fixed an issue where other downloadable files are not recognized

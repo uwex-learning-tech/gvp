@@ -3,14 +3,14 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.2
- * Released 04/13/2018
+ * @version: 4.0.4
+ * Released 02/28/2019
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Generic Video Player is a video player build on top of VideoJS to serve
     video contents.
-    Copyright (C) 2013-2018  Ethan S. Lin, UWEX CEOEL Media Services
+    Copyright (C) 2013-2019  Ethan S. Lin, UW Extended Campus
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
