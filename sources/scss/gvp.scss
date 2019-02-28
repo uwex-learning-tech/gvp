@@ -206,6 +206,7 @@ html {
     
     .gvp-title-bar {
         
+        display: none;
         position: absolute;
         width: 100%;
         @include box-sizing( border-box );
@@ -229,7 +230,7 @@ html {
         padding: 0;
         
         .gvp-splash-download-wrapper {
-            top: rem( 58px );
+            top: rem( 30px );
         }
         
     }
