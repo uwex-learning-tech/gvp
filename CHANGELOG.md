@@ -1,7 +1,7 @@
 # Version Change Log
 
 **Pending...**
-_none_
+* Force 16:9 aspect ratio
 
 **4.0.4**
 * Hide title bar in iframe embedded mode
