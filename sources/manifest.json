@@ -10,14 +10,14 @@
     "gvp_google_tracking_id": "",
     "gvp_root_directory": "",
     "gvp_logo_directory": "https://media.uwex.edu/content/media/storybook_support/logo/",
-    "gvp_logo_default": "ceoel",
+    "gvp_logo_default": "uwex",
     "gvp_kaltura": {
         "id": 1660872,
         "normal": 487081,
         "medium": 487061,
         "low": 487041
     },
-    "gvp_copyright": "University of Wisconsin System and University of Wisconsin-Extension, Division of Continuing Education, Outreach, &amp; E-Learning. All rights reserved.",
+    "gvp_copyright": "Board of Regents of the University of Wisconsin System and University of Wisconsin Extended Campus. All rights reserved.",
     "gvp_download_files": [ 
         
         {
@@ -43,8 +43,8 @@
     "gvp_custom_themes": [
         
         {
-            "name": "ceoel",
-            "colors": [ "#0a4a89", "#2a6b9f", "#578db5", "#88b1ce", "#c1d7e6" ]
+            "name": "uwex",
+            "colors": [ "#990033", "#880063", "#592C5F", "#645D9C", "#003764" ]
         },
         
         {
