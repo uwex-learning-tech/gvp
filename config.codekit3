@@ -25,6 +25,12 @@
 		"oAP": "/build/.gitignore",
 		"oF": 1
 		},
+	"/build": {
+		"ft": 65536,
+		"oA": 1,
+		"oAP": "/build/build",
+		"oF": 0
+		},
 	"/CHANGELOG.md": {
 		"cB": 0,
 		"cS": 0,
@@ -124066,17 +124072,6 @@
 		"sC": 0,
 		"tS": 0
 		},
-	"/sources/scripts/playerClass.js": {
-		"bF": 0,
-		"ft": 64,
-		"ma": 1,
-		"mi": 1,
-		"oA": 0,
-		"oAP": "/build/sources/scripts/playerClass-min.js",
-		"oF": 2,
-		"sC": 3,
-		"tS": 1
-		},
 	"/sources/scripts/templates/gvp.tpl": {
 		"cB": 0,
 		"ft": 8192,
@@ -124601,32 +124596,6 @@
 			"type": 0
 			}
 		],
-	"/sources/scripts/playerClass.js": [
-		{
-			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "/sources/scripts/modernizr.js",
-			"position": 0,
-			"type": 0
-			},
-		{
-			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "/node_modules/whatwg-fetch/fetch.js",
-			"position": 1,
-			"type": 0
-			},
-		{
-			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "/node_modules/url-search-params/build/url-search-params.js",
-			"position": 2,
-			"type": 0
-			},
-		{
-			"followForSyntaxChecking": 0,
-			"linkedFileAbbreviatedPath": "/node_modules/babel-polyfill/dist/polyfill.min.js",
-			"position": 3,
-			"type": 0
-			}
-		],
 	"/sources/scripts/videojs/video.js": [
 		{
 			"followForSyntaxChecking": 0,
@@ -124654,7 +124623,7 @@
 	"displayValueWasSetByUser": 1,
 	"iconImageName": "meme-grumpy",
 	"iconImageWasSetByUser": 0,
-	"lastBuiltDate": 525737272
+	"lastBuiltDate": 580928904.19057202
 	},
 "projectSettings": {
 	"abortBuildOnError": 1,
