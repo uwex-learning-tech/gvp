@@ -10,21 +10,15 @@ node_modules/
 .sass-cache
 **/.sass-cache
 
-# ignore video and vtt files in build directory
-build/*.mp4
-build/*.vtt
-build/*.pdf
-build/*.zip
-build/*.mp3
+# ignore build directory
+**/build
+build/
 
 # ignore .map files
 .map
 **/.map
-build/sources/css/*.map
-build/sources/scripts/*.map
 
 # ignore other experimental dev files
-build/sources/scripts/playerClass-min.js
 sources/scripts/playerClass.js
 
 **/.DS_Store
