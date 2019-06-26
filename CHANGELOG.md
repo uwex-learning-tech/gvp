@@ -1,7 +1,10 @@
 # Version Change Log
 
 **Pending...**
+
+**4.0.5**
 * Force 16:9 aspect ratio
+* Updated manifest to get program theme and copyright info from centralized `themes.json` file
 
 **4.0.4**
 * Hide title bar in iframe embedded mode
