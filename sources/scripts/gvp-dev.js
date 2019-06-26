@@ -3,8 +3,8 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.4
- * Released 02/28/2019
+ * @version: 4.0.5
+ * Released 06/26/2019
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
@@ -38,6 +38,7 @@
 /**** GLOBAL VARIABLES ****/
 
 let manifest = {};
+let theme = {};
 let program = {};
 let reference = {
     names: window.location.href,
@@ -121,7 +122,6 @@ function initGVP() {
         gvp.template = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
         
         setProgram();
-        setGvpTemplate();
         
     } );
     
@@ -129,19 +129,31 @@ function initGVP() {
 
 function setProgram() {
     
-    if ( manifest.gvp_custom_themes ) {
-
-        program = manifest.gvp_custom_themes.find( function (obj) {
-            return obj.name === reference.names[3];
-        } );
+    if ( manifest.gvp_program_themes ) {
         
-        if ( program === undefined ) {
+        getFile( manifest.gvp_program_themes, true ).then( results => {
             
-            program = manifest.gvp_custom_themes.find( function (obj) {
-                return obj.name === manifest.gvp_logo_default;
-            } );
+            if ( results != undefined ) {
+                
+                theme = results;
+                
+                program = theme.program_themes.find( function (obj) {
+                    return obj.name === reference.names[3];
+                } );
+                
+                if ( program === undefined ) {
+                    
+                    program = theme.program_themes.find( function (obj) {
+                        return obj.name === manifest.gvp_logo_default;
+                    } );
+                    
+                }
+                
+            }
             
-        }
+            setGvpTemplate();
+            
+        } );
         
     }
     
@@ -167,9 +179,13 @@ function setGvpTemplate() {
                 copyrightYearHolder.innerHTML = year;
                 
                 // set copyright notice
-                let noticeHolder = document.getElementById( 'gvp_notice' );
-                noticeHolder.innerHTML = manifest.gvp_copyright;
-                
+                if ( theme.copyright !== undefined ) {
+                    
+                    let noticeHolder = document.getElementById( 'gvp_notice' );
+                    noticeHolder.innerHTML = theme.copyright;
+                    
+                }
+
             } else {
                 
                 gvpWrapper.classList.add( "embedded" );
@@ -249,15 +265,19 @@ function setGvpUi() {
 
 function setProgramTheme() {
     
-    let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
-    
-    program.colors.forEach( function( hex ) {
-                    
-        let span = document.createElement( 'span' );
-        span.style.backgroundColor = hex;
-        decorationBar.appendChild(span);
+    if ( program.colors !== undefined ) {
         
-    } );
+        let decorationBar = document.getElementsByClassName( 'gvp-decoration-bar' )[0];
+        
+        program.colors.forEach( function( hex ) {
+                    
+            let span = document.createElement( 'span' );
+            span.style.backgroundColor = hex;
+            decorationBar.appendChild(span);
+            
+        } );
+        
+    }
     
 }
 
