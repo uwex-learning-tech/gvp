@@ -2,6 +2,9 @@
 
 **Pending...**
 
+**4.0.6**
+* Updated Skip Forward and Backward icons.
+
 **4.0.5**
 * Force 16:9 aspect ratio
 * Updated manifest to get program theme and copyright info from centralized `themes.json` file
