@@ -3,8 +3,8 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.5
- * Released 06/26/2019
+ * @version: 4.0.6
+ * Released 08/26/2019
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
@@ -915,12 +915,14 @@ function addForwardButton( vjs ) {
     videojs.registerComponent( 'ForwardBtn', forwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'ForwardBtn', {}, 1 );
     
+/*
     vjs.on( 'play', function() {
         
         secToSkip = getSecToSkip( vjs.duration() );
         document.getElementsByClassName('vjs-forward-button')[0].classList.add( 'sec' + secToSkip );
         
     } );
+*/
     
 }
 
@@ -963,12 +965,14 @@ function addBackwardButton( vjs ) {
     videojs.registerComponent( 'BackwardBtn', backwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'BackwardBtn', {}, 1 );
     
+/*
     vjs.on( 'play', function() {
        
         secToSkip = getSecToSkip( vjs.duration() );
         document.getElementsByClassName('vjs-backward-button')[0].classList.add( 'sec' + secToSkip );
        
     } );
+*/
     
 }
 
@@ -980,11 +984,7 @@ function getSecToSkip( duration ) {
         
     }
     
-    if ( duration >= 120 && duration < 180 ) {
-            
-        return 10;
-        
-    } else if ( duration >= 180 && duration < 300 ) {
+    if ( duration >= 180 && duration < 300 ) {
         
         return 15;
         
@@ -994,7 +994,7 @@ function getSecToSkip( duration ) {
         
     }
     
-    return 0;
+    return 10;
         
 }
 
