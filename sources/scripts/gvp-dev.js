@@ -51,7 +51,8 @@ let reference = {
 // an object to hold player source and template
 let gvp = {
     source: '',
-    template: null
+    template: null,
+    player: null
 };
 
 // an object to hold the kaltura library
@@ -581,7 +582,6 @@ function loadVideoJS() {
     
     // autoplay settings
     let isAutoplay = false;
-    let player = null;
 
     if ( reference.params.has( 'autoplay' ) && reference.params.get( 'autoplay' ) === '1' ) {
         isAutoplay = true;
@@ -614,7 +614,7 @@ function loadVideoJS() {
     }
     
     // initialize the video player bases options/configurations
-    player = videojs( 'gvp-video', playerOptions, function() {
+    gvp.player = videojs( 'gvp-video', playerOptions, function() {
         
         let self = this;
         
@@ -711,11 +711,11 @@ function loadVideoJS() {
             
             if ( flags.isKaltura ) {
 
-                sendToKalturaAnalytics( '2', self.duration() );
+                sendToKalturaAnalytics( '2' );
 
                 if ( playerOptions.autoplay ) {
                     
-                    sendToKalturaAnalytics( '3', self.duration() );
+                    sendToKalturaAnalytics( '3' );
                     
                 } else {
                     
@@ -723,12 +723,12 @@ function loadVideoJS() {
                     
                     bigPlayBtn.addEventListener( 'click', function() {
                         
-                        sendToKalturaAnalytics( '3', self.duration() );
+                        sendToKalturaAnalytics( '3' );
                         
                     }, { once: true } );
                     
                 }
-                
+
             }
             
         } );
@@ -760,17 +760,17 @@ function loadVideoJS() {
 
                 if ( progressPercentage >= 25 && flags.playReached25 == false ) {
                     flags.playReached25 = true;
-                    endToKalturaAnalytics( '4', self.duration() );
+                    sendToKalturaAnalytics( '4' );
                 }
 
                 if ( progressPercentage >= 50 && flags.playReached50 == false ) {
                     flags.playReached50 = true;
-                    endToKalturaAnalytics( '5', self.duration() );
+                    sendToKalturaAnalytics( '5' );
                 }
 
                 if ( progressPercentage >= 75 && flags.playReached75 == false ) {
                     flags.playReached75 = true;
-                    endToKalturaAnalytics( '6', self.duration() );
+                    sendToKalturaAnalytics( '6' );
                 }
 
             }
@@ -806,18 +806,34 @@ function loadVideoJS() {
             
             if ( flags.isKaltura ) {
 
-                sendToKalturaAnalytics( '7', self.duration() );
+                sendToKalturaAnalytics( '7' );
 
                 let bigReplayBtn = document.querySelector( '.vjs-big-play-button.replay' );
 
                 bigReplayBtn.addEventListener( 'click', function() {
                     
-                    sendToKalturaAnalytics( '16', self.duration() );
+                    sendToKalturaAnalytics( '16' );
                     
                 }, { once: true } );
 
             }
 
+        } );
+
+        self.on( 'fullscreenchange', function() {
+            
+            if ( flags.isKaltura ) {
+
+                let isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+        
+                if ( isFullScreen ) {
+                    sendToKalturaAnalytics( '14' );
+                } else {
+                    sendToKalturaAnalytics( '15' );
+                }
+
+            }
+    
         } );
         
         self.on( 'error', function() {
@@ -835,7 +851,7 @@ function loadVideoJS() {
         addDownloadFilesButton( self );
         
         // add markers if any
-        setupMarkers( player );
+        setupMarkers( gvp.player );
         
         // if youtube, hide cover on ready and reset markers
         if ( flags.isYouTube ) {
@@ -869,7 +885,7 @@ function loadVideoJS() {
             } );
             
             self.on( 'play', function() {
-                player.markers.reset(xml.markersCollection);
+                gvp.player.markers.reset(xml.markersCollection);
             } );
             
         }
@@ -879,27 +895,20 @@ function loadVideoJS() {
         
     } );
 
-    player.on( 'fullscreenchange', function() {
-        let state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
-        let event = state ? 'FullscreenOn' : 'FullscreenOff';
-
-        console.log(event);
-        console.log(player.isFullscreen());
-
-    } );
-
 }
 
-function sendToKalturaAnalytics( eventType, duration ) {
+function sendToKalturaAnalytics( eventType ) {
 
-    let timestamp = + new Date();
-                
-    let trackUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + sessionId + '&event%3AeventType=' + eventType + '&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + duration + '&event%3AeventTimestamp=' + timestamp;
+    if ( gvp.player ) {
 
-    let statHttp = new XMLHttpRequest();
-    
-    statHttp.open( 'GET', trackUrl, true );
-    statHttp.send( null );
+        let timestamp = + new Date();
+        let statHttp = new XMLHttpRequest();
+        let trackUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + sessionId + '&event%3AeventType=' + eventType + '&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + gvp.player.duration() + '&event%3AeventTimestamp=' + timestamp;
+        
+        statHttp.open( 'GET', trackUrl, true );
+        statHttp.send( null );
+
+    }
 
 }
 
