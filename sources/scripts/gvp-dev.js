@@ -3,14 +3,14 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.6
- * Released 08/26/2019
+ * @version: 4.0.7
+ * Released 02/xx/2020
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Generic Video Player is a video player build on top of VideoJS to serve
     video contents.
-    Copyright (C) 2013-2019  Ethan S. Lin, UW Extended Campus
+    Copyright (C) 2013-2020  Ethan S. Lin, UW Extended Campus
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,21 +37,30 @@
 
 /**** GLOBAL VARIABLES ****/
 
-let manifest = {};
-let theme = {};
-let program = {};
+const sessionId = guid(); // an unique id for session
+let manifest = {}; // an object to hold the data from the manifest file
+let theme = {}; // an object to hold the theme data
+let program = {}; // an object to hold the program data
+
+// an object to hold current browser window URL and queries
 let reference = {
     names: window.location.href,
-    params:new URLSearchParams( window.location.search )
+    params: new URLSearchParams( window.location.search )
 };
+
+// an object to hold player source and template
 let gvp = {
     source: '',
     template: null
 };
+
+// an object to hold the kaltura library
 let kaltura = {
     lib: null,
     widget: null
 };
+
+// an object to hold data from the XML
 let xml = {
     file: 'gvp.xml',
     doc: null,
@@ -61,34 +70,42 @@ let xml = {
     markersTag: null,
     markersCollection: []
 };
+
+// an object that holds the state of the player
 let flags = {
     isLocal: false,
     isYouTube: false,
     isKaltura: false,
     isIframe: false,
-    played: false
+    played: false,
+    playReached25: false,
+    playReached50: false,
+    playReached75: false
 };
 
-/**** ON DOM READY ****/
+/**** ON DOM READY; RUNS THE initGVP function ****/
 
 ( function ready( fn ) {
     
     if ( document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading' ) {
-        
         fn();
-        
     } else {
-        
         document.addEventListener( 'DOMContentLoaded', fn );
-        
     }
     
 } )( initGVP );
 
-/**** CORE FUNCTIONS ****/
+/**** GVP CORE FUNCTIONS ****/
 
+/**
+ * Initialize the generic video player first by loading the data
+ * from the manifest JSON file.
+ * 
+ * @function initGVP
+ */
 function initGVP() {
     
+    // set the URL to the manifest JSON file
     let manifestURL = document.getElementById( 'gvp-manifest' ).href;
     
     // parse directories from the URL
@@ -101,46 +118,62 @@ function initGVP() {
 	
 	reference.names = cleanArray( reference.names.split( '/' ) );
 	
-	// if inside an iframe
+	// if inside an iframe, set the isFrame flag to true
 	if ( window.self != window.top ) {
-    	
     	flags.isIframe = true;
-    	
 	}
     
     // get the data from the manifest file
     getFile( manifestURL, true ).then( result => {
         
+        // set JSON data to the manifest object
         manifest = result;
         
+        // default the player root director to 'sources/'
+        // if not specified in the JSON data
         if ( manifest.gvp_root_directory.length <= 0 ) {
             manifest.gvp_root_directory = 'sources/';
         }
-        
+
+        // set the URL to the Kaltura libraries
         kaltura.lib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
         kaltura.widget = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
+
+        // set the URL to the player template file
         gvp.template = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
         
+        // call to setup the program theme
         setProgram();
         
     } );
     
 }
 
+/**
+ * Retrieved program data from the manifest JSON file.
+ * 
+ * @function setProgram
+ */
 function setProgram() {
     
+    // if program themes data is set in the manifest JSON
     if ( manifest.gvp_program_themes ) {
         
+        // get the program theme data
         getFile( manifest.gvp_program_themes, true ).then( results => {
             
             if ( results != undefined ) {
                 
+                // set the theme data to the theme object
                 theme = results;
                 
+                // set the program if it matches the program
+                // from the URL
                 program = theme.program_themes.find( function (obj) {
                     return obj.name === reference.names[3];
                 } );
                 
+                // if program is undfined, set to the default program
                 if ( program === undefined ) {
                     
                     program = theme.program_themes.find( function (obj) {
@@ -151,6 +184,7 @@ function setProgram() {
                 
             }
             
+            // call to setup the player template
             setGvpTemplate();
             
         } );
@@ -159,16 +193,25 @@ function setProgram() {
     
 }
 
+/**
+ * Retrieved player HTML template from the template file.
+ * 
+ * @function setGvpTemplate
+ */
 function setGvpTemplate() {
     
+    // get the template file
     getFile( gvp.template ).then( result => {
         
         if ( result ) {
             
+            // get the DOM element to hold the HTML template
             let gvpWrapper = document.getElementById( 'gvp-wrapper' );
             
+            // set the HTML template to the DOM
             gvpWrapper.innerHTML = result;
             
+            // if it is not embeded in an iFrame
             if ( !flags.isIframe ) {
                 
                 // get/set copyright year
@@ -186,12 +229,17 @@ function setGvpTemplate() {
                     
                 }
 
+            // it is in an iFrame
             } else {
                 
+                // add the embedded class to the DOM element
                 gvpWrapper.classList.add( "embedded" );
                 
+                // if it is embedde in an iFrame and inside
+                // a Storybook+ presentation...
                 try {
                     
+                    // remove the title bar
                     if ( window.parent.SBPLUS !== undefined ) {
                         
                     	gvpWrapper.classList.add( 'sbplus-embed' );
@@ -211,6 +259,7 @@ function setGvpTemplate() {
                 
             }
 
+            // call to setup the player UI
             setGvpUi();
             
         }
@@ -219,11 +268,18 @@ function setGvpTemplate() {
     
 }
 
+/**
+ * Setup the player user interface with the correct program,
+ * theme, and environment.
+ * 
+ * @function setGvpUi
+ */
 function setGvpUi() {
     
     // display logo
     let logoURL = manifest.gvp_logo_directory + program.name + '.svg';
     
+    // retrive the program logo
     fileExist( logoURL ).then( result => {
         
         let programLogoDiv = document.getElementsByClassName( 'gvp-program-logo' );
@@ -241,6 +297,8 @@ function setGvpUi() {
         
     } );
     
+    // if it is not inside an iFrame
+    // allow the ability to black out the background
     if ( !flags.isIframe ) {
         
         if ( reference.params.has( 'light' ) && reference.params.get( "light" ) === '1' ) {
@@ -255,14 +313,21 @@ function setGvpUi() {
             
         }
         
+        // call to setup the program theme
         setProgramTheme();
         
     }
     
+    // call to the video source at the same time
     getVideoSource();
     
 }
 
+/**
+ * Setup the theme color bar if the data is available.
+ * 
+ * @function setProgramTheme
+ */
 function setProgramTheme() {
     
     if ( program.colors !== undefined ) {
@@ -281,6 +346,12 @@ function setProgramTheme() {
     
 }
 
+/**
+ * Read and parse the XML file that contains the video source
+ * and additional data. 
+ * 
+ * @function getVideoSource
+ */
 function getVideoSource() {
     
     // get the kaltura video id from gvp.xml file
@@ -333,8 +404,8 @@ function getVideoSource() {
                 
             }
             
-            
             // see if kalturaId tag is specified
+            // and load the Kaltura libraries if it is
             if ( xml.doc.getElementsByTagName( 'kalturaId' )[0] !== undefined ) {
                 
                 xml.kalturaTag = xml.doc.getElementsByTagName( 'kalturaId' )[0];
@@ -417,28 +488,46 @@ function getVideoSource() {
             
         }
         
+        // call to setup the video player functionality
         setVideoJs();
 
-        
     } );
     
 }
 
+/**
+ * Contains functions to set title, load the video JS, and
+ * set downloadable files. 
+ * 
+ * @function setVideoJs
+ */
 function setVideoJs() {
     setTitle();
     loadVideoJS();
     setDownloadables();
 }
 
+/**
+ * Loads the Kaltura libraries.
+ * 
+ * @function getKalturaLibrary
+ */
 function getKalturaLibrary() {
     getScript( kaltura.lib, false, false );
     getScript( kaltura.widget, false, loadLalturaSource );
 }
 
+/**
+ * Get video information from Kaltura.
+ * 
+ * @function loadLalturaSource
+ */
 function loadLalturaSource() {
     
     if ( kWidget ) {
         
+        // get the video source base on the provided
+        // configrations
         kWidget.getSources( {
             
             'partnerId': manifest.gvp_kaltura.id,
@@ -472,6 +561,7 @@ function loadLalturaSource() {
                     return;
                 }
                 
+                // call to setup the videoJS player
                 setVideoJs();
                 
             }
@@ -482,19 +572,23 @@ function loadLalturaSource() {
     
 }
 
+/**
+ * Loads the videoJS player.
+ * 
+ * @function loadVideoJS
+ */
 function loadVideoJS() {
     
+    // autoplay settings
     let isAutoplay = false;
     let player = null;
 
     if ( reference.params.has( 'autoplay' ) && reference.params.get( 'autoplay' ) === '1' ) {
-        
         isAutoplay = true;
-        
     }
     
+    // player options
     let playerOptions = {
-        
         techOrder: ['html5'],
         controls: true,
         autoplay: isAutoplay,
@@ -502,9 +596,9 @@ function loadVideoJS() {
         playbackRates: [0.5, 1, 1.5, 2],
         fluid: true,
         plugins: {}
-        
     };
     
+    // additional options if the video is from YouTube
     if ( flags.isYouTube && flags.isLocal === false ) {
         playerOptions.techOrder = ['youtube'];
         playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
@@ -514,14 +608,18 @@ function loadVideoJS() {
         }
     }
     
+    // add video qualitiy functionality if video is from YouTube or Kaltura
     if ( ( flags.isYouTube || flags.isKaltura ) && flags.isLocal === false ) {
         Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
     }
     
+    // initialize the video player bases options/configurations
     player = videojs( 'gvp-video', playerOptions, function() {
         
         let self = this;
         
+        // if video is from Kaltura, set the video sources
+        // mulitple Kaltura flavors
         if ( flags.isKaltura && flags.isLocal === false ) {
             
             self.poster( kaltura.poster + '/width/900/quality/100' );
@@ -531,6 +629,7 @@ function loadVideoJS() {
                 { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
             ] );
             
+            // setup the caption if applicable
             if ( kaltura.captionId ) {
                 
                 self.addRemoteTextTrack( {
@@ -546,7 +645,7 @@ function loadVideoJS() {
             
             // do nothing
             
-        } else {
+        } else { // if the video is local
             
             self.src( gvp.source + '.mp4' );
             
@@ -563,8 +662,8 @@ function loadVideoJS() {
             
         }
         
-        // queried event listeners
-        
+        // URL queried event listeners
+        // if start time is specified
         if ( reference.params.has( 'start' ) ) {
             
             self.on( 'play', function() {
@@ -589,6 +688,7 @@ function loadVideoJS() {
             
         }
         
+        // if end time is specified
         if ( reference.params.has( 'end' ) ) {
             
             self.on( 'timeupdate', function() {
@@ -604,31 +704,18 @@ function loadVideoJS() {
             
         }
         
-        // event listeners
-        
+        // media event listeners        
+
+        // on load
         self.on( 'loadedmetadata', function() {
             
             if ( flags.isKaltura ) {
-                
-                let timestamp = + new Date();
-                
-                let loadedUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=2&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
-                
-                let statHttp = new XMLHttpRequest();
-                
-                statHttp.open( 'GET', loadedUrl, true );
-                statHttp.send( null );
-                
+
+                sendToKalturaAnalytics( '2', self.duration() );
+
                 if ( playerOptions.autoplay ) {
-                
-                    let timestamp = + new Date();
                     
-                    let playUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=3&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
-                    
-                    let statHttp = new XMLHttpRequest();
-                    
-                    statHttp.open( 'GET', playUrl, true );
-                    statHttp.send( null );
+                    sendToKalturaAnalytics( '3', self.duration() );
                     
                 } else {
                     
@@ -636,16 +723,9 @@ function loadVideoJS() {
                     
                     bigPlayBtn.addEventListener( 'click', function() {
                         
-                        let timestamp = + new Date();
-                    
-                        let playUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=3&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
+                        sendToKalturaAnalytics( '3', self.duration() );
                         
-                        let statHttp = new XMLHttpRequest();
-                        
-                        statHttp.open( 'GET', playUrl, true );
-                        statHttp.send( null );
-                        
-                    }, {once: true} );
+                    }, { once: true } );
                     
                 }
                 
@@ -653,6 +733,7 @@ function loadVideoJS() {
             
         } );
         
+        // on playing
         self.on( 'playing', function() {
             
             let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
@@ -669,11 +750,45 @@ function loadVideoJS() {
             }
             
         } );
+
+        // as video playback progresses
+        self.on( 'timeupdate', function() {
+
+            if ( flags.isKaltura && self.duration() ) {
+
+                let progressPercentage = ( self.currentTime() / self.duration() ) * 100;
+
+                if ( progressPercentage >= 25 && flags.playReached25 == false ) {
+                    flags.playReached25 = true;
+                    endToKalturaAnalytics( '4', self.duration() );
+                }
+
+                if ( progressPercentage >= 50 && flags.playReached50 == false ) {
+                    flags.playReached50 = true;
+                    endToKalturaAnalytics( '5', self.duration() );
+                }
+
+                if ( progressPercentage >= 75 && flags.playReached75 == false ) {
+                    flags.playReached75 = true;
+                    endToKalturaAnalytics( '6', self.duration() );
+                }
+
+            }
+
+        } );
         
+        // as video completely ended
         self.on( 'ended', function() {
             
             document.getElementsByClassName( 'gvp-download-btn' )[0].style.display = 'initial';
             
+            if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false) {
+                
+                self.bigPlayButton.el_.classList.add( 'replay' );
+                self.hasStarted( false );
+                
+            }
+
             if ( flags.isIframe ) {
                 
                 if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false ) {
@@ -690,23 +805,17 @@ function loadVideoJS() {
             }
             
             if ( flags.isKaltura ) {
-                
-                let timestamp = + new Date();
-                
-                let statEnedUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + guid() + '&event%3AeventType=7&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + self.duration() + '&event%3AeventTimestamp=' + timestamp;
-                
-                let statHttp = new XMLHttpRequest();
-                
-                statHttp.open( 'GET', statEnedUrl, true );
-                statHttp.send( null );
-                
-            }
-            
-            if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false) {
-                
-                self.bigPlayButton.el_.classList.add( 'replay' );
-                self.hasStarted( false );
-                
+
+                sendToKalturaAnalytics( '7', self.duration() );
+
+                let bigReplayBtn = document.querySelector( '.vjs-big-play-button.replay' );
+
+                bigReplayBtn.addEventListener( 'click', function() {
+                    
+                    sendToKalturaAnalytics( '16', self.duration() );
+                    
+                }, { once: true } );
+
             }
 
         } );
@@ -719,7 +828,6 @@ function loadVideoJS() {
         } );
         
         // add forward and backward seconds button if video is longer than 1 minutes
-
         addForwardButton( self );
         addBackwardButton( self );
         
@@ -766,10 +874,32 @@ function loadVideoJS() {
             
         }
         
-        // hide cover
+        // hide the program theme cover
         hideCover();
         
     } );
+
+    player.on( 'fullscreenchange', function() {
+        let state = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+        let event = state ? 'FullscreenOn' : 'FullscreenOff';
+
+        console.log(event);
+        console.log(player.isFullscreen());
+
+    } );
+
+}
+
+function sendToKalturaAnalytics( eventType, duration ) {
+
+    let timestamp = + new Date();
+                
+    let trackUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + sessionId + '&event%3AeventType=' + eventType + '&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + duration + '&event%3AeventTimestamp=' + timestamp;
+
+    let statHttp = new XMLHttpRequest();
+    
+    statHttp.open( 'GET', trackUrl, true );
+    statHttp.send( null );
 
 }
 
