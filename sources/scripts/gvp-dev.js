@@ -391,7 +391,7 @@ function getVideoSource() {
                             
                             let marker = {
                                 time: toSeconds( markerTag[i].attributes.timecode.nodeValue ),
-                                text: markerTag[i].childNodes[0].nodeValue,
+                                text: markerTag[i].childNodes[0] ? markerTag[i].childNodes[0].nodeValue : '',
                                 color: markerColor
                             };
                             

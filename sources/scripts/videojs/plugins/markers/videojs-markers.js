@@ -11,7 +11,7 @@
     global.videojsMarkers = mod.exports;
   }
 })(this, function (_video) {
-  /*! videojs-markers - v1.0.1 - 2018-02-03
+  /*! videojs-markers - v1.0.1 - 2018-10-31
   * Copyright (c) 2018 ; Licensed  */
   'use strict';
 
@@ -202,17 +202,14 @@
 
       // set position
       markerDiv.style.left = getPosition(marker) + '%';
-      
       if (marker.duration) {
         markerDiv.style.width = marker.duration / player.duration() * 100 + '%';
         //markerDiv.style.marginLeft = '0px';
-      } /*
-else {
+      } else {
         var markerDivBounding = getElementBounding(markerDiv);
         markerDiv.style.marginLeft = markerDivBounding.width / 2 + 'px';
       }
-*/
-      
+
       if ( setting.markerTip.color(marker) !== '' ) {
           markerDiv.style.backgroundColor = setting.markerTip.color(marker);
       }
@@ -225,7 +222,7 @@ else {
         'data-marker-key': marker.key,
         'data-marker-time': setting.markerTip.time(marker)
       });
-      
+
       setMarkderDivStyle(marker, markerDiv);
 
       // bind click event to seek to marker time
@@ -300,13 +297,17 @@ else {
       markerDiv.addEventListener('mouseover', function () {
         var marker = markersMap[markerDiv.getAttribute('data-marker-key')];
         if (!!markerTip) {
-          markerTip.querySelector('.vjs-tip-inner').innerText = setting.markerTip.text(marker);
+          if (setting.markerTip.html) {
+            markerTip.querySelector('.vjs-tip-inner').innerHTML = setting.markerTip.html(marker);
+          } else {
+            markerTip.querySelector('.vjs-tip-inner').innerText = setting.markerTip.text(marker);
+          }
           // margin-left needs to minus the padding length to align correctly with the marker
           markerTip.style.left = getPosition(marker) + '%';
           var markerTipBounding = getElementBounding(markerTip);
           var markerDivBounding = getElementBounding(markerDiv);
           markerTip.style.marginLeft = -parseFloat(markerTipBounding.width / 2) + parseFloat(markerDivBounding.width / 4) + 'px';
-          markerTip.style.visibility = 'visible';
+          markerTip.style.visibility = markerTip.querySelector('.vjs-tip-inner').innerHTML.length ?'visible' : 'hidden';
         }
       });
 
@@ -322,6 +323,7 @@ else {
         className: 'vjs-tip',
         innerHTML: "<div class='vjs-tip-arrow'></div><div class='vjs-tip-inner'></div>"
       });
+      
       player.el().querySelector('.vjs-progress-holder').appendChild(markerTip);
     }
 
