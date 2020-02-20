@@ -1306,6 +1306,19 @@ function setDownloadables() {
             if ( result ) {
                 
                 createDownloadLink( filePath, fileLabel );
+
+                // send transcript download stat to Kaltura
+                if ( flags.isKaltura ) {
+                    
+                    if ( fileLabel === 'Transcript' ) {
+
+                        document.getElementById( 'transcriptDl' ).addEventListener( 'click', function() {
+                            sendToKalturaAnalytics( '10' );
+                        } );
+
+                    }
+                    
+                }
                 
             }
             
@@ -1353,17 +1366,16 @@ function setDownloadables() {
 
         } );
         
-        if ( flags.isKaltura ) {
-    
-            let vidDwnldLink = document.getElementById( 'videoDl' );
-            
-            vidDwnldLink.addEventListener( 'click', function( evt ) {
-                downloadKalVid( 'videoDl' );
-                evt.preventDefault();
-            } );
-            
-        }
-        
+    }
+
+    if ( flags.isKaltura ) {
+
+        // download video from Kaltura
+        document.getElementById( 'videoDl' ).addEventListener( 'click', function( evt ) {
+            downloadKalVid( 'videoDl' );
+            evt.preventDefault();
+        } );
+
     }
     
 }
@@ -1378,7 +1390,6 @@ function createDownloadLink( path, label ) {
     link.innerHTML = label;
     link.download = path;
     link.target = '_blank';
-    
     downloads.appendChild( link );
     
 }
