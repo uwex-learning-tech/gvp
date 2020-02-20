@@ -595,6 +595,9 @@ function loadVideoJS() {
         preload: 'auto',
         playbackRates: [0.5, 1, 1.5, 2],
         fluid: true,
+        controlBar: {
+            pictureInPictureToggle: false
+        },
         plugins: {}
     };
     
@@ -1054,15 +1057,6 @@ function addForwardButton( vjs ) {
     videojs.registerComponent( 'ForwardBtn', forwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'ForwardBtn', {}, 1 );
     
-/*
-    vjs.on( 'play', function() {
-        
-        secToSkip = getSecToSkip( vjs.duration() );
-        document.getElementsByClassName('vjs-forward-button')[0].classList.add( 'sec' + secToSkip );
-        
-    } );
-*/
-    
 }
 
 function addBackwardButton( vjs ) {
@@ -1104,33 +1098,18 @@ function addBackwardButton( vjs ) {
     videojs.registerComponent( 'BackwardBtn', backwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'BackwardBtn', {}, 1 );
     
-/*
-    vjs.on( 'play', function() {
-       
-        secToSkip = getSecToSkip( vjs.duration() );
-        document.getElementsByClassName('vjs-backward-button')[0].classList.add( 'sec' + secToSkip );
-       
-    } );
-*/
-    
 }
 
 function getSecToSkip( duration ) {
     
     if ( isNaN( duration ) ) {
-        
         return 0;
-        
     }
     
     if ( duration >= 180 && duration < 300 ) {
-        
         return 15;
-        
     } else if ( duration >= 300 ) {
-        
         return 30;
-        
     }
     
     return 10;
@@ -1196,15 +1175,19 @@ function downloadables( vjs ) {
     DownloadMenuItem.prototype.handleClick = function() {
 
       if ( this.options_.kaltura === true ) {
-          
+    
           if ( this.options_.id === 'videoDl' ) {
 
                 downloadKalVid( this.options_.id );
               
           } else {
-              
+
               document.getElementById( this.options_.id ).click();
-              
+
+              if ( this.options_.id === 'transcriptDl' ) {
+                  sendToKalturaAnalytics( '10' );
+              }              
+
           }
           
       } else {

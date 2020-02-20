@@ -160639,17 +160639,6 @@
 		"oO": 0,
 		"oS": 1
 		},
-	"/sources/scripts/videojs/plugins/markers/videojs-markers-min.js": {
-		"bF": 0,
-		"ft": 64,
-		"ma": 0,
-		"mi": 1,
-		"oA": 0,
-		"oAP": "/build/scripts/videojs/plugins/markers/videojs-markers-min.js",
-		"oF": 0,
-		"sC": 1,
-		"tS": 0
-		},
 	"/sources/scripts/videojs/plugins/markers/videojs-markers.js": {
 		"bF": 0,
 		"ft": 64,
