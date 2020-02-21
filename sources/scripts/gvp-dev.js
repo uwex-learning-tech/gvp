@@ -96,6 +96,46 @@ let flags = {
     
 } )( initGVP );
 
+function loadGoogleAnalytics() {
+
+    /* Google Analytics gtag.js */
+    let head = document.getElementsByTagName( 'head' )[0];
+    let gtagScript = document.createElement( 'script' );
+
+    gtagScript.type = "text/javascript";
+    gtagScript.setAttribute( 'async', true );
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=UA-158792549-1';
+
+    head.appendChild( gtagScript );
+    /* Google Analytics gtag.js */
+
+    /* Google Tag Manager */
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NCB47RC');
+    
+    let noscript = document.getElementsByTagName( 'noscript' )[0];
+    let gtagIframe = document.createElement( 'iframe' );
+
+    gtagIframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-NCB47RC';
+    gtagIframe.width = 0;
+    gtagIframe.height = 0;
+    gtagIframe.style.display = 'none';
+    gtagIframe.style.visibility = 'hidden';
+
+    noscript.appendChild( gtagIframe );
+    /* Google Tag Manager */
+
+    /* Google Analytics */
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-158792549-1');
+    /* Google Analytics */
+
+}
+
 /**** GVP CORE FUNCTIONS ****/
 
 /**
@@ -105,7 +145,9 @@ let flags = {
  * @function initGVP
  */
 function initGVP() {
-    
+
+    loadGoogleAnalytics();
+
     // set the URL to the manifest JSON file
     let manifestURL = document.getElementById( 'gvp-manifest' ).href;
     
@@ -962,6 +1004,14 @@ function setTitle() {
     
     document.getElementsByTagName( 'title' )[0].innerHTML = title;
     document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = title;
+
+    // send to Google Analytics
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'event': 'Pageview',
+        'pagePath': window.location.pathname,
+        'pageTitle': title.length ? title : window.location.hostname
+    });
     
 }
 
