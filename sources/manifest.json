@@ -11,6 +11,7 @@
     "gvp_root_directory": "",
     "gvp_logo_directory": "https://media.uwex.edu/content/media/player_support/logo/",
     "gvp_program_themes": "https://media.uwex.edu/content/media/player_support/themes.json",
+    "gvp_author_directory": "https://media.uwex.edu/content/media/player_support/author/",
     "gvp_logo_default": "uwex",
     "gvp_kaltura": {
         "id": 1660872,
