@@ -10,6 +10,7 @@
 </div>
 
 <div class="gvp-video-wrapper">
+    <div class="gvp-author-wrapper"><h2></h2></div>
     <div class="gvp-splash-download-wrapper">
         <button class="gvp-download-btn" aria-label="Toggle Download List"><span class="fa fa-download"></span> File Downloads</button>
         <div class="gvp-download-list"></div>

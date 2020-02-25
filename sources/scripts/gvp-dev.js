@@ -66,6 +66,7 @@ let xml = {
     file: 'gvp.xml',
     doc: null,
     titleTag: null,
+    authorTag: null,
     kalturaTag: null,
     fileNameTag: null,
     markersTag: null,
@@ -456,6 +457,24 @@ function getVideoSource() {
                 }
                 
             }
+
+            // see if author tag is specified
+            // and get author name if it is
+            if ( xml.doc.getElementsByTagName( 'author' )[0] !== undefined ) {
+
+                xml.authorTag = xml.doc.getElementsByTagName( 'author' )[0];
+
+                let authorName = '';
+                const nameInXml = xml.authorTag.childNodes[0].nodeValue.trim();
+
+                if ( xml.authorTag.childNodes[0] !== undefined
+                    && nameInXml != '' ) {
+                    authorName = nameInXml;
+                }
+
+                setAuthor(authorName);
+
+            }
             
             // see if kalturaId tag is specified
             // and load the Kaltura libraries if it is
@@ -557,7 +576,6 @@ function getVideoSource() {
 function setVideoJs() {
     setTitle();
     loadVideoJS();
-    setAuthor();
     setDownloadables();
 }
 
@@ -1501,10 +1519,33 @@ function downloadKalVid( id ) {
     
 }
 
-function setAuthor() {
+function setAuthor( name ) {
 
-    console.log("author info");
+    if ( name.length ) {
 
+        const authorEl = document.querySelector( '.gvp-author-wrapper h2' );
+        authorEl.innerHTML = name;
+
+        const authorUrl = manifest.gvp_author_directory + name.replace(/[^\w]/gi, '').toLowerCase() + '.json?callback=author';
+
+        fileExist( authorUrl ).then( result => {
+        
+            if ( result ) {
+                
+                const authorJsonp = document.createElement("script");
+                authorJsonp.src = authorUrl;
+                document.body.appendChild( authorJsonp );
+
+            }
+            
+        } );
+
+    }
+    
+}
+
+function author( data ) {
+    document.querySelector( '.gvp-author-wrapper h2' ).innerHTML = data.name;
 }
 
 /****** HELPER FUNCTIONS ******/

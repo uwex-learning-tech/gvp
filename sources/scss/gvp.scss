@@ -137,6 +137,24 @@ html {
             @include filter( invert(1) );
         }
         
+        .gvp-author-wrapper {
+
+            position: absolute;
+            top: rem( 16px );
+            left: rem( 16px );
+            padding: rem( 8px );
+            background-color: rgba( 0, 0, 0, 0.50 );
+            z-index: 1;
+
+            h2 {
+                margin: 0;
+                color: #fff;
+                font-size: rem( 18px );
+                line-height: normal;
+            }
+
+        }
+
         .gvp-splash-download-wrapper {
     
             position: absolute;
