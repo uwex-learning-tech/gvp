@@ -70,7 +70,9 @@
 		"uCM": 0
 		},
 	"/config.rb": {
-		"ft": 131072,
+		"cB": 0,
+		"ft": 8192,
+		"hM": 0,
 		"oA": 0,
 		"oAP": "/config.rb",
 		"oF": 0
@@ -159809,9 +159811,9 @@
 		},
 	"/sources/manifest.json": {
 		"ft": 524288,
-		"oA": 1,
-		"oAP": "/build/manifest.json",
-		"oF": 2,
+		"oA": 2,
+		"oAP": "/build/sources/manifest.json",
+		"oF": 3,
 		"oO": 0,
 		"oS": 1
 		},
