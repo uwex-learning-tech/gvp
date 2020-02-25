@@ -96,46 +96,6 @@ let flags = {
     
 } )( initGVP );
 
-function loadGoogleAnalytics() {
-
-    /* Google Analytics gtag.js */
-    let head = document.getElementsByTagName( 'head' )[0];
-    let gtagScript = document.createElement( 'script' );
-
-    gtagScript.type = "text/javascript";
-    gtagScript.setAttribute( 'async', true );
-    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=UA-158792549-1';
-
-    head.appendChild( gtagScript );
-    /* Google Analytics gtag.js */
-
-    /* Google Tag Manager */
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NCB47RC');
-    
-    let noscript = document.getElementsByTagName( 'noscript' )[0];
-    let gtagIframe = document.createElement( 'iframe' );
-
-    gtagIframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-NCB47RC';
-    gtagIframe.width = 0;
-    gtagIframe.height = 0;
-    gtagIframe.style.display = 'none';
-    gtagIframe.style.visibility = 'hidden';
-
-    noscript.appendChild( gtagIframe );
-    /* Google Tag Manager */
-
-    /* Google Analytics */
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-158792549-1');
-    /* Google Analytics */
-
-}
-
 /**** GVP CORE FUNCTIONS ****/
 
 /**
@@ -146,6 +106,7 @@ function loadGoogleAnalytics() {
  */
 function initGVP() {
 
+    // load Google Analytic scripts first
     loadGoogleAnalytics();
 
     // set the URL to the manifest JSON file
@@ -190,6 +151,55 @@ function initGVP() {
         
     } );
     
+}
+
+/**
+ * Load Google Analytics scripts and send pageview event.
+ * 
+ * @function loadGoogleAnalytics
+ */
+
+function loadGoogleAnalytics() {
+
+    /* Google Analytics gtag.js */
+    let head = document.getElementsByTagName( 'head' )[0];
+    let gtagScript = document.createElement( 'script' );
+
+    gtagScript.type = "text/javascript";
+    gtagScript.setAttribute( 'async', true );
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=UA-158792549-1';
+
+    head.appendChild( gtagScript );
+    /* Google Analytics gtag.js */
+
+    /* Google Tag Manager */
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-NCB47RC');
+    
+    let noscript = document.getElementsByTagName( 'noscript' )[0];
+    let gtagIframe = document.createElement( 'iframe' );
+
+    gtagIframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-NCB47RC';
+    gtagIframe.width = 0;
+    gtagIframe.height = 0;
+    gtagIframe.style.display = 'none';
+    gtagIframe.style.visibility = 'hidden';
+
+    noscript.appendChild( gtagIframe );
+    /* Google Tag Manager */
+
+    /* Google Analytics */
+    function gtag(){
+        const dataLayer = window.dataLayer = window.dataLayer || [];
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-158792549-1');
+    /* Google Analytics */
+
 }
 
 /**
@@ -547,6 +557,7 @@ function getVideoSource() {
 function setVideoJs() {
     setTitle();
     loadVideoJS();
+    setAuthor();
     setDownloadables();
 }
 
@@ -1488,6 +1499,12 @@ function downloadKalVid( id ) {
       
     };
     
+}
+
+function setAuthor() {
+
+    console.log("author info");
+
 }
 
 /****** HELPER FUNCTIONS ******/
