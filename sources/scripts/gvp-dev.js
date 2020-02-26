@@ -590,7 +590,7 @@ function getKalturaLibrary() {
 }
 
 /**
- * Get video information from Kaltura.
+ * Get video source and information from Kaltura.
  * 
  * @function loadLalturaSource
  */
@@ -810,11 +810,13 @@ function loadVideoJS() {
         // on playing
         self.on( 'playing', function() {
             
-            let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
-            let splashDwnldBtn = document.getElementsByClassName( 'gvp-download-btn' )[0];
+            const logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+            const splashDwnldBtn = document.getElementsByClassName( 'gvp-download-btn' )[0];
+            const authorName = document.getElementsByClassName( 'gvp-author-wrapper' )[0];
             
             logo.style.display = 'none';
             splashDwnldBtn.style.display = 'none';
+            authorName.style.display = 'none';
             
             if ( flags.isIframe ) {
                 
@@ -855,6 +857,7 @@ function loadVideoJS() {
         self.on( 'ended', function() {
             
             document.getElementsByClassName( 'gvp-download-btn' )[0].style.display = 'initial';
+            document.getElementsByClassName( 'gvp-author-wrapper' )[0].style.display = 'initial';
             
             if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false) {
                 
@@ -894,6 +897,7 @@ function loadVideoJS() {
 
         } );
 
+        // on entering or exiting full screen
         self.on( 'fullscreenchange', function() {
             
             if ( flags.isKaltura ) {
@@ -909,7 +913,31 @@ function loadVideoJS() {
             }
     
         } );
+
+        // on playback seeked
+        self.on( 'seeked', function() {
+
+            if ( flags.isKaltura ) {
+                sendToKalturaAnalytics( '17', true );
+            }
+
+        } );
+
+        // on ratechange
+        self.on( 'ratechange', function(e) {
+            
+            // send ratechange to Google Analytics
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({
+                'event': 'ratechange',
+                'pagePath': window.location.pathname,
+                'playbackrate': self.playbackRate(),
+                'playbackRateEventValue': 1
+            });
+
+        } );
         
+        // on encountering error
         self.on( 'error', function() {
             
             let msg = 'Please double check the file name.<br>Expecting: ' + self.currentSrc() + '<br><br>';
@@ -971,13 +999,19 @@ function loadVideoJS() {
 
 }
 
-function sendToKalturaAnalytics( eventType ) {
+/**
+ * Send stats to Kaltura Analytics.
+ * 
+ * @function sendToKalturaAnalytics
+ */
+function sendToKalturaAnalytics( eventType, seeked = false ) {
 
     if ( gvp.player ) {
 
+        let isSeeked = seeked ? 'true' : 'false';
         let timestamp = + new Date();
         let statHttp = new XMLHttpRequest();
-        let trackUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + sessionId + '&event%3AeventType=' + eventType + '&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=false&event%3Aduration=' + gvp.player.duration() + '&event%3AeventTimestamp=' + timestamp;
+        let trackUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + sessionId + '&event%3AeventType=' + eventType + '&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=' + isSeeked + '&event%3Aduration=' + gvp.player.duration() + '&event%3AeventTimestamp=' + timestamp;
         
         statHttp.open( 'GET', trackUrl, true );
         statHttp.send( null );
@@ -986,17 +1020,27 @@ function sendToKalturaAnalytics( eventType ) {
 
 }
 
+/**
+ * Add markers specified in the XML to the video
+ * progress bar.
+ * 
+ * @function setupMarkers
+ */
 function setupMarkers( player ) {
     
     // add markers
     player.markers( {
-                    
         markers: xml.markersCollection
-        
     } );
     
 }
 
+/**
+ * Set the title of the video from the XML
+ * or from Kaltura if applicable.
+ * 
+ * @function setTitle
+ */
 function setTitle() {
     
     let title = "";
@@ -1044,6 +1088,12 @@ function setTitle() {
     
 }
 
+/**
+ * Get the default video title base on the 
+ * specified settings.
+ * 
+ * @function setDefaultTitle
+ */
 function setDefaultTitle() {
     
     if ( flags.isKaltura && flags.isLocal === false ) {
@@ -1064,6 +1114,12 @@ function setDefaultTitle() {
         
 }
 
+/**
+ * Hide the cover or the loading screen with
+ * the program logo.
+ * 
+ * @function hideCover
+ */
 function hideCover() {
     
     setTimeout( function() {
@@ -1099,6 +1155,11 @@ function hideCover() {
     
 }
 
+/**
+ * Add the forward button to the video playback control.
+ * 
+ * @function addForwardButton
+ */
 function addForwardButton( vjs ) {
     
     let secToSkip = 5;
@@ -1138,6 +1199,11 @@ function addForwardButton( vjs ) {
     
 }
 
+/**
+ * Add the backward button to the video playback control.
+ * 
+ * @function addBackwardButton
+ */
 function addBackwardButton( vjs ) {
     
     let secToSkip = 5;
@@ -1179,6 +1245,11 @@ function addBackwardButton( vjs ) {
     
 }
 
+/**
+ * Determine the number of seconds to seek forward or backward.
+ * 
+ * @function getSecToSkip
+ */
 function getSecToSkip( duration ) {
     
     if ( isNaN( duration ) ) {
@@ -1195,6 +1266,11 @@ function getSecToSkip( duration ) {
         
 }
 
+/**
+ * Add download drop down menu to the playback control.
+ * 
+ * @function addDownloadFilesButton
+ */
 function addDownloadFilesButton( vjs ) {
     
     if ( flags. sbplusEmbed === undefined ) {
@@ -1232,6 +1308,11 @@ function addDownloadFilesButton( vjs ) {
     
 }
 
+/**
+ * Get downloadable file types.
+ * 
+ * @function downloadables
+ */
 function downloadables( vjs ) {
     
     let files = document.getElementsByClassName( 'gvp-download-list' )[0].childNodes;
@@ -1304,6 +1385,11 @@ function downloadables( vjs ) {
     
 }
 
+/**
+ * Set the downloadable file type with proper name.
+ * 
+ * @function setDownloadables
+ */
 function setDownloadables() {
     
     let supportedFiles = manifest.gvp_download_files;
@@ -1459,6 +1545,11 @@ function setDownloadables() {
     
 }
 
+/**
+ * Turn downloadables to a download link.
+ * 
+ * @function createDownloadLink
+ */
 function createDownloadLink( path, label ) {
     
     let downloads = document.getElementsByClassName( 'gvp-download-list' )[0];
@@ -1473,6 +1564,11 @@ function createDownloadLink( path, label ) {
     
 }
 
+/**
+ * Download video from Kaltura.
+ * 
+ * @function downloadKalVid
+ */
 function downloadKalVid( id ) {
     
     let videoUrl = document.getElementById( id ).href;
@@ -1519,6 +1615,11 @@ function downloadKalVid( id ) {
     
 }
 
+/**
+ * Set the video title from the XML.
+ * 
+ * @function setAuthor
+ */
 function setAuthor( name ) {
 
     if ( name.length ) {
@@ -1544,6 +1645,11 @@ function setAuthor( name ) {
     
 }
 
+/**
+ * Callback from the centralized author info.
+ * 
+ * @function setAuthor
+ */
 function author( data ) {
     document.querySelector( '.gvp-author-wrapper h2' ).innerHTML = data.name;
 }
