@@ -467,15 +467,15 @@ function getVideoSource() {
                 xml.authorTag = xml.doc.getElementsByTagName( 'author' )[0];
 
                 let authorName = '';
-                const nameInXml = xml.authorTag.childNodes[0].nodeValue.trim();
 
-                if ( xml.authorTag.childNodes[0] !== undefined
-                    && nameInXml != '' ) {
-                    authorName = nameInXml;
+                if ( xml.authorTag.childNodes[0] !== undefined && xml.authorTag.childNodes[0].nodeValue !== undefined ) {
+                    authorName = xml.authorTag.childNodes[0].nodeValue.trim();
                 }
 
                 setAuthor(authorName);
 
+            } else {
+                document.querySelector( '.gvp-author-wrapper' ).style.display = 'none';
             }
             
             // see if kalturaId tag is specified
@@ -1653,6 +1653,8 @@ function setAuthor( name ) {
             
         } );
 
+    } else {
+        document.querySelector( '.gvp-author-wrapper' ).style.display = 'none';
     }
     
 }
@@ -1660,7 +1662,7 @@ function setAuthor( name ) {
 /**
  * Callback from the centralized author info.
  * 
- * @function setAuthor
+ * @function author
  */
 function author( data ) {
     document.querySelector( '.gvp-author-wrapper h2' ).innerHTML = data.name;
