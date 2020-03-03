@@ -80,9 +80,11 @@ let flags = {
     isKaltura: false,
     isIframe: false,
     played: false,
+    firstPlayed: false,
     playReached25: false,
     playReached50: false,
-    playReached75: false
+    playReached75: false,
+    playReached100: false
 };
 
 /**** ON DOM READY; RUNS THE initGVP function ****/
@@ -789,7 +791,10 @@ function loadVideoJS() {
 
                 if ( playerOptions.autoplay ) {
                     
-                    sendToKalturaAnalytics( '3' );
+                    if ( flags.firstPlayed === false ) {
+                        sendToKalturaAnalytics( '3' );
+                        flags.firstPlayed = true;
+                    }
                     
                 } else {
                     
@@ -797,7 +802,10 @@ function loadVideoJS() {
                     
                     bigPlayBtn.addEventListener( 'click', function() {
                         
-                        sendToKalturaAnalytics( '3' );
+                        if ( flags.firstPlayed === false ) {
+                            sendToKalturaAnalytics( '3' );
+                            flags.firstPlayed = true;
+                        }
                         
                     }, { once: true } );
                     
@@ -883,7 +891,11 @@ function loadVideoJS() {
             
             if ( flags.isKaltura ) {
 
-                sendToKalturaAnalytics( '7' );
+                if ( flags.playReached100 === false ) {
+                    sendToKalturaAnalytics( '7' );
+                    flags.playReached100 = true;
+                }
+                
 
                 let bigReplayBtn = document.querySelector( '.vjs-big-play-button.replay' );
 
@@ -924,7 +936,7 @@ function loadVideoJS() {
         } );
 
         // on ratechange
-        self.on( 'ratechange', function(e) {
+        self.on( 'ratechange', function() {
             
             // send ratechange to Google Analytics
             window.dataLayer = window.dataLayer || [];
