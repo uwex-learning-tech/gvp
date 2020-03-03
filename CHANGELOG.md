@@ -1,6 +1,11 @@
 # Version Change Log
 
-**Pending...**
+**4.0.7**
+* Added an optional `author` tag in the XML to hold author name and will attempt to use author name specified in the centralized author profile.
+* Marker text are now optional. Tooltip will not be shown if there is no marker texts.
+* Updated VideoJS library to version 7.6.6
+* Now sends play reached 25%, 50%, and 75%, entered full screen, exited full screen, seeked, replayed, and transcript download events to Kaltura Analytics
+* Now sends page view and playback rate change events to Google Analytics.
 
 **4.0.6**
 * Updated Skip Forward and Backward icons.
