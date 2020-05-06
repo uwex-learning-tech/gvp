@@ -159828,17 +159828,6 @@
 		"sC": 3,
 		"tS": 1
 		},
-	"/sources/scripts/kwidget.getsources.js": {
-		"bF": 0,
-		"ft": 64,
-		"ma": 0,
-		"mi": 0,
-		"oA": 2,
-		"oAP": "/build/sources/scripts/kwidget.getsources.js",
-		"oF": 3,
-		"sC": 0,
-		"tS": 0
-		},
 	"/sources/scripts/modernizr.js": {
 		"bF": 0,
 		"ft": 64,
@@ -159847,17 +159836,6 @@
 		"oA": 1,
 		"oAP": "/build/scripts/modernizr.js",
 		"oF": 0,
-		"sC": 0,
-		"tS": 0
-		},
-	"/sources/scripts/mwembedloader.js": {
-		"bF": 0,
-		"ft": 64,
-		"ma": 0,
-		"mi": 0,
-		"oA": 2,
-		"oAP": "/build/sources/scripts/mwembedloader.js",
-		"oF": 3,
 		"sC": 0,
 		"tS": 0
 		},
