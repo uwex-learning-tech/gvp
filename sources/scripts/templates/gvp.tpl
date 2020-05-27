@@ -15,7 +15,7 @@
         <button class="gvp-download-btn" aria-label="Toggle Download List"><span class="fa fa-download"></span> File Downloads</button>
         <div class="gvp-download-list"></div>
     </div>
-    <video id="gvp-video" class="video-js vjs-default-skin vjs-16-9"></video>
+    <video id="gvp-video" class="video-js vjs-default-skin vjs-16-9" playsinline=""></video>
     <div class="gvp-program-logo"></div>
 </div>
 
