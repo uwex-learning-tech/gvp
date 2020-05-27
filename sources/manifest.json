@@ -14,7 +14,7 @@
     "gvp_author_directory": "https://media.uwex.edu/content/media/player_support/author/",
     "gvp_logo_default": "uwex",
     "gvp_kaltura": {
-        "api": "https://wwwtest.dle.uwsa.edu/UWSALTI/API/V1/Kaltura/getSources.php",
+        "api": "https://dle.uwsa.edu/UWSALTI/API/V1/Kaltura/getSources.php",
         "auth": "",
         "normal": 487091,
         "medium": 487081,
