@@ -704,7 +704,7 @@ function loadVideoJS() {
             ] );
             
             // setup the caption if applicable
-            if ( kaltura.captions[0].captionID ) {
+            if ( kaltura.caption && kaltura.captions[0] && kaltura.captions[0].captionID ) {
                 
                 self.addRemoteTextTrack( {
             		kind: 'captions',
