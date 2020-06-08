@@ -1,5 +1,12 @@
 # Version Change Log
 
+**4.0.8**
+* Removed Kaltura HTML5 Library
+* Updated Kaltura configuration in manifest file
+* Implemented Kaltura sources request by calling API script by UWSS
+* Video now plays inline on mobile devices
+* Fixed an issue where missing Kaltura caption crashed the player
+
 **4.0.7**
 * Added an optional `author` tag in the XML to hold author name and will attempt to use author name specified in the centralized author profile.
 * Marker text are now optional. Tooltip will not be shown if there is no marker texts.

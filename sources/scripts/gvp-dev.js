@@ -3,8 +3,8 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.7
- * Released 03/03/2020
+ * @version: 4.0.8
+ * Released 06/08/2020
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
