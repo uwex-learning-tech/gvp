@@ -56,7 +56,10 @@ let gvp = {
 };
 
 // an object to hold the kaltura library
-let kaltura = {};
+let kaltura = {
+    lib: null,
+    widget: null
+};
 
 // an object to hold data from the XML
 let xml = {
@@ -138,6 +141,10 @@ function initGVP() {
         if ( manifest.gvp_root_directory.length <= 0 ) {
             manifest.gvp_root_directory = 'sources/';
         }
+
+        // set the URL to the Kaltura libraries
+        kaltura.lib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
+        kaltura.widget = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
 
         // set the URL to the player template file
         gvp.template = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
@@ -581,66 +588,113 @@ function setVideoJs() {
  */
 function getKalturaLibrary() {
 
-    const url = manifest.gvp_kaltura.api;
+    getScript( kaltura.lib, false, false );
+    getScript( kaltura.widget, false, loadKalturaSource );
 
-    const formData = new FormData();
-    formData.append( 'authorization', manifest.gvp_kaltura.auth );
-    formData.append( 'entryId', gvp.source );
+    // const url = manifest.gvp_kaltura.api;
 
-    const http = new XMLHttpRequest();
-    http.open('POST', url, true);
+    // const formData = new FormData();
+    // formData.append( 'authorization', manifest.gvp_kaltura.auth );
+    // formData.append( 'entryId', gvp.source );
 
-    http.onreadystatechange = function() {
+    // const http = new XMLHttpRequest();
+    // http.open('POST', url, true);
 
-        if ( this.readyState === XMLHttpRequest.DONE && this.status === 200 ) {
-            kaltura = JSON.parse( this.response );
-            loadLalturaSource();
-        }
+    // http.onreadystatechange = function() {
 
-    }
+    //     if ( this.readyState === XMLHttpRequest.DONE && this.status === 200 ) {
+    //         kaltura = JSON.parse( this.response );
+    //         loadKalturaSource();
+    //     }
 
-    http.send(formData);
+    // }
+
+    // http.send(formData);
     
 }
 
 /**
  * Get video source and information from Kaltura.
  * 
- * @function loadLalturaSource
+ * @function loadKalturaSource
  */
-function loadLalturaSource() {
+function loadKalturaSource() {
     
-    if ( kaltura ) {
+    if ( kWidget ) {
 
-        kaltura.flavor = {};
-                
-        kaltura.sources.forEach( function( flavor ) {
-            
-            if ( flavor.flavorParamsId === manifest.gvp_kaltura.low ) {
-                kaltura.flavor.low = flavor.src;
-                return;
+        // get the video source base on the provided
+        // configrations
+        kWidget.getSources( {
+
+            'partnerId': manifest.gvp_kaltura.id,
+            'entryId': gvp.source,
+            'callback': function( data ) {
+
+                kaltura = data;
+                kaltura.flavor = {};
+
+                kaltura.sources.forEach( function( flavor ) {
+
+                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.low ) {
+                        kaltura.flavor.low = flavor.src;
+                        return;
+                    }
+
+                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.medium ) {
+                        kaltura.flavor.medium = flavor.src;
+                        return;
+                    }
+
+                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.normal ) {
+                        kaltura.flavor.normal = flavor.src;
+                        return;
+                    }
+
+                } );
+
+                if ( kaltura.sources.length === 0 ) {
+                    showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
+                    return;
+                }
+
+                // call to setup the videoJS player
+                setVideoJs(); 
             }
-            
-            if ( flavor.flavorParamsId === manifest.gvp_kaltura.medium ) {
-                kaltura.flavor.medium = flavor.src;
-                return;
-            }
-            
-            if ( flavor.flavorParamsId === manifest.gvp_kaltura.normal ) {
-                kaltura.flavor.normal = flavor.src;
-                return;
-            }
-            
         } );
-        
-        if ( kaltura.sources.length === 0 ) {
-            showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
-            return;
-        }
-        
-        // call to setup the videoJS player
-        setVideoJs();
+
     }
+
+    // if ( kaltura ) {
+
+    //     kaltura.flavor = {};
+                
+    //     kaltura.sources.forEach( function( flavor ) {
+            
+    //         if ( flavor.flavorParamsId === manifest.gvp_kaltura.low ) {
+    //             kaltura.flavor.low = flavor.src;
+    //             return;
+    //         }
+            
+    //         if ( flavor.flavorParamsId === manifest.gvp_kaltura.medium ) {
+    //             kaltura.flavor.medium = flavor.src;
+    //             return;
+    //         }
+            
+    //         if ( flavor.flavorParamsId === manifest.gvp_kaltura.normal ) {
+    //             kaltura.flavor.normal = flavor.src;
+    //             return;
+    //         }
+            
+    //     } );
+        
+    //     if ( kaltura.sources.length === 0 ) {
+    //         showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
+    //         return;
+    //     }
+        
+    //     // call to setup the videoJS player
+    //     setVideoJs();
+    // }
     
 }
 
@@ -696,23 +750,35 @@ function loadVideoJS() {
         // mulitple Kaltura flavors
         if ( flags.isKaltura && flags.isLocal === false ) {
             
-            self.poster( kaltura.thumbnail + '/width/900/quality/100' );
+            self.poster( kaltura.poster + '/width/900/quality/100' );
+            //self.poster( kaltura.thumbnail + '/width/900/quality/100' );
             self.updateSrc( [
-                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
-                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
-                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
+                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 960 },
+                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 1280 },
+                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 1280 } 
             ] );
             
             // setup the caption if applicable
-            if ( kaltura.caption && kaltura.captions[0] && kaltura.captions[0].captionID ) {
+            // if ( kaltura.caption && kaltura.captions[0] && kaltura.captions[0].captionID ) {
                 
+            //     self.addRemoteTextTrack( {
+            // 		kind: 'captions',
+            // 		language: 'en',
+            // 		label: kaltura.captions[0].captionLang,
+            // 		src: kaltura.captions[0].captionWebVTTURL
+        	// 	}, true );
+                
+            // }
+
+            if ( kaltura.captionId ) {
+
                 self.addRemoteTextTrack( {
-            		kind: 'captions',
-            		language: 'en',
-            		label: kaltura.captions[0].captionLang,
-            		src: kaltura.captions[0].captionWebVTTURL
-        		}, true );
-                
+                    kind: 'captions',
+                    language: 'en',
+                    label: 'English',
+                    src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+                }, true );
+
             }
             
         } else if ( flags.isYouTube && flags.isLocal === false ) {
@@ -1668,6 +1734,26 @@ function author( data ) {
 }
 
 /****** HELPER FUNCTIONS ******/
+
+function getScript( file, isAsync = true, callback = false ) {
+
+    let script = document.createElement( 'script' );
+    let head = document.getElementsByTagName( 'head' )[0];
+
+    script.async = isAsync;
+
+    if ( callback ) {
+        script.onload = callback;
+    }
+
+    script.onerror = function() {
+        console.warn( 'Failed to load ' + file );
+    };
+
+    script.src = file;
+    head.appendChild( script );
+
+}
 
 async function fileExist( file ) {
     
