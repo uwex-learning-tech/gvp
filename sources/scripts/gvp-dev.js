@@ -753,9 +753,9 @@ function loadVideoJS() {
             self.poster( kaltura.poster + '/width/900/quality/100' );
             //self.poster( kaltura.thumbnail + '/width/900/quality/100' );
             self.updateSrc( [
-                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 960 },
-                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 1280 },
-                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 1280 } 
+                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
+                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
+                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
             ] );
             
             // setup the caption if applicable
