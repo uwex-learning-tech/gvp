@@ -1087,11 +1087,14 @@ function sendToKalturaAnalytics( eventType, seeked = false ) {
 
         let isSeeked = seeked ? 'true' : 'false';
         let timestamp = + new Date();
-        let statHttp = new XMLHttpRequest();
-        let trackUrl = 'https://www.kaltura.com/api_v3/index.php?service=stats&action=collect&event%3AsessionId=' + sessionId + '&event%3AeventType=' + eventType + '&event%3ApartnerId=' + manifest.gvp_kaltura.id + '&event%3AentryId=' + gvp.source + '&event%3Areferrer=https%3A%2F%2Fmedia.uwex.edu&event%3Aseek=' + isSeeked + '&event%3Aduration=' + gvp.player.duration() + '&event%3AeventTimestamp=' + timestamp;
+        let data = "event%5BentryId%5D=" + gvp.source + "&event%5BpartnerId%5D=" + manifest.gvp_kaltura.id +"&event%5Bduration%5D=" + gvp.player.duration() + "&event%5BeventType%5D=" + eventType + "&event%5Breferrer%5D=https%3A%2F%2Fmedia.uwex.edu&event%5Bseek%5D=" + isSeeked + "&event%5BsessionId%5D=" + sessionId + "&event%5BeventTimestamp%5D=" + timestamp + "&event%5BobjectType%5D=KalturaStatsEvent";
+
+        let xhr = new XMLHttpRequest();
         
-        statHttp.open( 'GET', trackUrl, true );
-        statHttp.send( null );
+        xhr.open("POST", "https://www.kaltura.com/api_v3/service/stats/action/collect");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+        xhr.send(data);
 
     }
 
