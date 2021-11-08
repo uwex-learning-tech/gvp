@@ -187,9 +187,11 @@ if( ! window.kWidget ){
 					'name': result[1]['name'],
 					'entryId' :  result[1]['id'],
 					//'description': result[2]['description'],
-                    'captionId': ( ( result[2]['totalCount'] > 0 ) ? result[2]['objects'][0]['id'] : null ),
+                    //'captionId': ( ( result[2]['totalCount'] > 0 ) ? result[2]['objects'][0]['id'] : null ),
+					'caption': ( ( result[2]['totalCount'] > 0 ) ? result[2]['objects'] : null ),
 					'sources': deviceSources
 				});
+				
 			}
 
 		});

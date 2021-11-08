@@ -759,27 +759,31 @@ function loadVideoJS() {
             ] );
             
             // setup the caption if applicable
-            // if ( kaltura.caption && kaltura.captions[0] && kaltura.captions[0].captionID ) {
+            if ( kaltura.caption ) {
                 
-            //     self.addRemoteTextTrack( {
-            // 		kind: 'captions',
-            // 		language: 'en',
-            // 		label: kaltura.captions[0].captionLang,
-            // 		src: kaltura.captions[0].captionWebVTTURL
-        	// 	}, true );
+                kaltura.caption.forEach( caption => {
+
+                    self.addRemoteTextTrack( {
+                        kind: 'captions',
+                        language: caption.languageCode,
+                        label: caption.language,
+                        src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + caption.id + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+                    }, true );
+
+                });
                 
-            // }
-
-            if ( kaltura.captionId ) {
-
-                self.addRemoteTextTrack( {
-                    kind: 'captions',
-                    language: 'en',
-                    label: 'English',
-                    src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
-                }, true );
-
             }
+
+            // if ( kaltura.captionId ) {
+
+            //     self.addRemoteTextTrack( {
+            //         kind: 'captions',
+            //         language: 'en',
+            //         label: 'English',
+            //         src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+            //     }, true );
+
+            // }
             
         } else if ( flags.isYouTube && flags.isLocal === false ) {
             
