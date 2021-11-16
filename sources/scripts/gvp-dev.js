@@ -3,14 +3,14 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.8
- * Released 06/08/2020
+ * @version: 4.0.9
+ * Released 11/16/2021
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Generic Video Player is a video player build on top of VideoJS to serve
     video contents.
-    Copyright (C) 2013-2020  Ethan S. Lin, UW Extended Campus
+    Copyright (C) 2013-2021  Ethan S. Lin, UW Extended Campus
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -591,26 +591,6 @@ function getKalturaLibrary() {
     getScript( kaltura.lib, false, false );
     getScript( kaltura.widget, false, loadKalturaSource );
 
-    // const url = manifest.gvp_kaltura.api;
-
-    // const formData = new FormData();
-    // formData.append( 'authorization', manifest.gvp_kaltura.auth );
-    // formData.append( 'entryId', gvp.source );
-
-    // const http = new XMLHttpRequest();
-    // http.open('POST', url, true);
-
-    // http.onreadystatechange = function() {
-
-    //     if ( this.readyState === XMLHttpRequest.DONE && this.status === 200 ) {
-    //         kaltura = JSON.parse( this.response );
-    //         loadKalturaSource();
-    //     }
-
-    // }
-
-    // http.send(formData);
-    
 }
 
 /**
@@ -663,38 +643,6 @@ function loadKalturaSource() {
         } );
 
     }
-
-    // if ( kaltura ) {
-
-    //     kaltura.flavor = {};
-                
-    //     kaltura.sources.forEach( function( flavor ) {
-            
-    //         if ( flavor.flavorParamsId === manifest.gvp_kaltura.low ) {
-    //             kaltura.flavor.low = flavor.src;
-    //             return;
-    //         }
-            
-    //         if ( flavor.flavorParamsId === manifest.gvp_kaltura.medium ) {
-    //             kaltura.flavor.medium = flavor.src;
-    //             return;
-    //         }
-            
-    //         if ( flavor.flavorParamsId === manifest.gvp_kaltura.normal ) {
-    //             kaltura.flavor.normal = flavor.src;
-    //             return;
-    //         }
-            
-    //     } );
-        
-    //     if ( kaltura.sources.length === 0 ) {
-    //         showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
-    //         return;
-    //     }
-        
-    //     // call to setup the videoJS player
-    //     setVideoJs();
-    // }
     
 }
 
@@ -763,27 +711,20 @@ function loadVideoJS() {
                 
                 kaltura.caption.forEach( caption => {
 
-                    self.addRemoteTextTrack( {
-                        kind: 'captions',
-                        language: caption.languageCode,
-                        label: caption.language,
-                        src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + caption.id + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
-                    }, true );
+                    if ( caption.label.toLowerCase() != "English (autocaption)" ) {
 
-                });
+                        self.addRemoteTextTrack( {
+                            kind: 'captions',
+                            language: caption.languageCode,
+                            label: caption.language,
+                            src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + caption.id + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+                        }, true );
+
+                    }
+
+                } );
                 
             }
-
-            // if ( kaltura.captionId ) {
-
-            //     self.addRemoteTextTrack( {
-            //         kind: 'captions',
-            //         language: 'en',
-            //         label: 'English',
-            //         src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + kaltura.captionId + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
-            //     }, true );
-
-            // }
             
         } else if ( flags.isYouTube && flags.isLocal === false ) {
             
@@ -853,32 +794,47 @@ function loadVideoJS() {
         // on load
         self.on( 'loadedmetadata', function() {
             
+            sendToGoogleAnalytics( 'loadedmetadata' );
+
             if ( flags.isKaltura ) {
-
                 sendToKalturaAnalytics( '2' );
+            }
 
-                if ( playerOptions.autoplay ) {
+            if ( playerOptions.autoplay ) {
                     
-                    if ( flags.firstPlayed === false ) {
+                if ( flags.firstPlayed === false ) {
+                    
+                    if ( flags.isKaltura ) {
                         sendToKalturaAnalytics( '3' );
-                        flags.firstPlayed = true;
                     }
                     
-                } else {
-                    
-                    let bigPlayBtn = document.getElementsByClassName( 'vjs-big-play-button' )[0];
-                    
-                    bigPlayBtn.addEventListener( 'click', function() {
-                        
-                        if ( flags.firstPlayed === false ) {
-                            sendToKalturaAnalytics( '3' );
-                            flags.firstPlayed = true;
-                        }
-                        
-                    }, { once: true } );
-                    
+                    sendToGoogleAnalytics( 'play' );
+                    flags.firstPlayed = true;
                 }
 
+            } else {
+                
+                let bigPlayBtn = document.getElementsByClassName( 'vjs-big-play-button' )[0];
+                
+                bigPlayBtn.addEventListener( 'click', function() {
+                    
+                    if ( flags.firstPlayed === false ) {
+
+                        if ( flags.isKaltura ) {
+                            sendToKalturaAnalytics( '3' );
+                        }
+
+                        sendToGoogleAnalytics( 'play' );
+                        flags.firstPlayed = true;
+
+                    } else {
+
+                        sendToGoogleAnalytics( 'replay' );
+
+                    }
+                    
+                }, { once: true } );
+                
             }
             
         } );
@@ -906,23 +862,41 @@ function loadVideoJS() {
         // as video playback progresses
         self.on( 'timeupdate', function() {
 
-            if ( flags.isKaltura && self.duration() ) {
+            let progressPercentage = ( self.currentTime() / self.duration() ) * 100;
 
-                let progressPercentage = ( self.currentTime() / self.duration() ) * 100;
+            if ( self.duration() ) {
 
                 if ( progressPercentage >= 25 && flags.playReached25 == false ) {
                     flags.playReached25 = true;
-                    sendToKalturaAnalytics( '4' );
+
+                    if ( self.isKaltura ) {
+                        sendToKalturaAnalytics( '4' );
+                    }
+                    
+                    sendToGoogleAnalytics( 'timereached', 25 );
+                    
                 }
 
                 if ( progressPercentage >= 50 && flags.playReached50 == false ) {
                     flags.playReached50 = true;
-                    sendToKalturaAnalytics( '5' );
+                    
+                    if ( self.isKaltura ) {
+                        sendToKalturaAnalytics( '5' );
+                    }
+
+                    sendToGoogleAnalytics( 'timereached', 50 );
+
                 }
 
                 if ( progressPercentage >= 75 && flags.playReached75 == false ) {
                     flags.playReached75 = true;
-                    sendToKalturaAnalytics( '6' );
+                    
+                    if ( self.isKaltura ) {
+                        sendToKalturaAnalytics( '6' );
+                    }
+
+                    sendToGoogleAnalytics( 'timereached', 75 );
+
                 }
 
             }
@@ -956,43 +930,62 @@ function loadVideoJS() {
                 }
                 
             }
-            
-            if ( flags.isKaltura ) {
 
-                if ( flags.playReached100 === false ) {
+            if ( flags.playReached100 === false ) {
+
+                if ( flags.isKaltura ) {
                     sendToKalturaAnalytics( '7' );
-                    flags.playReached100 = true;
                 }
-                
-                let bigReplayBtn = document.querySelector( '.vjs-big-play-button.replay' );
 
-                if ( bigReplayBtn ) {
-                    bigReplayBtn.addEventListener( 'click', function() {
-                    
-                        sendToKalturaAnalytics( '16' );
-                        
-                    }, { once: true } );
-                }
+                sendToGoogleAnalytics( 'timereached', 100 );
+                
+                flags.playReached100 = true;
 
             }
+            
+            let bigReplayBtn = document.querySelector( '.vjs-big-play-button.replay' );
+
+            if ( bigReplayBtn ) {
+
+                bigReplayBtn.addEventListener( 'click', function() {
+                
+                    sendToGoogleAnalytics( 'replay' );
+
+                    if ( flags.isKaltura ) {
+                        sendToKalturaAnalytics( '16' );
+                    }
+                    
+                }, { once: true } );
+
+            }
+
+            sendToGoogleAnalytics( 'ended' );
 
         } );
 
         // on entering or exiting full screen
         self.on( 'fullscreenchange', function() {
             
-            if ( flags.isKaltura ) {
-
-                let isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
+            let isFullScreen = document.fullScreen || document.mozFullScreen || document.webkitIsFullScreen;
         
-                if ( isFullScreen ) {
+            if ( isFullScreen ) {
+
+                if ( flags.isKaltura ) {
                     sendToKalturaAnalytics( '14' );
-                } else {
+                }
+
+                sendToGoogleAnalytics( 'fullscreenchange', 1 );
+                
+            } else {
+
+                if ( flags.isKaltura ) {
                     sendToKalturaAnalytics( '15' );
                 }
 
+                sendToGoogleAnalytics( 'fullscreenchange', 0 );
+                
             }
-    
+
         } );
 
         // on playback seeked
@@ -1002,19 +995,14 @@ function loadVideoJS() {
                 sendToKalturaAnalytics( '17', true );
             }
 
+            sendToGoogleAnalytics( 'seeked', self.currentTime() );
+
         } );
 
         // on ratechange
         self.on( 'ratechange', function() {
             
-            // send ratechange to Google Analytics
-            window.dataLayer = window.dataLayer || [];
-            window.dataLayer.push({
-                'event': 'ratechange',
-                'pagePath': window.location.pathname,
-                'playbackrate': self.playbackRate(),
-                'playbackRateEventValue': 1
-            });
+            sendToGoogleAnalytics( 'ratechange', self.playbackRate() );
 
         } );
         
@@ -1100,6 +1088,95 @@ function sendToKalturaAnalytics( eventType, seeked = false ) {
         
         xhr.send(data);
 
+        // new kWidget.api({ 'wid' : '_' + manifest.gvp_kaltura.id }).doRequest({
+        //     'service': 'analytics',
+        //     'action': 'trackEvent',
+        //     'entryId': gvp.source,
+        //     'eventType': eventType,
+        //     'sessionId': sessionId,
+        //     'partnerId': manifest.gvp_kaltura.id,
+        //     'playbackType': 'vod',
+        //     'referer': encodeURI(window.location)
+        // }, function (data) {
+        //     console.log(data);
+        // });
+
+    }
+
+}
+
+function sendToGoogleAnalytics( event, value = 0 ) {
+
+    window.dataLayer = window.dataLayer || [];
+
+    if ( event == 'play' ) {
+
+        window.dataLayer.push({
+            'event': 'play',
+            'pagePath': window.location.pathname
+        });
+
+    } else if ( event == 'replay' ) {
+
+        window.dataLayer.push({
+            'event': 'replay',
+            'pagePath': window.location.pathname
+        });
+
+    } else if ( event == 'loadedmetadata') {
+        
+        window.dataLayer.push({
+            'event': 'loadedmetadata',
+            'pagePath': window.location.pathname
+        });
+
+    } else if ( event == 'timereached' ) {
+
+        window.dataLayer.push({
+            'event': 'timereached',
+            'pagePath': window.location.pathname,
+            'timeReachedValue': value
+        });
+
+    } else if ( event == 'ended' ) {
+
+        window.dataLayer.push({
+            'event': 'ended',
+            'pagePath': window.location.pathname
+        });
+
+    } else if ( event == 'fullscreenchange' ) {
+
+        window.dataLayer.push({
+            'event': 'fullscreenchange',
+            'pagePath': window.location.pathname,
+            'fullScreenChangeValue': value
+        });
+
+    } else if ( event == 'seeked' ) {
+
+        window.dataLayer.push({
+            'event': 'seeked',
+            'pagePath': window.location.pathname,
+            'seeked': value
+        });
+
+    } else if ( event == 'ratechange' ) {
+
+        window.dataLayer.push({
+            'event': 'ratechange',
+            'pagePath': window.location.pathname,
+            'playbackrate': value
+        });
+
+    } else if ( event == 'pageview' ) {
+
+        window.dataLayer.push({
+            'event': 'Pageview',
+            'pagePath': window.location.pathname,
+            'pageTitle': value.length ? value : window.location.hostname
+        });
+
     }
 
 }
@@ -1162,13 +1239,7 @@ function setTitle() {
     document.getElementsByTagName( 'title' )[0].innerHTML = title;
     document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = title;
 
-    // send to Google Analytics
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-        'event': 'Pageview',
-        'pagePath': window.location.pathname,
-        'pageTitle': title.length ? title : window.location.hostname
-    });
+    sendToGoogleAnalytics( 'pageview', title );
     
 }
 
