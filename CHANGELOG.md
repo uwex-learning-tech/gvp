@@ -1,5 +1,9 @@
 # Version Change Log
 
+**4.0.9**
+* Now supports multiple caption tracks
+* Added more player event trackings for Google Analytics
+
 **4.0.8**
 * Removed Kaltura HTML5 Library
 * Updated Kaltura configuration in manifest file
