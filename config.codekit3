@@ -61,14 +61,6 @@
       "rFN" : 0,
       "uCM" : 0
     },
-    "\/config.rb" : {
-      "cB" : 0,
-      "ft" : 8192,
-      "hM" : 0,
-      "oA" : 1,
-      "oAP" : "\/config.rb",
-      "oF" : 1
-    },
     "\/gvp.xml" : {
       "cB" : 0,
       "ft" : 8192,
@@ -1015,8 +1007,8 @@
       "tS" : 0
     },
     "\/sources\/scss\/gvp.scss" : {
-      "aP" : 0,
-      "bl" : 0,
+      "aP" : 1,
+      "bl" : 1,
       "co" : 0,
       "dP" : 10,
       "ec" : 1,
@@ -1069,7 +1061,7 @@
     "displayValueWasSetByUser" : 1,
     "iconImageName" : "meme-grumpy",
     "iconImageWasSetByUser" : 0,
-    "lastBuiltDate" : 603844994.75842404
+    "lastBuiltDate" : 659901451.82688296
   },
   "projectSettings" : {
     "abortBuildOnError" : 1,

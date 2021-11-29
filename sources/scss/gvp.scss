@@ -1,12 +1,33 @@
-@import "compass/css3/animation";
-@import "compass/css3/box-sizing";
-@import "compass/css3/flexbox";
-@import "compass/css3/border-radius";
-@import "compass/css3/transform";
-@import "compass/css3/transition";
-@import "compass/css3/user-interface";
-@import "compass/css3/filter";
-@import "compass/css3/text-shadow";
+/*!
+ * Generic Video Player (GVP)
+ *
+ * @author: Ethan Lin
+ * @url: https://github.com/uwex-learning-tech/gvp
+ * @version: 4.0.10
+ * Released 11/29/2021
+ *
+ * @license: GNU GENERAL PUBLIC LICENSE v3
+ *
+    Generic Video Player is a video player build on top of VideoJS to serve
+    video contents.
+    Copyright (C) 2013-2021  Ethan S. Lin, UW Extended Campus
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+@use 'sass:math';
 
 $base: 16px;
 $gutter: 20px;
@@ -15,7 +36,7 @@ $default-bg-color: #EFEEE8;
 $body-bgcolor: #636266;
 
 @function rem( $px ) {
-    @return $px / $default-font-size * 1rem;
+    @return ( math.div($px , $base) ) * 1rem;
 };
 
 /********************************* GVP CSS ************************************/
@@ -43,9 +64,9 @@ html {
     
     .gvp-cover {
         
-        @include display-flex();
-        @include align-items( center );
-        @include justify-content( center );
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: absolute;
         width: 100%;
         height: calc( 100% - #{$gutter} );
@@ -59,7 +80,7 @@ html {
             height: 124px;
             background-repeat: no-repeat;
             background-position: center center;
-            @include user-select( none );
+            user-select: none;
         }
         
         .gvp-error-msg {
@@ -67,7 +88,7 @@ html {
             position: absolute;
             max-width: rem( 350px );
             background-color: #ff3636;
-            padding: rem( $gutter / 2);
+            padding: rem( math.div($gutter, 2) );
             font-size: rem( 14px );
             color: #fff;
             top: rem( $gutter * 2 );
@@ -77,13 +98,13 @@ html {
     
     .gvp-decoration-bar {
         
-        @include display-flex();
-        @include flex-flow( row nowrap );
+        display: flex;
+        flex-flow: row nowrap;
         
         span {
-            @include flex( 1 0 auto );
+            flex: 1 0 auto;
             height: rem( $gutter );
-            @include user-select( none );
+            user-select: none;
             background-color: rgb(10, 74, 137);
         }
         
@@ -98,9 +119,9 @@ html {
         color: #ccc;
         background-color: rgba( 0, 0, 0, 0.5 );
         padding: rem( 5px ) rem( 10px );
-        @include border-radius( 20px );
+        border-radius: rem( 20px );
         cursor: pointer;
-        @include user-select( none );
+        user-select: none;
     }
     
     #gvp-light:hover {
@@ -121,7 +142,6 @@ html {
     .gvp-video-wrapper {
         
         position: relative;
-        //margin-top: rem( 18px );
         padding: 0 rem( $gutter );
         
         .gvp-program-logo {
@@ -133,8 +153,8 @@ html {
             background-repeat: no-repeat;
             background-position: center bottom;
             z-index: 1;
-            @include user-select( none );
-            @include filter( invert(1) );
+            user-select: none;
+            filter: invert(1);
         }
         
         .gvp-author-wrapper {
@@ -227,7 +247,7 @@ html {
         display: none;
         position: absolute;
         width: 100%;
-        @include box-sizing( border-box );
+        box-sizing: border-box;
         top: 0;
         left: 0;
         z-index: 1;
@@ -297,8 +317,8 @@ html {
 
 body.light-off {
         
-    @include animation-name( fadeToBlack );
-    @include animation-duration( 0.5s );
+    animation-name: fadeToBlack;
+    animation-duration: 0.5s;
     background-color: #000;
     
     #gvp-wrapper {
@@ -365,12 +385,13 @@ and (min-device-width : 900px) {
 
 /******************************* ANIMATIONS **********************************/
 
-@include keyframes( fadeToBlack ) {
+
+@keyframes fadeToBlack {
     from { background-color: $default-bg-color; }
     to { background-color: #000; }
-};
+}
 
-@include keyframes( fadeFromBlack ) {
+@keyframes fadeFromBlack {
     from { background-color: #000; }
     to { background-color: $default-bg-color; }
 };
@@ -382,7 +403,7 @@ and (min-device-width : 900px) {
     bottom: 2%;
     left: 1%;
     right: unset;
-    @include border-radius(rem(5px));
+    border-radius: rem( 5px );
     width: 98%;
     
     .vjs-menu-button {
@@ -480,28 +501,6 @@ and (min-device-width : 900px) {
         cursor: pointer
     }
     
-/*
-    .sec0 {
-        display: none;
-    }
-    
-    .sec5:before {
-        content: '5';
-    }
-    
-    .sec10:before {
-        content: '10';
-    }
-    
-    .sec15:before {
-        content: '15';
-    }
-    
-    .sec30:before {
-        content: '30';
-    }
-*/
-    
 }
 
 /******************************* VIDEOJS CSS **********************************/
@@ -555,8 +554,8 @@ $center-big-play-button: true; // true default
         /* Align center */
         left: 50%;
         top: 50%;
-        margin-left: -($big-play-width / 2);
-        margin-top: -($big-play-height / 2);   
+        margin-left: -( math.div( $big-play-width, 2 ) );
+        margin-top: -( math.div( $big-play-height, 2 ) );   
     } @else {
         /* Align top left. 0.5em = 15px default */
         left: 0.5em;
@@ -662,15 +661,17 @@ smaller disconnected loaded time ranges */
     height: 10px;
     width: 10px;
     margin-left: -5px;
-    @include border-radius( 50% );
+    border-radius: 50%;
     background-color: rgb(166, 231, 141);
-    @include single-transition( opacity, .2s, ease);
+    transition: opacity 0.2s ease;
     z-index: 1;
 }
+
 .vjs-marker:hover {
     cursor: pointer;
-    @include scale(1.7);
+    transform: scale( 1.7 );
 }
+
 .vjs-tip {
     visibility: hidden;
     display: block;
@@ -681,6 +682,7 @@ smaller disconnected loaded time ranges */
     bottom: 14px;
     z-index: 100000;
 }
+
 .vjs-tip .vjs-tip-arrow {
     background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==) no-repeat top left;
     bottom: 0;
@@ -691,20 +693,23 @@ smaller disconnected loaded time ranges */
     width: 9px;
     height: 5px;
 }
+
 .vjs-tip .vjs-tip-inner {
-    @include border-radius( 3px );
+    border-radius: rem( 3px );
     padding: 5px 8px 4px 8px;
     background-color: #000;
     color: #fff;
     max-width: 200px;
     text-align: center;
 }
+
 .vjs-break-overlay {
     visibility: hidden;
     position: absolute;
     z-index: 100000;
     top: 0;
 }
+
 .vjs-break-overlay .vjs-break-overlay-text {
     padding: 9px;
     text-align: center;
