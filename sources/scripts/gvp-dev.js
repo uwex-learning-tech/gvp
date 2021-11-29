@@ -991,11 +991,15 @@ function loadVideoJS() {
         // on playback seeked
         self.on( 'seeked', function() {
 
-            if ( flags.isKaltura ) {
-                sendToKalturaAnalytics( '17', true );
-            }
+            if ( self.currentTime() > 0 ) {
 
-            sendToGoogleAnalytics( 'seeked', self.currentTime() );
+                if ( flags.isKaltura ) {
+                    sendToKalturaAnalytics( '17', true );
+                }
+
+                sendToGoogleAnalytics( 'seeked', self.currentTime() );
+                
+            }
 
         } );
 
