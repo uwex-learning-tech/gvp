@@ -1,5 +1,9 @@
 # Version Change Log
 
+**4.0.10**
+* Updated SCSS to use DartSass instead of Compass
+* Seeked event is now only send to Google Analytics if greater than 0
+
 **4.0.9**
 * Now supports multiple caption tracks
 * Added more player event trackings for Google Analytics

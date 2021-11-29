@@ -2,9 +2,9 @@
  * Generic Video Player (GVP)
  *
  * @author: Ethan Lin
- * @url: https://github.com/oel-mediateam/gvp_v4
- * @version: 4.0.9
- * Released 11/16/2021
+ * @url: https://github.com/uwex-learning-tech/gvp
+ * @version: 4.0.10
+ * Released 11/29/2021
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *

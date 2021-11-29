@@ -1,5 +1,5 @@
 # Generic Video Player
-**_version 4.0.9_**
+**_version 4.0.10_**
 
 Generic video player is utilizing and built upon VideoJS, a HTML5 video player, to deliver video contents.
 
@@ -9,7 +9,6 @@ Generic video player is utilizing and built upon VideoJS, a HTML5 video player, 
 * Mozilla Firefox 45+
 * Apple Safari 11+
 * Opera 29+
-* Internet Explorer 11
 * Microsoft Edge 24+
 
 *Latest stable version is always recommended.*
