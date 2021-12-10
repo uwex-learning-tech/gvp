@@ -710,8 +710,8 @@ function loadVideoJS() {
             if ( kaltura.caption ) {
                 
                 kaltura.caption.forEach( caption => {
-
-                    if ( caption.label.toLowerCase() != "English (autocaption)" ) {
+                    
+                    if ( caption.label.toLowerCase() !== "english (autocaption)" ) {
 
                         self.addRemoteTextTrack( {
                             kind: 'captions',
