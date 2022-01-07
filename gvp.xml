@@ -5,11 +5,15 @@
         Settings tag is optional unless the video is from Kaltura.
          * title tag is optional but can be used to override the value/title
            from URL string parameter or Kaltrua.
+         * author tag is optional
          * fileName tag is optional
             - use for setting a different file name rather than parsing
               the name from the URL
          * kalturaId tag is required for video hosted on Kaltura.
          * youtubeId tag is required for video hosted on YouTube.
+         * captionLanguage tag is optional
+           - use for specifiying caption language code and label
+           - default to "en" for code and "English" for label
          
          !!! kalturaId has higher priority over youtubeId if both tag exists !!!
          
@@ -29,11 +33,14 @@
     
     <settings>
 <!--
-        <title>Final Fantasy XIV: Job Actions</title>1_8kqeqqq0
-        <youtubeId>fSdfPXFGuw0</youtubeId> kal: 1_8kqeqqq0
--->
+        <title>Final Fantasy XIV: Job Actions</title>
         <author></author>
+        <youtubeId>fSdfPXFGuw0</youtubeId>
         <kalturaId>1_jzsl74em</kalturaId>
+-->
+        
+        <youtubeId>bXo_cKEdVvw</youtubeId>
+        <captionLanguage code="fr">Français</captionLanguage>
     </settings>
     
     <!--########################## READ ME: MARKERS ############################
@@ -72,13 +79,13 @@
     </markers>
 -->
     
-    <markers>
+    <!-- <markers>
         <marker timecode="00:18" color=""></marker>
 
         <marker timecode="00:55" color="">Pearson Correlation Test</marker>
         <marker timecode="01:30" color="">Coefficient of Determination</marker>
         <marker timecode="02:18" color="">Look Out!</marker>
 
-    </markers>
+    </markers> -->
     
 </gvp>

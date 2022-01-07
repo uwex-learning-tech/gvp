@@ -3,14 +3,14 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/uwex-learning-tech/gvp
- * @version: 4.0.10
- * Released 11/29/2021
+ * @version: 4.0.11
+ * Released 01/07/2022
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Generic Video Player is a video player build on top of VideoJS to serve
     video contents.
-    Copyright (C) 2013-2021  Ethan S. Lin, UW Extended Campus
+    Copyright (C) 2013-2022  Ethan S. Lin, UW Extended Campus
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,11 @@ let reference = {
 let gvp = {
     source: '',
     template: null,
-    player: null
+    player: null,
+    captionLanguage: {
+        code: '',
+        label: ''
+    }
 };
 
 // an object to hold the kaltura library
@@ -69,6 +73,7 @@ let xml = {
     authorTag: null,
     kalturaTag: null,
     fileNameTag: null,
+    captionLanguageTag: null,
     markersTag: null,
     markersCollection: []
 };
@@ -420,6 +425,25 @@ function getVideoSource() {
             let xmlParser = new DOMParser();
             
             xml.doc = xmlParser.parseFromString( result, 'text/xml' );
+
+            // check for caption language setting
+            xml.captionLanguageTag = xml.doc.getElementsByTagName( 'captionLanguage' )[0];
+
+            if ( xml.captionLanguageTag ) {
+                
+                const childNode = xml.captionLanguageTag.childNodes[0];
+                const childNodeAttribute = xml.captionLanguageTag.getAttribute( 'code' );
+
+                if ( childNodeAttribute !== undefined && childNodeAttribute.trim() != '' ) {
+                    gvp.captionLanguage.code = childNodeAttribute;
+                }
+
+                if ( childNode !== undefined
+                    && childNode.nodeValue.trim() != '') {
+                        gvp.captionLanguage.label = childNode.nodeValue.trim();
+                }
+
+            }
             
             // check to see is there are markers
             if ( xml.doc != null ) {
@@ -561,7 +585,7 @@ function getVideoSource() {
             }
             
         }
-        
+
         // call to setup the video player functionality
         setVideoJs();
 
@@ -726,25 +750,35 @@ function loadVideoJS() {
                 
             }
             
-        } else if ( flags.isYouTube && flags.isLocal === false ) {
-            
-            // do nothing
-            
-        } else { // if the video is local
-            
-            self.src( gvp.source + '.mp4' );
-            
-            if ( fileExist( gvp.source + '.vtt' ) ) {
-                
-                self.addRemoteTextTrack( {
-            		kind: 'captions',
-            		language: 'en',
-            		label: 'English',
-            		src: gvp.source + '.vtt'
-        		}, true );
-        		
+        } else {
+
+            if ( flags.isLocal ) {
+                self.src (gvp.source + '.mp4' );
             }
-            
+
+            fileExist( gvp.source + '.vtt' ).then( result => {
+                
+                if ( result ) {
+
+                    let code = 'en';
+                    let label = 'English';
+
+                    if ( gvp.captionLanguage ) {
+                        code = gvp.captionLanguage.code.length ? gvp.captionLanguage.code : code;
+                        label = gvp.captionLanguage.label.length ? gvp.captionLanguage.label : label;
+                    }
+                    
+                    self.addRemoteTextTrack( {
+                        kind: 'captions',
+                        language: code,
+                        label: label,
+                        src: gvp.source + '.vtt'
+                    }, true );
+
+                }
+
+            } );
+
         }
         
         // URL queried event listeners
@@ -1030,34 +1064,6 @@ function loadVideoJS() {
         
         // if youtube, hide cover on ready and reset markers
         if ( flags.isYouTube ) {
-            
-            let ytCaption = 'https://www.youtube.com/api/timedtext?fmt=vtt&v=' + gvp.source + '&lang=en';
-            
-            let ytPromise = new Promise( ( resolve, reject ) => {
-                
-                resolve( remoteYTCaptionExist( ytCaption ) );
-                reject( noYTCaptionExist() );
-                
-            } );
-            
-            ytPromise.then( ( result ) => {
-                
-                if ( result !== null || result !== undefined ) {
-                    
-                    if ( result.length > 0 ) {
-                    
-                        self.addRemoteTextTrack( {
-                            kind: 'captions',
-                            label: 'English',
-                            srclang: 'en',
-                            src: ytCaption
-                        }, false );
-                        
-                    }
-                    
-                }
-                
-            } );
             
             self.on( 'play', function() {
                 gvp.player.markers.reset(xml.markersCollection);
@@ -1856,34 +1862,6 @@ async function fileExist( file ) {
     } catch ( e ) {
         return false;
     }
-    
-}
-
-async function remoteYTCaptionExist( file ) {
-    
-    let options = {
-        method: 'GET'
-    };
-    
-    try {
-        
-        let response = await fetch( file, options );
-        
-        if ( response.ok ) {
-            return response.text();
-        }
-        
-        return false;
-        
-    } catch ( e ) {
-        return false;
-    }
-    
-}
-
-function noYTCaptionExist() {
-    
-    console.warn("YouTube caption failed to retreive or not found.");
     
 }
 
