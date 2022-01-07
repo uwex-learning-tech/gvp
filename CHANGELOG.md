@@ -1,5 +1,10 @@
 # Version Change Log
 
+**4.0.11**
+* Removed codes to get available captions from YouTube directly. Google shut down this API service as of December 2021.
+* Added support for local caption file for YouTube
+* Added an optional new tag in xml to specify caption language and code
+
 **4.0.10**
 * Updated SCSS to use DartSass instead of Compass
 * Seeked event is now only send to Google Analytics if greater than 0
