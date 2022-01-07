@@ -1,15 +1,15 @@
 # Generic Video Player
-**_version 4.0.10_**
+**_version 4.0.11_**
 
 Generic video player is utilizing and built upon VideoJS, a HTML5 video player, to deliver video contents.
 
 ---
-### Minimum Supported Web Browsers
-* Google Chrome 42+
-* Mozilla Firefox 45+
-* Apple Safari 11+
-* Opera 29+
-* Microsoft Edge 24+
+### Supported Web Browsers
+* Google Chrome
+* Mozilla Firefox
+* Apple Safari
+* Opera
+* Microsoft Edge
 
 *Latest stable version is always recommended.*
 
@@ -27,4 +27,4 @@ See [CHANGELOG](https://github.com/uwex-learning-tech/gvp/blob/master/CHANGELOG.
 
 ---
 ### License & Copyright
-Generic Video Player (GVP) is licensed under [GNU v3](https://github.com/uwex-learning-tech/gvp/blob/master/LICENSE) license. (c) 2012 - 2021. [Learning Technology & Media](https://media.uwex.edu), and [University of Wisconsin Extended Campus](http://ce.uwex.edu/). All rights reserved. [Video.js](http://videojs.com/) is a free and open source HTML5 video player, copyright by [Brightcove, Inc.](https://www.brightcove.com/en/) and licensed under the [Apache License](https://github.com/videojs/video.js/blob/master/LICENSE), Version 2.0.
+Generic Video Player (GVP) is licensed under [GNU v3](https://github.com/uwex-learning-tech/gvp/blob/master/LICENSE) license. (c) 2012 - 2022. [Learning Technology & Media](https://media.uwex.edu), and [University of Wisconsin Extended Campus](http://ce.uwex.edu/). All rights reserved. [Video.js](http://videojs.com/) is a free and open source HTML5 video player, copyright by [Brightcove, Inc.](https://www.brightcove.com/en/) and licensed under the [Apache License](https://github.com/videojs/video.js/blob/master/LICENSE), Version 2.0.
