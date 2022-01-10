@@ -12,12 +12,12 @@
          * kalturaId tag is required for video hosted on Kaltura.
          * youtubeId tag is required for video hosted on YouTube.
          * captionLanguage tag is optional
-           - use for specifiying caption language code and label
+           - use for specifying caption language code and label
            - default to "en" for code and "English" for label
          
          !!! kalturaId has higher priority over youtubeId if both tag exists !!!
          
-         Correct Usage:
+         Examples:
          
          <settings>                                 <settings>
             <title></title>                             <title></title>
@@ -28,7 +28,7 @@
          
          <settings>                                 <settings>
             <kalturaId></kalturaId>     ~ OR ~          <youtubeId></youtubeId>
-         </settings>                                </settings> 
+         </settings>                                </settings>
     #########################################################################-->
     
     <settings>
@@ -38,9 +38,9 @@
         <youtubeId>fSdfPXFGuw0</youtubeId>
         <kalturaId>1_jzsl74em</kalturaId>
 -->
-        
-        <youtubeId>bXo_cKEdVvw</youtubeId>
-        <captionLanguage code="fr">Français</captionLanguage>
+        <author>Julie Kinzelman</author>
+        <kalturaId>1_jzsl74em</kalturaId>
+        <!-- <captionLanguage code="fr">Français</captionLanguage> -->
     </settings>
     
     <!--########################## READ ME: MARKERS ############################
@@ -79,13 +79,13 @@
     </markers>
 -->
     
-    <!-- <markers>
+    <markers>
         <marker timecode="00:18" color=""></marker>
 
         <marker timecode="00:55" color="">Pearson Correlation Test</marker>
         <marker timecode="01:30" color="">Coefficient of Determination</marker>
         <marker timecode="02:18" color="">Look Out!</marker>
 
-    </markers> -->
+    </markers>
     
 </gvp>
