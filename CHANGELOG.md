@@ -1,5 +1,9 @@
 # Version Change Log
 
+**4.0.12**
+* Updated VideoJS to version 7.17.0
+* Added a workaround for YouTube video not playing in embedded-iframe in Chromium-based web browser.
+
 **4.0.11**
 * Removed codes to get available captions from YouTube directly. Google shut down this API service as of December 2021.
 * Added support for local caption file for YouTube
