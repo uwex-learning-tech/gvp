@@ -3,8 +3,8 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/uwex-learning-tech/gvp
- * @version: 4.0.11
- * Released 01/07/2022
+ * @version: 4.0.12
+ * Released 01/11/2022
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
@@ -702,10 +702,6 @@ function loadVideoJS() {
     if ( flags.isYouTube && flags.isLocal === false ) {
         playerOptions.techOrder = ['youtube'];
         playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
-        playerOptions.youtube = {
-            'modestbranding': 1,
-            'iv_load_policy' : 3
-        }
     }
     
     // add video qualitiy functionality if video is from YouTube or Kaltura
@@ -723,7 +719,6 @@ function loadVideoJS() {
         if ( flags.isKaltura && flags.isLocal === false ) {
             
             self.poster( kaltura.poster + '/width/900/quality/100' );
-            //self.poster( kaltura.thumbnail + '/width/900/quality/100' );
             self.updateSrc( [
                 { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
                 { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
