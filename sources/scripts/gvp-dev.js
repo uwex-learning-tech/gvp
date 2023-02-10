@@ -3,14 +3,14 @@
  *
  * @author: Ethan Lin
  * @url: https://github.com/uwex-learning-tech/gvp
- * @version: 4.0.12
- * Released 01/11/2022
+ * @version: 4.0.13
+ * Released 02/10/2023
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Generic Video Player is a video player build on top of VideoJS to serve
     video contents.
-    Copyright (C) 2013-2022  Ethan S. Lin, UW Extended Campus
+    Copyright (C) 2013-2023  Ethan S. Lin, UW Extended Campus
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ function loadGoogleAnalytics() {
 
     gtagScript.type = "text/javascript";
     gtagScript.setAttribute( 'async', true );
-    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=UA-158792549-1';
+    gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-6PC5NDV3F8';
 
     head.appendChild( gtagScript );
     /* Google Analytics gtag.js */
@@ -205,7 +205,7 @@ function loadGoogleAnalytics() {
         dataLayer.push(arguments);
     }
     gtag('js', new Date());
-    gtag('config', 'UA-158792549-1');
+    gtag('config', 'G-6PC5NDV3F8');
     /* Google Analytics */
 
 }

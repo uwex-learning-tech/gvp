@@ -1,5 +1,8 @@
 # Version Change Log
 
+**4.0.13**
+* Updated Google Analytics tracking to GA4
+
 **4.0.12**
 * Updated VideoJS to version 7.17.0
 * Added a workaround for YouTube video not playing in embedded-iframe in Chromium-based web browser.
