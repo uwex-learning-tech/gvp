@@ -7,7 +7,6 @@
     "display": "browser",
     "orientation": "portrait",
     
-    "gvp_google_tracking_id": "",
     "gvp_root_directory": "",
     "gvp_logo_directory": "https://media.uwex.edu/content/media/player_support/logo/",
     "gvp_program_themes": "https://media.uwex.edu/content/media/player_support/themes.json",
