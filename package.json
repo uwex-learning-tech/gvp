@@ -1,0 +1,45 @@
+{
+  "name": "generic-video-player",
+  "version": "4.0.13",
+  "description": "A generic video player for delivering video content at UWEX.",
+  "private": true,
+  "scripts": {
+    "start": "webpack serve --open --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uwex-learning-tech/gvp.git"
+  },
+  "keywords": [
+    "video",
+    "player",
+    "html5",
+    "videojs"
+  ],
+  "author": "Ethan Lin",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/uwex-learning-tech/gvp/issues"
+  },
+  "homepage": "https://github.com/uwex-learning-tech/gvp#readme",
+  "devDependencies": {
+    "copy-webpack-plugin": "^11.0.0",
+    "css-loader": "^6.8.1",
+    "html-webpack-plugin": "^5.5.3",
+    "install": "^0.13.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "npm": "^10.1.0",
+    "postcss-loader": "^7.3.3",
+    "sass": "^1.66.1",
+    "sass-loader": "^13.3.2",
+    "style-loader": "^3.3.3",
+    "terser": "^5.19.4",
+    "terser-webpack-plugin": "^5.3.9",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-concat-files-plugin": "^0.5.2",
+    "webpack-dev-server": "^4.15.1",
+    "webpack-merge": "^5.9.0"
+  }
+}

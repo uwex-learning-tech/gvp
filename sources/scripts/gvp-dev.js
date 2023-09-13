@@ -35,6 +35,8 @@
  *
  */
 
+import '../scss/gvp.scss';
+
 /**** GLOBAL VARIABLES ****/
 
 const sessionId = guid(); // an unique id for session
