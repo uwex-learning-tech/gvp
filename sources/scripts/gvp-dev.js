@@ -824,11 +824,19 @@ function loadVideoJS() {
 
         // on load
         self.on( 'loadedmetadata', function() {
-            
+
             sendToGoogleAnalytics( 'loadedmetadata' );
 
             if ( flags.isKaltura ) {
                 sendToKalturaAnalytics( '2' );
+            }
+
+            if ( !flags.isYouTube ) {
+                const badge = document.querySelector( '.gvp-duration-badge' );
+                if ( badge && !isNaN( self.duration() ) ) {
+                    badge.innerHTML = '<strong>Duration:</strong> ' + formatDuration( self.duration() );
+                    badge.hidden = false;
+                }
             }
 
             if ( playerOptions.autoplay ) {
@@ -874,12 +882,17 @@ function loadVideoJS() {
         self.on( 'playing', function() {
             
             const logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
-            const splashDwnldBtn = document.getElementsByClassName( 'gvp-download-btn' )[0];
+            const splashDownloads = document.getElementsByClassName( 'gvp-splash-downloads' )[0];
             const authorName = document.getElementsByClassName( 'gvp-author-wrapper' )[0];
-            
+            const durationBadge = document.getElementsByClassName( 'gvp-duration-badge' )[0];
+
             logo.style.display = 'none';
-            splashDwnldBtn.style.display = 'none';
+            splashDownloads.style.display = 'none';
             authorName.style.display = 'none';
+
+            if ( durationBadge ) {
+                durationBadge.style.display = 'none';
+            }
             
             if ( flags.isIframe ) {
                 
@@ -937,7 +950,7 @@ function loadVideoJS() {
         // as video completely ended
         self.on( 'ended', function() {
             
-            document.getElementsByClassName( 'gvp-download-btn' )[0].style.display = 'initial';
+            document.getElementsByClassName( 'gvp-splash-downloads' )[0].style.display = 'flex';
             document.getElementsByClassName( 'gvp-author-wrapper' )[0].style.display = 'initial';
             
             if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false) {
@@ -1408,8 +1421,31 @@ function addBackwardButton( vjs ) {
 }
 
 /**
+ * Format a duration in seconds as m:ss or h:mm:ss.
+ *
+ * @function formatDuration
+ */
+function formatDuration( seconds ) {
+
+    if ( isNaN( seconds ) || seconds < 0 ) {
+        return '';
+    }
+
+    const s = Math.floor( seconds % 60 ).toString().padStart( 2, '0' );
+    const m = Math.floor( ( seconds / 60 ) % 60 );
+    const h = Math.floor( seconds / 3600 );
+
+    if ( h > 0 ) {
+        return h + ':' + m.toString().padStart( 2, '0' ) + ':' + s;
+    }
+
+    return m + ':' + s;
+
+}
+
+/**
  * Determine the number of seconds to seek forward or backward.
- * 
+ *
  * @function getSecToSkip
  */
 function getSecToSkip( duration ) {
@@ -1462,7 +1498,13 @@ function addDownloadFilesButton( vjs ) {
             } );
     
             videojs.registerComponent( 'DownloadButton', downloadButton );
-            vjs.getChild( 'controlBar' ).addChild( 'DownloadButton', {}, 13 );
+
+            // Insert immediately before the fullscreen toggle so the order is
+            // ... | Settings | Downloads | Fullscreen
+            let controlBar = vjs.getChild( 'controlBar' );
+            let fullscreenToggle = controlBar.getChild( 'FullscreenToggle' );
+            let fullscreenIndex = controlBar.children().indexOf( fullscreenToggle );
+            controlBar.addChild( 'DownloadButton', {}, fullscreenIndex );
             
         }, 1000 );
         
@@ -1653,47 +1695,8 @@ function setDownloadables() {
         
     } );
     
-    let downloadList =  document.getElementsByClassName( 'gvp-download-list' )[0];
-    let anywhere = document.getElementsByTagName( 'body' )[0];
-    
-    if ( downloadList.childNodes.length ) {
-        
-        let downloadBtn = document.getElementsByClassName( 'gvp-download-btn' )[0];
-        
-        downloadBtn.style.display = 'block';
-        
-        downloadBtn.addEventListener( 'click', function() {
-            
-            if ( downloadList.style.display == 'block' ) {
-                
-                downloadList.style.display = 'none';
-                downloadBtn.classList.remove( 'active' );
-                
-            } else {
-                
-                downloadList.style.display = 'block';
-                downloadBtn.classList.add( 'active' );
-                
-            }
-            
-        } );
-        
-        anywhere.addEventListener( 'click', function( evt ) {
-            
-            if ( !evt.target.classList.contains( 'gvp-download-btn' ) ) {
-                
-                if ( downloadList.style.display == 'block' ) {
-                
-                    downloadList.style.display = 'none';
-                    downloadBtn.classList.remove( 'active' );
-                    
-                }
-                
-            }
-
-        } );
-        
-    }
+    // Splash pill buttons render via CSS display:flex on .gvp-splash-downloads;
+    // no JS toggling needed here. An empty flex container renders nothing.
 
     if ( flags.isKaltura ) {
 
@@ -1713,17 +1716,32 @@ function setDownloadables() {
  * @function createDownloadLink
  */
 function createDownloadLink( path, label ) {
-    
+
     let downloads = document.getElementsByClassName( 'gvp-download-list' )[0];
+    let splashDownloads = document.getElementsByClassName( 'gvp-splash-downloads' )[0];
+
+    // Hidden data-store link (plain text label; read by the control-bar download menu)
     let link = document.createElement( 'a' );
-    
     link.id = label.toLowerCase() + "Dl";
     link.href = path;
     link.innerHTML = label;
     link.download = path;
     link.target = '_blank';
     downloads.appendChild( link );
-    
+
+    // Visible splash pill button — proxies its click to the data-store link
+    // so Kaltura/analytics handlers attached to the data-store link still fire.
+    let splashLink = document.createElement( 'a' );
+    splashLink.href = path;
+    splashLink.innerHTML = '<span class="fa fa-download"></span> ' + label;
+    splashLink.download = path;
+    splashLink.target = '_blank';
+    splashLink.addEventListener( 'click', function( evt ) {
+        evt.preventDefault();
+        link.click();
+    } );
+    splashDownloads.appendChild( splashLink );
+
 }
 
 /**

@@ -12,11 +12,12 @@
 <div class="gvp-video-wrapper">
     <div class="gvp-author-wrapper"><h2></h2></div>
     <div class="gvp-splash-download-wrapper">
-        <button class="gvp-download-btn" aria-label="Toggle Download List"><span class="fa fa-download"></span> File Downloads</button>
-        <div class="gvp-download-list"></div>
+        <div class="gvp-splash-downloads"></div>
+        <div class="gvp-download-list" hidden></div>
     </div>
     <video id="gvp-video" class="video-js vjs-default-skin vjs-16-9" playsinline="" crossorigin="anonymous"></video>
     <div class="gvp-program-logo"></div>
+    <div class="gvp-duration-badge" hidden></div>
 </div>
 
 <div class="gvp-footer">

@@ -93,7 +93,7 @@ html {
             color: #fff;
             top: rem( $gutter * 2 );
         }
-        
+
     }
     
     .gvp-decoration-bar {
@@ -156,7 +156,21 @@ html {
             user-select: none;
             filter: invert(1);
         }
-        
+
+        .gvp-duration-badge {
+            position: absolute;
+            top: rem( 16px );
+            left: rem( 36px );
+            padding: rem( 6px ) rem( 12px );
+            background-color: rgba( 0, 0, 0, 0.65 );
+            color: #fff;
+            font-size: rem( 14px );
+            border-radius: rem( 4px );
+            font-variant-numeric: tabular-nums;
+            user-select: none;
+            z-index: 2;
+        }
+
         .gvp-author-wrapper {
 
             position: absolute;
@@ -176,46 +190,44 @@ html {
         }
 
         .gvp-splash-download-wrapper {
-    
+
             position: absolute;
             top: rem( 16px );
             right: rem( 36px );
             z-index: 1;
-            
-            .gvp-download-btn {
-                display: none;
-                border: none;
-                background-color: rgba( 0, 0, 0, 0.65 );
-                color: #fff;
-                padding: rem( 8px );
-                cursor: pointer;
-            }
-            
-            .gvp-download-btn:hover,
-            .gvp-download-btn.active {
-                background-color: rgba( 0, 0, 0, 0.95 );
-            }
-            
+
             .gvp-download-list {
-                
                 display: none;
-                border-top: rem( 1px ) solid #888;
-                background-color: rgba( 0, 0, 0, 0.65 );
-                
+            }
+
+            .gvp-splash-downloads {
+
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: rem( 8px );
+
                 a {
-                    display: block;
-                    padding: rem( 8px );
+                    display: inline-flex;
+                    align-items: center;
+                    gap: rem( 6px );
+                    padding: rem( 6px ) rem( 12px );
+                    background-color: rgba( 0, 0, 0, 0.65 );
                     color: #fff;
-                    font-size: rem( 12px );
+                    font-size: rem( 14px );
+                    border-radius: rem( 4px );
                     text-decoration: none;
+                    cursor: pointer;
+                    user-select: none;
                 }
-                
+
                 a:hover {
                     background-color: rgba( 0, 0, 0, 0.95 );
                 }
-                
+
             }
-            
+
         }
         
     }
@@ -226,7 +238,94 @@ html {
         text-align: center;
         padding: 0 rem( $gutter );
     }
-        
+
+    .video-js .vjs-menu .vjs-menu-content {
+        min-width: 6em;
+    }
+
+    .video-js .vjs-menu .vjs-menu-item {
+        text-align: left;
+        text-transform: capitalize;
+        padding-left: rem( 28px );
+        padding-right: rem( 12px );
+        white-space: nowrap;
+        position: relative;
+    }
+
+    .video-js .vjs-menu .vjs-menu-item::before {
+        content: '';
+        position: absolute;
+        left: rem( 10px );
+        top: 50%;
+        transform: translateY(-50%);
+        width: 1em;
+        text-align: center;
+    }
+
+    .video-js .vjs-menu .vjs-menu-item.vjs-selected::before {
+        content: '\2713';
+    }
+
+    .video-js .vjs-downloads-button + .vjs-menu .vjs-menu-item::before {
+        content: '\f019';
+        font-family: 'FontAwesome';
+    }
+
+    .video-js .vjs-captions-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
+        display: none;
+    }
+
+    // The captions menu has a bold "Captions Settings" title that doesn't fit
+    // in video.js's default 10em menu width and gets clipped by the menu-content
+    // overflow:hidden. Widen just this menu and recenter it on the 4em button.
+    .video-js .vjs-subs-caps-button + .vjs-menu {
+        width: 13em;
+        left: -4.5em;
+    }
+
+    // Zero out the video.js default `margin-bottom: 1.5em` on .vjs-menu so the
+    // menu's box bottom sits flush with the bottom of the button; the calc()
+    // offsets below are then measured from the button bottom directly.
+    .video-js .vjs-menu-button-popup .vjs-menu {
+        margin-bottom: 0;
+    }
+
+    // Lift the menu above the control bar (3em tall) so it doesn't occlude
+    // the button row. 8px = triangle height, 2px = visual gap to button top.
+    .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+        bottom: calc( 3em + 10px );
+        border: 1px solid rgba( 255, 255, 255, 0.3 );
+        border-radius: rem( 4px );
+    }
+
+    // Down-pointing triangle centered beneath the menu, pointing at the button.
+    // Anchored to .vjs-menu (not .vjs-menu-content) because the latter has
+    // overflow:auto which would clip the triangle. Triangle geometry is in px
+    // so it stays a fixed visual size regardless of font-size context.
+    .video-js .vjs-menu-button-popup .vjs-menu::before {
+        content: '';
+        position: absolute;
+        bottom: calc( 3em + 2px );
+        left: 50%;
+        transform: translateX(-50%);
+        width: 0;
+        height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 8px solid rgba( 43, 51, 63, 0.7 );
+    }
+
+    // Invisible bridge covering the gap between the button top and the menu
+    // so the cursor can transit without leaving the hover target.
+    .video-js .vjs-menu-button-popup .vjs-menu::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 2em;
+        height: calc( 1em + 10px );
+    }
+
 }
 
 #gvp-wrapper.embedded {
@@ -363,7 +462,11 @@ and (min-device-width : 900px) {
             .gvp-splash-download-wrapper {
                 right: rem( 16px );
             }
-            
+
+            .gvp-duration-badge {
+                left: rem( 16px );
+            }
+
             .gvp-program-logo {
                 bottom: rem( 10px );
                 right: rem( 10px );
@@ -431,22 +534,24 @@ and (min-device-width : 900px) {
 
 /* VIDEOJS DOWNLOADS BUTTON */
 .video-js .vjs-control-bar {
-    
+
     .vjs-menu-button {
-        
-        .vjs-downloads-button:before {
-            font-family: "FontAwesome";
-            content: "\f019";
-            font-size: 150%;
-            vertical-align: text-bottom;
-        }
-        
+
         .vjs-downloads-button {
             cursor: pointer;
+
+            .vjs-icon-placeholder:before {
+                font-family: "FontAwesome";
+                content: "\f019";
+                font-size: 1.5em;
+                line-height: 2;
+                position: relative;
+                top: 0.03em;
+            }
         }
-        
+
     }
-    
+
 }
 
 /* VIDEOJS FORWARD TEN SECONDS BUTTON */
@@ -603,6 +708,12 @@ $slider-bg-color: lighten($primary-background-color, 33%);
 .video-js .vjs-play-progress::before {
     z-index: 2;
     top: -0.3em;
+}
+
+/* Hide the hover-percentage readout on the volume slider (the thumb/tooltip
+   bundle video.js renders as .vjs-mouse-display inside the volume control). */
+.video-js .vjs-volume-control .vjs-mouse-display {
+    display: none;
 }
 
 /* The main progress bar also has a bar that shows how much has been loaded. */
