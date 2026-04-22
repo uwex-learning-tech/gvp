@@ -1,5 +1,8 @@
 # Version Change Log
 
+**4.0.15**
+* Added support for HTML transcripts; falls back to PDF when HTML is not provided
+
 **4.0.14**
 * Added duration badge on the splash screen
 * Reworked splash download buttons as inline pill links
