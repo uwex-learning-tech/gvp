@@ -1638,62 +1638,83 @@ function setDownloadables() {
         
     }
     
+    // Wire the Kaltura transcript-download analytics event onto whichever
+    // transcript link ends up in the DOM (HTML or PDF — same element id).
+    let attachTranscriptAnalytics = function() {
+        if ( flags.isKaltura ) {
+            document.getElementById( 'transcriptDl' ).addEventListener( 'click', function() {
+                sendToKalturaAnalytics( '10' );
+            } );
+        }
+    };
+
     supportedFiles.forEach( function( file ) {
-        
+
         let fileLabel = file.label;
         let ext = file.format;
         let filePath = cleanString( fileName ) + '.' + ext;
-        
+
         // video
         if ( ext === "mp4" ) {
 
             let dwnldPath = filePath;
-            
+
             if ( flags.isKaltura && flags.isLocal === false ) {
-                
+
                 dwnldPath = kaltura.flavor.normal;
-                
+
             } else {
-                
+
                 if ( reference.names[lastIndex] !== undefined ) {
-                    
+
                     dwnldPath = cleanString( fileName ) + '.' + ext;
-                    
+
                 }
-                
+
             }
-            
+
             if ( flags.isYouTube === false ) {
                 createDownloadLink( dwnldPath, fileLabel );
             }
-            
+
             return;
-            
+
         }
-        
-        fileExist( filePath ).then( result => {
-                
-            if ( result ) {
-                
-                createDownloadLink( filePath, fileLabel );
 
-                // send transcript download stat to Kaltura
-                if ( flags.isKaltura ) {
-                    
-                    if ( fileLabel === 'Transcript' ) {
+        // Transcript: prefer a sibling .html file (opens inline in a new tab).
+        // Fall back to the manifest-configured format (.pdf) if HTML is absent.
+        // Only one format is ever wired up per video.
+        if ( fileLabel === 'Transcript' ) {
 
-                        document.getElementById( 'transcriptDl' ).addEventListener( 'click', function() {
-                            sendToKalturaAnalytics( '10' );
-                        } );
+            let htmlPath = cleanString( fileName ) + '.html';
 
-                    }
-                    
+            fileExist( htmlPath ).then( htmlFound => {
+
+                if ( htmlFound ) {
+                    createDownloadLink( htmlPath, fileLabel, true );
+                    attachTranscriptAnalytics();
+                    return;
                 }
-                
+
+                fileExist( filePath ).then( pdfFound => {
+                    if ( pdfFound ) {
+                        createDownloadLink( filePath, fileLabel );
+                        attachTranscriptAnalytics();
+                    }
+                } );
+
+            } );
+
+            return;
+
+        }
+
+        fileExist( filePath ).then( result => {
+            if ( result ) {
+                createDownloadLink( filePath, fileLabel );
             }
-            
         } );
-        
+
     } );
     
     // Splash pill buttons render via CSS display:flex on .gvp-splash-downloads;
@@ -1713,20 +1734,23 @@ function setDownloadables() {
 
 /**
  * Turn downloadables to a download link.
- * 
+ *
  * @function createDownloadLink
  */
-function createDownloadLink( path, label ) {
+function createDownloadLink( path, label, inline = false ) {
 
     let downloads = document.getElementsByClassName( 'gvp-download-list' )[0];
     let splashDownloads = document.getElementsByClassName( 'gvp-splash-downloads' )[0];
+    let icon = inline ? 'fa-file-text-o' : 'fa-download';
 
     // Hidden data-store link (plain text label; read by the control-bar download menu)
     let link = document.createElement( 'a' );
     link.id = label.toLowerCase() + "Dl";
     link.href = path;
     link.innerHTML = label;
-    link.download = path;
+    if ( !inline ) {
+        link.download = path;
+    }
     link.target = '_blank';
     downloads.appendChild( link );
 
@@ -1734,8 +1758,10 @@ function createDownloadLink( path, label ) {
     // so Kaltura/analytics handlers attached to the data-store link still fire.
     let splashLink = document.createElement( 'a' );
     splashLink.href = path;
-    splashLink.innerHTML = '<span class="fa fa-download"></span> ' + label;
-    splashLink.download = path;
+    splashLink.innerHTML = '<span class="fa ' + icon + '"></span> ' + label;
+    if ( !inline ) {
+        splashLink.download = path;
+    }
     splashLink.target = '_blank';
     splashLink.addEventListener( 'click', function( evt ) {
         evt.preventDefault();
