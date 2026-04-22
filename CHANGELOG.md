@@ -1,5 +1,12 @@
 # Version Change Log
 
+**4.0.14**
+* Added duration badge on the splash screen
+* Reworked splash download buttons as inline pill links
+* Moved control-bar download button next to the fullscreen toggle
+* Polished VideoJS menu styling (selected-item checkmark, FontAwesome icons, triangle indicator, hover bridge, widened captions menu)
+* Hid the volume slider hover-percentage readout
+
 **4.0.13**
 * Updated Google Analytics tracking to GA4
 
