@@ -1,5 +1,10 @@
 # Version Change Log
 
+**4.0.16**
+* Video quality now defaults to 1080p and falls back to the next available flavor when it is missing
+* Quality menu lists every available Kaltura flavor, labeled by resolution
+* Kaltura flavors are now configured as a list in manifest.json
+
 **4.0.15**
 * Added support for HTML transcripts; falls back to PDF when HTML is not provided
 
