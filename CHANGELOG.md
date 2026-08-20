@@ -1,5 +1,8 @@
 # Version Change Log
 
+**4.0.17**
+* Updated VideoJS to version 7.21.7, resolving known security advisories
+
 **4.0.16**
 * Video quality now defaults to 1080p and falls back to the next available flavor when it is missing
 * Quality menu lists every available Kaltura flavor, labeled by resolution

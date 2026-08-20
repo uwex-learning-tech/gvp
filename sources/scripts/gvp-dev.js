@@ -4,7 +4,7 @@
  * @author: Ethan Lin
  * @author: Bryan Bortz
  * @url: https://github.com/uwex-learning-tech/gvp
- * @version: 4.0.16
+ * @version: 4.0.17
  * Released 08/20/2026
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
