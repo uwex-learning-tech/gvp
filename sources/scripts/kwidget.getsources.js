@@ -101,10 +101,12 @@ if( ! window.kWidget ){
 					source['type'] = 'video/mp4';
 				}
 
-				// Check for iPhone src with flavor params id
-				if( asset.flavorParamsId === 487081) {
+				// Any other ready MP4 flavor (e.g. the HD/720 and HD/1080 web flavors,
+				// which carry no device tags). Which flavors are offered to the viewer
+				// is decided by the player from the manifest (gvp_kaltura.flavors), so
+				// adding a flavor never requires editing this file.
+				if( ! source['src'] && asset.fileExt && asset.fileExt.toLowerCase() == 'mp4' ) {
 					source['src'] = src + '/a.mp4';
-					/* source['data-flavorid'] = 'HD/720'; */
 					source['type'] = 'video/mp4';
 				}
 

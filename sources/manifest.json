@@ -14,9 +14,8 @@
     "gvp_logo_default": "uwex",
     "gvp_kaltura": {
         "id": 2370711,
-        "normal": 487081,
-        "medium": 487061,
-        "low": 487041
+        "default_quality": 1080,
+        "flavors": [ 487091, 487081, 487061, 487041 ]
     },
     "gvp_download_files": [ 
         

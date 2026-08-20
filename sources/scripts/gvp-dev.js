@@ -638,31 +638,24 @@ function loadKalturaSource() {
             'callback': function( data ) {
 
                 kaltura = data;
-                kaltura.flavor = {};
-
-                kaltura.sources.forEach( function( flavor ) {
-
-                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.low ) {
-                        kaltura.flavor.low = flavor.src;
-                        return;
-                    }
-
-                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.medium ) {
-                        kaltura.flavor.medium = flavor.src;
-                        return;
-                    }
-
-                    if ( flavor.flavorParamsId === manifest.gvp_kaltura.normal ) {
-                        kaltura.flavor.normal = flavor.src;
-                        return;
-                    }
-
-                } );
 
                 if ( kaltura.sources.length === 0 ) {
                     showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
                     return;
                 }
+
+                // build the quality levels from the flavors Kaltura actually
+                // returned; configured flavors that do not exist for this
+                // entry (e.g. no 1080p for a 720p upload) are skipped
+                kaltura.flavors = selectKalturaFlavors( kaltura.sources, manifest.gvp_kaltura );
+
+                if ( kaltura.flavors.length === 0 ) {
+                    showErrorMsgOnCover( 'No playable video found for Kaltura video Id (' + gvp.source + ').' );
+                    return;
+                }
+
+                // the quality to start playback (and the video download) with
+                kaltura.defaultFlavor = pickDefaultFlavor( kaltura.flavors, manifest.gvp_kaltura.default_quality );
 
                 // call to setup the videoJS player
                 setVideoJs(); 
@@ -671,6 +664,96 @@ function loadKalturaSource() {
 
     }
     
+}
+
+/**
+ * Returns the Kaltura flavor params IDs the player may offer, in order of
+ * preference, from the manifest's gvp_kaltura settings.
+ *
+ * Preferred form:   "flavors": [ 487091, 487081, 487061, 487041 ]
+ * Legacy form:      "normal": 487091, "medium": 487081, "low": 487041
+ *
+ * @function getKalturaFlavorWhitelist
+ * @param {Object} config - manifest.gvp_kaltura
+ * @return {Array} flavor params IDs as numbers
+ */
+function getKalturaFlavorWhitelist( config ) {
+
+    let ids = Array.isArray( config.flavors ) ? config.flavors : [ config.normal, config.medium, config.low ];
+
+    return ids.map( Number ).filter( id => Number.isFinite( id ) );
+
+}
+
+/**
+ * Builds the list of playable quality levels from the sources Kaltura
+ * returned for the entry. Only flavors listed in the manifest are offered,
+ * and only the ones that actually exist (ready) for this entry; a
+ * configured flavor that Kaltura did not return is simply left out, so a
+ * 720p upload with no 1080p flavor still plays. Resolution and label come
+ * from the real asset height rather than from a fixed slot.
+ *
+ * If none of the configured flavors exist, any MP4 flavor Kaltura returned
+ * is used instead so the viewer still gets a playable video.
+ *
+ * @function selectKalturaFlavors
+ * @param {Array} sources - sources from kWidget.getSources
+ * @param {Object} config - manifest.gvp_kaltura
+ * @return {Array} video.js sources [{ src, type, res, label }], highest resolution first
+ */
+function selectKalturaFlavors( sources, config ) {
+
+    let whitelist = getKalturaFlavorWhitelist( config );
+
+    let isPlayableMp4 = source => source.src && source.type === 'video/mp4';
+
+    let flavors = sources.filter( source => {
+        return isPlayableMp4( source ) && whitelist.indexOf( Number( source.flavorParamsId ) ) !== -1;
+    } );
+
+    if ( flavors.length === 0 ) {
+        console.warn( 'GVP: none of the configured Kaltura flavors (' + whitelist.join( ', ' ) + ') exist for entry ' + gvp.source + '; falling back to any available MP4 flavor.' );
+        flavors = sources.filter( isPlayableMp4 );
+    }
+
+    return flavors.map( source => {
+
+        let height = parseInt( source['data-height'], 10 ) || 0;
+
+        return {
+            type: 'video/mp4',
+            src: source.src,
+            res: height,
+            label: height ? height + 'p' : 'default',
+            flavorParamsId: source.flavorParamsId
+        };
+
+    } )
+    // highest quality first (the order the quality menu shows them in)
+    .sort( ( a, b ) => b.res - a.res )
+    // one entry per resolution
+    .filter( ( flavor, index, list ) => index === 0 || flavor.res !== list[index - 1].res );
+
+}
+
+/**
+ * Picks the quality level to start playback with: the highest available
+ * resolution that does not exceed the preferred one. If every available
+ * flavor is above the preferred resolution, the lowest available is used.
+ *
+ * @function pickDefaultFlavor
+ * @param {Array} flavors - from selectKalturaFlavors (highest resolution first)
+ * @param {Number} preferredRes - manifest gvp_kaltura.default_quality (defaults to 1080)
+ * @return {Object} the chosen flavor
+ */
+function pickDefaultFlavor( flavors, preferredRes ) {
+
+    let preferred = parseInt( preferredRes, 10 ) || 1080;
+
+    let match = flavors.find( flavor => flavor.res <= preferred );
+
+    return match || flavors[flavors.length - 1];
+
 }
 
 /**
@@ -707,9 +790,16 @@ function loadVideoJS() {
         playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
     }
     
-    // add video qualitiy functionality if video is from YouTube or Kaltura
+    // add video quality functionality if video is from YouTube or Kaltura
     if ( ( flags.isYouTube || flags.isKaltura ) && flags.isLocal === false ) {
-        Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': 720 } } );
+
+        // Kaltura: start on the best flavor that exists for this entry (see
+        // pickDefaultFlavor) so the default never points at a missing flavor;
+        // YouTube: the plugin resolves the available qualities itself
+        let defaultRes = ( flags.isKaltura && kaltura.defaultFlavor ) ? kaltura.defaultFlavor.res : 720;
+
+        Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': defaultRes } } );
+
     }
     
     // initialize the video player bases options/configurations
@@ -722,11 +812,7 @@ function loadVideoJS() {
         if ( flags.isKaltura && flags.isLocal === false ) {
             
             self.poster( kaltura.poster + '/width/900/quality/100' );
-            self.updateSrc( [
-                { type: 'video/mp4', src: kaltura.flavor.low, label: 'low', res: 360 },
-                { type: 'video/mp4', src: kaltura.flavor.normal, label: 'normal', res: 720 },
-                { type: 'video/mp4', src: kaltura.flavor.medium, label: 'medium', res: 640 } 
-            ] );
+            self.updateSrc( kaltura.flavors );
             
             // setup the caption if applicable
             if ( kaltura.caption ) {
@@ -1661,7 +1747,7 @@ function setDownloadables() {
 
             if ( flags.isKaltura && flags.isLocal === false ) {
 
-                dwnldPath = kaltura.flavor.normal;
+                dwnldPath = kaltura.defaultFlavor.src;
 
             } else {
 
