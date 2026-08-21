@@ -13,7 +13,7 @@ Generic video player is utilizing and built upon VideoJS, a HTML5 video player, 
 
 *Latest stable version is always recommended.*
 
-For documentation, please visit https://media.uwex.edu/resources/documentation/generic-video-player-v4/
+Documentation is located at the [OPLR Media Team website](https://media.uwex.edu/staff-documentation/media-services-documentation/generic-video-player-v4).
 
 ---
 ### Bug Reporting and Questions
