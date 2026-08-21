@@ -126,10 +126,13 @@ module.exports = {
                     from: 'sources/scripts/videojs/font',
                     to: 'sources/scripts/videojs/font'
                 },
-                {
-                    from: 'sources/scripts/videojs/lang',
-                    to: 'sources/scripts/videojs/lang'
-                },
+                // The VideoJS translations are deliberately NOT copied. Nothing
+                // loads them -- there is no call to videojs.addLanguage() and no
+                // <script> for any lang file -- so shipping them added 441 KiB to
+                // every deploy, eight times the size of the player itself. The
+                // files stay in sources/ with the rest of the VideoJS drop; wiring
+                // up locales means loading the one that matches manifest.lang, not
+                // copying all 106.
                 {
                     from: 'sources/scripts/videojs/video-js.css',
                     to: 'sources/scripts/videojs/'
