@@ -1127,17 +1127,24 @@ function loadVideoJS() {
         
         // if end time is specified
         if ( reference.params.has( 'end' ) ) {
-            
-            self.on( 'timeupdate', function() {
-                
+
+            // Named so it can unbind ITSELF. The bare self.off('timeupdate')
+            // this replaces tore off every timeupdate listener on the player,
+            // including the quartile progress tracking registered further down,
+            // so any ?end= session stopped reporting 25/50/75% the moment it
+            // reached the end point.
+            let stopAtEnd = function() {
+
                 if ( self.currentTime() >= queryToSeconds( reference.params.get( 'end' ) ) ) {
-                    
+
                     self.pause();
-                    self.off( 'timeupdate' );
-                    
+                    self.off( 'timeupdate', stopAtEnd );
+
                 }
-                
-            } );
+
+            };
+
+            self.on( 'timeupdate', stopAtEnd );
             
         }
         
@@ -1181,30 +1188,52 @@ function loadVideoJS() {
             } else {
                 
                 let bigPlayBtn = document.getElementsByClassName( 'vjs-big-play-button' )[0];
-                
-                bigPlayBtn.addEventListener( 'click', function() {
-                    
-                    if ( flags.firstPlayed === false ) {
 
-                        if ( flags.isKaltura ) {
-                            sendToKalturaAnalytics( '3' );
+                // loadedmetadata fires again on every quality switch, and this
+                // used to register another one-shot listener each time -- so a
+                // viewer who changed quality twice sent three play/replay events
+                // from a single press. The button is the same element across
+                // switches, so binding it once is enough.
+                if ( bigPlayBtn && !bigPlayBtn.dataset.gvpAnalyticsBound ) {
+
+                    bigPlayBtn.dataset.gvpAnalyticsBound = 'true';
+
+                    bigPlayBtn.addEventListener( 'click', function() {
+
+                        if ( flags.firstPlayed === false ) {
+
+                            if ( flags.isKaltura ) {
+                                sendToKalturaAnalytics( '3' );
+                            }
+
+                            sendToGoogleAnalytics( 'play' );
+                            flags.firstPlayed = true;
+
+                        } else {
+
+                            sendToGoogleAnalytics( 'replay' );
+
                         }
 
-                        sendToGoogleAnalytics( 'play' );
-                        flags.firstPlayed = true;
+                    }, { once: true } );
 
-                    } else {
-
-                        sendToGoogleAnalytics( 'replay' );
-
-                    }
-                    
-                }, { once: true } );
+                }
                 
             }
             
         } );
         
+        // leaving the end card: fade the black back out
+        self.on( 'play', function() {
+
+            const videoWrapper = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+            if ( videoWrapper ) {
+                videoWrapper.classList.remove( 'is-ended' );
+            }
+
+        } );
+
         // on playing
         self.on( 'playing', function() {
             
@@ -1245,7 +1274,7 @@ function loadVideoJS() {
                 if ( progressPercentage >= 25 && flags.playReached25 == false ) {
                     flags.playReached25 = true;
 
-                    if ( self.isKaltura ) {
+                    if ( flags.isKaltura ) {
                         sendToKalturaAnalytics( '4' );
                     }
                     
@@ -1256,7 +1285,7 @@ function loadVideoJS() {
                 if ( progressPercentage >= 50 && flags.playReached50 == false ) {
                     flags.playReached50 = true;
                     
-                    if ( self.isKaltura ) {
+                    if ( flags.isKaltura ) {
                         sendToKalturaAnalytics( '5' );
                     }
 
@@ -1267,7 +1296,7 @@ function loadVideoJS() {
                 if ( progressPercentage >= 75 && flags.playReached75 == false ) {
                     flags.playReached75 = true;
                     
-                    if ( self.isKaltura ) {
+                    if ( flags.isKaltura ) {
                         sendToKalturaAnalytics( '6' );
                     }
 
