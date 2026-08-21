@@ -2037,8 +2037,10 @@ function setTitle() {
         
     }
     
-    document.getElementsByTagName( 'title' )[0].innerHTML = title;
-    document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].innerHTML = title;
+    // textContent, not innerHTML: the title can come straight from the ?title=
+    // query parameter, so markup in it would run in the player's own origin.
+    document.getElementsByTagName( 'title' )[0].textContent = title;
+    document.getElementsByClassName( 'gvp-title-bar' )[0].children[0].textContent = title;
 
     sendToGoogleAnalytics( 'pageview', title );
     
