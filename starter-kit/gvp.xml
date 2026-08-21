@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gvp>
+    
+    <!--########################## READ ME: SETTINGS ###########################
+        Settings tag is optional unless the video is from Kaltura.
+         * title tag is optional but can be used to override the value/title
+           from URL string parameter or Kaltrua.
+         * author tag is optional
+         * fileName tag is optional
+            - use for setting a different file name rather than parsing
+              the name from the URL
+         * kalturaId tag is required for video hosted on Kaltura.
+         * youtubeId tag is required for video hosted on YouTube.
+         * captionLanguage tag is optional (for YouTube and local video)
+           - use for specifying caption language code and label
+           - defaulted to "en" for code and "English" for label
+         
+         !!! kalturaId has higher priority over youtubeId if both tag exists !!!
+         
+         Examples:
+         
+         <settings>                                 <settings>
+            <title></title>                             <title></title>
+            <kalturaId></kalturaId>     ~ OR ~          <fileName></fileName>
+         </settings>                                </settings>
+         
+         ~ OR ~
+         
+         <settings>                                 <settings>
+            <kalturaId></kalturaId>     ~ OR ~          <youtubeId></youtubeId>
+         </settings>                                </settings> 
+    #########################################################################-->
+    
+    <settings>
+        <kalturaId>0_f2jmp3gg</kalturaId>
+    </settings>
+    
+    <!--########################## READ ME: MARKERS ############################
+        Markers tag (parent) is optional.
+         * Must have at least one Marker tag (child) with required timecode
+           attribute. Timecode value must be in hh:mm:ss or mm:ss format.
+         * The texts between the open and close marker tag will be displayed.
+         * Remove all if will be not be used.
+         * Color attribute is optional and must be in HEX or RGB(A) string value
+         
+         Usage:
+         
+         <markers>
+            <marker timecode="00:30" color="">How to write XML!</marker>
+         </markers>
+         
+    #########################################################################-->
+    
+</gvp>
