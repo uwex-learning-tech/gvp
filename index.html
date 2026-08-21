@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Generic Video Player</title>
+    <!-- Critical: gvp.css is injected after the (large, render-blocking)
+         video.js script, so without this the page paints white and then snaps
+         to the player background. Colour comes from $default-bg-color. -->
+    <style>html,body{background-color:<%= baseBackground %>;margin:0;}</style>
     <link id="gvp-manifest" href="sources/manifest.json" rel="manifest"/>
     <link href="sources/scripts/videojs/video-js.css" rel="stylesheet" media="all" />
     <script async src="https://use.fontawesome.com/7e0c8d6453.js"></script>
@@ -15,7 +19,7 @@
 		<p>This web page requires JavaScript, please <a href="http://www.enable-javascript.com/" target="_blank">enable JavaScript</a>.</p>
 	</noscript>
     
-    <div id="gvp-wrapper" data-version="4.0.0"></div>
+    <div id="gvp-wrapper" data-version="<%= version %>"></div>
     
 </body>
 </html>

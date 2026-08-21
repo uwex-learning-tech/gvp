@@ -4,8 +4,9 @@
  * @author: Ethan Lin
  * @author: Bryan Bortz
  * @url: https://github.com/uwex-learning-tech/gvp
- * @version: 4.0.17
- * Released 08/20/2026
+ *
+ * The version and build date are injected at build time from package.json --
+ * see the banner at the top of the built file, and __GVP_VERSION__ below.
  *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
@@ -61,6 +62,9 @@ let gvp = {
         label: ''
     }
 };
+
+// injected by webpack.DefinePlugin from package.json
+const GVP_VERSION = typeof __GVP_VERSION__ !== 'undefined' ? __GVP_VERSION__ : 'dev';
 
 // an object to hold the kaltura library
 let kaltura = {
@@ -155,6 +159,13 @@ function initGVP() {
             document.documentElement.setAttribute( 'dir', manifest.dir );
         }
 
+        // keep the DOM attribute honest even when the page was not built by
+        // webpack (e.g. served straight from sources during development)
+        let wrapperEl = document.getElementById( 'gvp-wrapper' );
+
+        if ( wrapperEl && wrapperEl.dataset.version !== GVP_VERSION ) {
+            wrapperEl.dataset.version = GVP_VERSION;
+        }
         
         // default the player root director to 'sources/'
         // if not specified in the JSON data
