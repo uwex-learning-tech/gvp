@@ -39,6 +39,26 @@ $body-bgcolor: #636266;
     @return ( math.div($px , $base) ) * 1rem;
 };
 
+// Removes an element from sight while leaving it in the accessibility tree.
+// Used where text is visually redundant but is still the only thing naming the
+// content for a screen reader -- notably the embedded title bar.
+@mixin visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    clip: rect( 0 0 0 0 );
+    clip-path: inset( 50% );
+    white-space: nowrap;
+}
+
+.gvp-visually-hidden {
+    @include visually-hidden;
+}
+
 /********************************* GVP CSS ************************************/
 
 html {
@@ -180,10 +200,15 @@ html {
             background-color: rgba( 0, 0, 0, 0.50 );
             z-index: 1;
 
-            h2 {
+            // A presenter's name is not a section heading. This used to be an
+            // <h2> purely for the pill styling, which put a phantom entry in the
+            // document outline -- heading navigation jumped from the video title
+            // straight to a person's name that introduced nothing.
+            .gvp-author-name {
                 margin: 0;
-                color: #fff;
-                font-size: rem( 18px );
+                color: inherit;
+                font-size: inherit;
+                font-weight: normal;
                 line-height: normal;
             }
 
@@ -341,14 +366,15 @@ html {
         display: none;
     }
     
+    // Embedded, the title is visually redundant -- but it is also the only text
+    // naming the video, and the host iframe rarely carries a title of its own,
+    // so it is hidden from sight rather than removed from the accessibility
+    // tree. The overlay styling below is kept for any mode that reveals it.
     .gvp-title-bar {
         
-        display: none;
-        position: absolute;
-        width: 100%;
+        @include visually-hidden;
+
         box-sizing: border-box;
-        top: 0;
-        left: 0;
         z-index: 1;
         padding: 0;
         background-color: rgba( 0,0,0, 0.65 );

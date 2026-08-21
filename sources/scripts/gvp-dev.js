@@ -143,6 +143,18 @@ function initGVP() {
         
         // set JSON data to the manifest object
         manifest = result;
+
+        // manifest.lang/dir were decorative until now -- nothing read them, so a
+        // deployment that set them for an RTL or non-English site silently kept
+        // announcing the page as English left-to-right.
+        if ( manifest.lang ) {
+            document.documentElement.setAttribute( 'lang', manifest.lang );
+        }
+
+        if ( manifest.dir ) {
+            document.documentElement.setAttribute( 'dir', manifest.dir );
+        }
+
         
         // default the player root director to 'sources/'
         // if not specified in the JSON data
@@ -194,6 +206,7 @@ function loadGoogleAnalytics() {
     let gtagIframe = document.createElement( 'iframe' );
 
     gtagIframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-NCB47RC';
+    gtagIframe.title = 'Google Tag Manager';
     gtagIframe.width = 0;
     gtagIframe.height = 0;
     gtagIframe.style.display = 'none';
@@ -309,7 +322,7 @@ function setGvpTemplate() {
                     	gvpWrapper.classList.add( 'sbplus-embed' );
                     	
                     	let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                    	titleBar.style.display = 'none';
+                    	titleBar.classList.add( 'gvp-visually-hidden' );
                     	
                     	flags.sbplusEmbed = true;
                     	
@@ -983,8 +996,13 @@ function loadVideoJS() {
             
             if ( flags.isIframe ) {
                 
+                // Visually hidden, not display:none: embedded, this <h1> is the
+                // only text that names the video, and the host iframe usually
+                // has no title either -- so removing it from the accessibility
+                // tree leaves a screen reader user inside an unnamed frame with
+                // nothing at all identifying what they are on.
                 let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                titleBar.style.display = 'none';
+                titleBar.classList.add( 'gvp-visually-hidden' );
                 
             }
             
@@ -1372,7 +1390,10 @@ function setDefaultTitle() {
         
     }
     
-    return '';
+    // Returning an empty string left both the <h1> and the document title blank
+    // for the whole session, so a screen reader landed on a page with no name at
+    // all. A generic name is not much, but it is something to announce.
+    return 'Untitled video';
         
 }
 
@@ -1917,7 +1938,7 @@ function setAuthor( name ) {
 
     if ( name.length ) {
 
-        const authorEl = document.querySelector( '.gvp-author-wrapper h2' );
+        const authorEl = document.querySelector( '.gvp-author-wrapper .gvp-author-name' );
         authorEl.innerHTML = name;
 
         const authorUrl = manifest.gvp_author_directory + name.replace(/[^\w]/gi, '').toLowerCase() + '.json?callback=author';
@@ -1946,7 +1967,7 @@ function setAuthor( name ) {
  * @function author
  */
 function author( data ) {
-    document.querySelector( '.gvp-author-wrapper h2' ).innerHTML = data.name;
+    document.querySelector( '.gvp-author-wrapper .gvp-author-name' ).innerHTML = data.name;
 }
 
 /****** HELPER FUNCTIONS ******/
