@@ -842,6 +842,20 @@ function loadVideoJS() {
     gvp.player = videojs( 'gvp-video', playerOptions, function() {
         
         let self = this;
+
+        // Layer the video fades to when it ends. Inserted directly after
+        // .vjs-poster so it paints over the video and the poster but stays
+        // under the replay button and control bar (DOM order is the stacking
+        // order inside the player).
+        let endFade = document.createElement( 'div' );
+        endFade.className = 'gvp-end-fade';
+        let posterEl = self.el().querySelector( '.vjs-poster' );
+
+        if ( posterEl ) {
+            posterEl.insertAdjacentElement( 'afterend', endFade );
+        } else {
+            self.el().appendChild( endFade );
+        }
         
         // The player is only worth sealing once video.js has built it -- before
         // that there is nothing focusable to seal. If the cover has already
@@ -1106,7 +1120,17 @@ function loadVideoJS() {
         self.on( 'ended', function() {
             
             document.getElementsByClassName( 'gvp-splash-downloads' )[0].style.display = 'flex';
-            document.getElementsByClassName( 'gvp-author-wrapper' )[0].style.display = 'initial';
+
+            // Only restore the author chip if there actually is an author. When
+            // the XML has no <author>, setAuthor() hides this wrapper; showing it
+            // again here painted an empty padded box with a dark background --
+            // the little black square in the top-left of the replay screen.
+            const authorWrapper = document.getElementsByClassName( 'gvp-author-wrapper' )[0];
+            const authorHeading = authorWrapper ? authorWrapper.querySelector( '.gvp-author-name' ) : null;
+
+            if ( authorHeading && authorHeading.textContent.trim().length ) {
+                authorWrapper.style.display = 'initial';
+            }
             
             if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false) {
                 
@@ -1115,19 +1139,26 @@ function loadVideoJS() {
                 
             }
 
-            if ( flags.isIframe ) {
-                
-                if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false ) {
-                    
-                    let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
-                    
+            if ( flags.sbplusEmbed === undefined || flags.sbplusEmbed === false ) {
+
+                // Bring the corner logo back over the end card. The embedded
+                // title bar deliberately stays hidden here -- it overlays the
+                // video, and the end card reads cleaner without it.
+                let logo = document.getElementsByClassName( 'gvp-program-logo' )[1];
+
+                if ( logo ) {
                     logo.style.display = 'initial';
-                    
-                    let titleBar = document.getElementsByClassName( 'gvp-title-bar' )[0];
-                    titleBar.style.display = 'block';
-                    
                 }
-                
+
+            }
+
+            // Fade the picture down to black rather than snapping back to the
+            // poster. The class also suppresses .vjs-poster, so the first frame
+            // never reappears behind the end card.
+            let videoWrapper = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+            if ( videoWrapper ) {
+                videoWrapper.classList.add( 'is-ended' );
             }
 
             if ( flags.playReached100 === false ) {

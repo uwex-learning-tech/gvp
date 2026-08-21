@@ -242,6 +242,59 @@ html {
                 }
             }
         }
+
+        // ---- end-of-video card -------------------------------------------
+        // The video fades down to black instead of snapping back to the poster.
+        // This layer is injected right after .vjs-poster, so it covers the video
+        // and the poster but sits under the replay button and control bar.
+        .gvp-end-fade {
+            position: absolute;
+            inset: 0;
+            background-color: #000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 700ms ease;
+        }
+
+        &.is-ended {
+
+            .gvp-end-fade {
+                opacity: 1;
+            }
+
+            // Never reveal the first frame again behind the end card.
+            .vjs-poster {
+                display: none;
+            }
+
+            // Ease the overlays in just behind the fade instead of popping them.
+            .vjs-big-play-button,
+            .gvp-splash-downloads,
+            .gvp-author-wrapper,
+            > .gvp-program-logo {
+                animation: gvpEndCardIn 450ms ease 250ms both;
+            }
+
+        }
+
+        @media ( prefers-reduced-motion: reduce ) {
+
+            .gvp-end-fade {
+                transition: none;
+            }
+
+            &.is-ended {
+
+                .vjs-big-play-button,
+                .gvp-splash-downloads,
+                .gvp-author-wrapper,
+                > .gvp-program-logo {
+                    animation: none;
+                }
+
+            }
+
+        }
         
         // Direct child only: .gvp-cover also contains a .gvp-program-logo and
         // that one is centred on the video, not pinned to the corner.
@@ -661,6 +714,11 @@ and (min-device-width : 900px) {
 
 /******************************* ANIMATIONS **********************************/
 
+
+@keyframes gvpEndCardIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
 
 @keyframes fadeToBlack {
     from { background-color: $default-bg-color; }
