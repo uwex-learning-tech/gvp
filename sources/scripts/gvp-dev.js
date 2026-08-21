@@ -3844,6 +3844,15 @@ function showErrorMsgOnCover( title, detail, source, code ) {
         cover.style.display = 'none';
     }
 
+    // coverUp() marked the wrapper busy and only startCoverFade() clears it,
+    // which is never reached when the failure happens before the player is
+    // built -- leaving the region announcing as loading for good.
+    let busyWrapper = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+    if ( busyWrapper ) {
+        busyWrapper.removeAttribute( 'aria-busy' );
+    }
+
     // The panel owns the video area now. video.js leaves its control bar fully
     // mounted after an error, so without this a screen reader user tabs straight
     // into play/seek/volume for a video that will never play. The download pills
