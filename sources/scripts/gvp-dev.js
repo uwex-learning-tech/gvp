@@ -113,18 +113,6 @@ let flags = {
     playReached100: false
 };
 
-/**** ON DOM READY; RUNS THE initGVP function ****/
-
-( function ready( fn ) {
-    
-    if ( document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading' ) {
-        fn();
-    } else {
-        document.addEventListener( 'DOMContentLoaded', fn );
-    }
-    
-} )( initGVP );
-
 /**** GVP CORE FUNCTIONS ****/
 
 /**
@@ -3884,3 +3872,21 @@ function showErrorMsgOnCover( title, detail, source, code ) {
     }
 
 }
+
+/**** ON DOM READY; RUNS THE initGVP function ****/
+
+// Last in the file, deliberately. The bundle is injected with `defer`, so by
+// the time it runs readyState is already 'interactive' and initGVP() is called
+// synchronously, during module evaluation. Anything it can reach on that first
+// pass must already exist -- and `const`/`let` declarations further down the
+// file (gvpErrors, coveredRegions, noticeState) do not, unlike hoisted
+// functions. Reporting GVP-102 from up top threw on the error table itself.
+( function ready( fn ) {
+    
+    if ( document.attachEvent ? document.readyState === 'complete' : document.readyState !== 'loading' ) {
+        fn();
+    } else {
+        document.addEventListener( 'DOMContentLoaded', fn );
+    }
+    
+} )( initGVP );
