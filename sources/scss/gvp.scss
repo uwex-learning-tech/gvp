@@ -59,6 +59,18 @@ $body-bgcolor: #636266;
     @include visually-hidden;
 }
 
+// The splash overlays -- the author chip, the duration badge and the download
+// pills -- are all the same pill: same padding, ground, radius and type size.
+// Defined once so the three cannot drift apart, and so the badge's offset below
+// the author chip stays predictable.
+@mixin gvp-badge {
+    padding: rem( 6px ) rem( 12px );
+    background-color: rgba( 0, 0, 0, 0.65 );
+    color: #fff;
+    font-size: rem( 14px );
+    border-radius: rem( 4px );
+}
+
 /********************************* GVP CSS ************************************/
 
 html {
@@ -87,13 +99,34 @@ html {
         display: flex;
         align-items: center;
         justify-content: center;
+        // Overlays the video box exactly (it is a child of .gvp-video-wrapper),
+        // so `align-items: center` centres the logo on the video rather than on
+        // the full wrapper height, which used to leave it far too low on tall
+        // windows.
         position: absolute;
-        width: 100%;
-        height: calc( 100% - #{$gutter} );
-        top: rem( $gutter );
-        left: 0;
+        inset: 0;
         background-color: $default-bg-color;
-        z-index: 99;
+        // Above every splash overlay (download pills sit at 101 so they can
+        // clear the error panel at 100). If the cover were underneath them the
+        // buttons would fade in over the loading screen, ahead of the thumbnail.
+        // showErrorMsgOnCover() hides this, so errors are never trapped behind it.
+        z-index: 200;
+
+        // Opaque from the moment the template lands. It must never fade IN: on a
+        // warm cache the player behind it is already painted, so fading in would
+        // briefly reveal the poster, hide it again, then reveal it once more.
+        // The placeholder logo fades in instead, which gives the soft entry
+        // without ever letting the content underneath peek through.
+        opacity: 1;
+        transition: opacity 300ms ease;
+
+        &.is-hidden {
+            opacity: 0;
+        }
+
+        @media ( prefers-reduced-motion: reduce ) {
+            transition: none;
+        }
         
         .gvp-program-logo {
             width: 340px;
@@ -101,25 +134,31 @@ html {
             background-repeat: no-repeat;
             background-position: center center;
             user-select: none;
+
+            // The soft entry happens here, inside the already-opaque cover:
+            // invisible to start, easing up to its resting 50%.
+            opacity: 0;
+            transition: opacity 200ms ease;
+
+            &.is-visible {
+                opacity: 0.5;
+            }
+
+            @media ( prefers-reduced-motion: reduce ) {
+                transition: none;
+            }
         }
         
-        .gvp-error-msg {
-            display: none;
-            position: absolute;
-            max-width: rem( 350px );
-            background-color: #ff3636;
-            padding: rem( math.div($gutter, 2) );
-            font-size: rem( 14px );
-            color: #fff;
-            top: rem( $gutter * 2 );
-        }
-
     }
     
     .gvp-decoration-bar {
         
         display: flex;
         flex-flow: row nowrap;
+        // The coloured spans are appended by setProgramTheme() once themes.json
+        // resolves, which is a separate request from the template. Reserve the
+        // height up front so the bar cannot grow 0 -> 20px and shove the page down.
+        height: rem( $gutter );
         
         span {
             flex: 1 0 auto;
@@ -154,6 +193,13 @@ html {
         
         h1 {
             font-size: rem( 28px );
+            // The title is written in after the video metadata arrives, so an
+            // empty h1 would collapse and then shove the page down once it is
+            // filled. Reserve exactly one line box; `lh` keeps the natural line
+            // height so the final layout is unchanged (em fallback for older
+            // engines without `lh`).
+            min-height: 1.2em;
+            min-height: 1lh;
             margin-bottom: rem( 14px ); 
         }
         
@@ -162,9 +208,44 @@ html {
     .gvp-video-wrapper {
         
         position: relative;
-        padding: 0 rem( $gutter );
+
+        // The side gutter is published as a custom property because the
+        // absolutely-positioned overlays need it too: their containing block is
+        // this element's PADDING box, so an `inset: 0` overlay spills across the
+        // gutter and hangs off both sides of the video. The blocks that run the
+        // video edge to edge set this to 0 instead of zeroing padding directly.
+        --gvp-inset: #{rem( $gutter )};
+
+        padding: 0 var( --gvp-inset );
+
+        // Nothing in the video area may paint black before playback starts.
+        // Three separate layers can do it, so all three are pinned to the page
+        // colour until the video has actually started:
+        //   .video-js   - video.js sets background-color: #000
+        //   .vjs-tech   - Safari paints a <video> with no decoded frame black
+        //   .vjs-poster - transparent until its image decodes, showing the above
+        // Once playback begins, black is the correct colour for letterboxing.
+        .video-js {
+            background-color: $default-bg-color;
+
+            .vjs-tech,
+            .vjs-poster {
+                background-color: $default-bg-color;
+            }
+
+            &.vjs-has-started {
+                background-color: #000;
+
+                .vjs-tech,
+                .vjs-poster {
+                    background-color: transparent;
+                }
+            }
+        }
         
-        .gvp-program-logo {
+        // Direct child only: .gvp-cover also contains a .gvp-program-logo and
+        // that one is centred on the video, not pinned to the corner.
+        > .gvp-program-logo {
             position: absolute;
             bottom: rem( 10px );
             right: rem( 30px );
@@ -178,27 +259,39 @@ html {
         }
 
         .gvp-duration-badge {
-            position: absolute;
-            top: rem( 16px );
-            left: rem( 36px );
-            padding: rem( 6px ) rem( 12px );
-            background-color: rgba( 0, 0, 0, 0.65 );
-            color: #fff;
-            font-size: rem( 14px );
-            border-radius: rem( 4px );
+
+            @include gvp-badge;
+
             font-variant-numeric: tabular-nums;
             user-select: none;
             z-index: 2;
+
+            // The duration comes from a metadata call that can land well after
+            // the poster, so ease it in instead of letting it pop. The element
+            // is `hidden` until then; JS unhides it and adds .is-visible on the
+            // next frame so there is a starting opacity to animate from.
+            opacity: 0;
+            transition: opacity 300ms ease-in;
+
+            &.is-visible {
+                opacity: 1;
+            }
+
+            @media ( prefers-reduced-motion: reduce ) {
+                transition: none;
+            }
         }
 
         .gvp-author-wrapper {
 
-            position: absolute;
-            top: rem( 16px );
-            left: rem( 16px );
-            padding: rem( 8px );
-            background-color: rgba( 0, 0, 0, 0.50 );
-            z-index: 1;
+            @include gvp-badge;
+
+            // Belt and braces for the JS guard above: with no author the name
+            // is empty, and the padding + background would otherwise render as
+            // a small black square.
+            &:has( .gvp-author-name:empty ) {
+                display: none;
+            }
 
             // A presenter's name is not a section heading. This used to be an
             // <h2> purely for the pill styling, which put a phantom entry in the
@@ -214,12 +307,55 @@ html {
 
         }
 
+        // The author chip and the duration badge share the top-left corner and
+        // are now the same pill, so they sit side by side on one line and only
+        // stack when there genuinely is not room -- a narrow embed, or a long
+        // author name. flex-wrap decides that from the actual measured width
+        // rather than from a guessed breakpoint, and it also means the badge
+        // needs no special case when there is no author: the chip is display:none
+        // and the badge simply becomes the first item in the row.
+        //
+        // `right` reserves the opposite corner for the download pills, and is
+        // what gives the row a width to wrap inside of.
+        .gvp-splash-meta {
+
+            position: absolute;
+            top: rem( 16px );
+            left: calc( var( --gvp-inset ) + #{rem( 16px )} );
+            right: calc( var( --gvp-inset ) + #{rem( 160px )} );
+            z-index: 2;
+
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            gap: rem( 8px );
+
+        }
+
         .gvp-splash-download-wrapper {
 
             position: absolute;
             top: rem( 16px );
-            right: rem( 36px );
-            z-index: 1;
+            right: calc( var( --gvp-inset ) + #{rem( 16px )} );
+            // Above the error panel (z-index 100): if the video fails, the
+            // downloads are the viewer's fallback, so they must stay reachable.
+            z-index: 101;
+
+            // This wrapper is what grows as each download check resolves, so it
+            // is the thing that must stay unpainted until the row is complete --
+            // otherwise it registers a layout shift per pill.
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 300ms ease;
+
+            &.is-visible {
+                visibility: visible;
+                opacity: 1;
+            }
+
+            @media ( prefers-reduced-motion: reduce ) {
+                transition: none;
+            }
 
             .gvp-download-list {
                 display: none;
@@ -249,6 +385,18 @@ html {
 
                 a:hover {
                     background-color: rgba( 0, 0, 0, 0.95 );
+                }
+
+                // These pills are deliberately painted ABOVE the error panel,
+                // so when the video is dead they are the viewer's only working
+                // control. A dark pill on a near-black panel gives the default
+                // UA outline almost nothing to work with, so the ring is
+                // explicit -- and doubled with a dark outer ring so it reads on
+                // the page background too.
+                a:focus-visible {
+                    outline: 2px solid #fff;
+                    outline-offset: 2px;
+                    box-shadow: 0 0 0 4px rgba( 0, 0, 0, 0.85 );
                 }
 
             }
@@ -357,11 +505,7 @@ html {
     
     background-color: #fff;
     
-    .gvp-cover {
-        top: 0;
-        height: 100%;
-    }
-    
+
     .gvp-decoration-bar {
         display: none;
     }
@@ -390,10 +534,19 @@ html {
     
     .gvp-video-wrapper {
         
-        padding: 0;
+        --gvp-inset: 0px;
         
-        .gvp-splash-download-wrapper {
-            top: rem( 30px );
+        // Embedded, the video runs edge to edge (no wrapper padding), so the
+        // corner overlays use the tighter 16px inset -- same treatment the
+        // >=900px standalone block applies when it drops its padding. Both
+        // corners share the same top so they sit on one line.
+        // Both corners now derive their inset from --gvp-inset, which this
+        // block already sets to 0, so they need no overrides here.
+
+        // Match the corner overlays: edge to edge, the watermark tucks in to
+        // 10px like it does in the >=900px standalone block.
+        > .gvp-program-logo {
+            right: rem( 10px );
         }
         
     }
@@ -483,17 +636,11 @@ and (min-device-width : 900px) {
             width: rem( 900px );
             margin-left: auto;
             margin-right: auto;
-            padding: 0;
+            --gvp-inset: 0px;
             
-            .gvp-splash-download-wrapper {
-                right: rem( 16px );
-            }
 
-            .gvp-duration-badge {
-                left: rem( 16px );
-            }
 
-            .gvp-program-logo {
+            > .gvp-program-logo {
                 bottom: rem( 10px );
                 right: rem( 10px );
             }

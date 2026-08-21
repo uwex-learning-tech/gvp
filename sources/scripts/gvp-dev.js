@@ -86,7 +86,19 @@ let xml = {
 };
 
 // an object that holds the state of the player
+// Everything that has to be on screen before the cover clears registers here,
+// so the whole splash -- poster/thumbnail, download buttons, author chip, corner
+// logo -- is revealed in one piece instead of arriving in stages. The duration
+// badge is deliberately NOT part of this: it depends on a separate metadata call
+// and is allowed to fade in late on its own.
+let splashParts = [];
+
+function splashWaitFor( promise ) {
+    splashParts.push( Promise.resolve( promise ).catch( function() {} ) );
+}
+
 let flags = {
+    hasError: false,
     isLocal: false,
     isYouTube: false,
     isKaltura: false,
@@ -831,12 +843,33 @@ function loadVideoJS() {
         
         let self = this;
         
+        // The player is only worth sealing once video.js has built it -- before
+        // that there is nothing focusable to seal. If the cover has already
+        // cleared by now, leave it alone.
+        if ( coverSealed ) {
+            sealRegion( self.el() );
+        }
+
         // if video is from Kaltura, set the video sources
         // mulitple Kaltura flavors
         if ( flags.isKaltura && flags.isLocal === false ) {
             
             self.poster( kaltura.poster + '/width/900/quality/100' );
             self.updateSrc( kaltura.flavors );
+
+            // video.js only sets the poster as a background image; nothing waits
+            // for it to arrive. Without this the cover would clear over an empty
+            // frame and the thumbnail would fade in afterwards, out of step with
+            // the download buttons.
+            splashWaitFor( new Promise( function( resolve ) {
+
+                let probe = new Image();
+
+                probe.onload = resolve;
+                probe.onerror = resolve;
+                probe.src = posterUrl;
+
+            } ) );
             
             // setup the caption if applicable
             if ( kaltura.caption ) {
@@ -947,6 +980,12 @@ function loadVideoJS() {
                 if ( badge && !isNaN( self.duration() ) ) {
                     badge.innerHTML = '<strong>Duration:</strong> ' + formatDuration( self.duration() );
                     badge.hidden = false;
+                    // Unhide first, then flip the class on the next frame so the
+                    // opacity transition actually has two states to animate
+                    // between (you cannot transition out of display:none).
+                    requestAnimationFrame( function() {
+                        badge.classList.add( 'is-visible' );
+                    } );
                 }
             }
 
@@ -1414,37 +1453,124 @@ function setDefaultTitle() {
  * 
  * @function hideCover
  */
-function hideCover() {
-    
-    setTimeout( function() {
-        
-        let cover = document.getElementsByClassName( 'gvp-cover' )[0];
-    
-        if ( cover.style.display !== 'none' ) {
-            
-            cover.style.opacity = 1;
-            
-            let last = +new Date();
-            let tick = function() {
-                
-                cover.style.opacity = +cover.style.opacity - ( new Date() - last ) / 500;
-                last = +new Date();
-                
-                if ( +cover.style.opacity > 0 && +cover.style.opacity <= 1 ) {
-                    (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 500);
-                }
-                
-                if ( +cover.style.opacity <= 0 ) {
-                    cover.style.opacity = 0;
-                    cover.style.display = 'none';
-                }
-                
-            };
-            
-            tick();
+/**
+ * Marks the player as busy and seals off what the cover is hiding.
+ *
+ * @function coverUp
+ */
+function coverUp() {
 
+    let wrapper = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+    if ( wrapper ) {
+        wrapper.setAttribute( 'aria-busy', 'true' );
+    }
+
+    inertedRegions = [];
+    coverSealed = true;
+
+    coveredRegions.forEach( function( selector ) {
+        sealRegion( document.querySelector( selector ) );
+    } );
+
+}
+
+/**
+ * Releases exactly what coverUp() sealed.
+ *
+ * @function releaseCovered
+ */
+function releaseCovered() {
+
+    let els = inertedRegions.slice();
+    let scope = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+    // Belt and braces: if `inert` ever gets copied onto an element we never
+    // touched -- which is exactly how video.js propagates attributes -- a
+    // stranded one would leave the player permanently unclickable. Sweep for the
+    // attribute rather than trusting the list alone.
+    if ( scope ) {
+
+        [].forEach.call( scope.querySelectorAll( '[inert]' ), function( el ) {
+            if ( els.indexOf( el ) === -1 ) {
+                els.push( el );
+            }
+        } );
+
+    }
+
+    els.forEach( function( el ) {
+        el.removeAttribute( 'inert' );
+        el.removeAttribute( 'aria-hidden' );
+    } );
+
+    inertedRegions = [];
+    coverSealed = false;
+
+}
+
+function hideCover() {
+
+    // Hold the cover until the splash behind it is fully composed, so the
+    // download buttons, author chip and corner logo all appear together as it
+    // fades rather than popping in afterwards. Capped so a slow or failed
+    // download check can never strand the viewer on the cover.
+    Promise.race( [
+
+        Promise.allSettled( splashParts ),
+        new Promise( function( resolve ) { setTimeout( resolve, 4000 ); } )
+
+    ] ).then( startCoverFade );
+
+}
+
+/**
+ * Fades the cover out.
+ *
+ * @function startCoverFade
+ */
+function startCoverFade() {
+
+    // The splash is composed; hand the player back to the keyboard and to AT.
+    let wrapper = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+    if ( wrapper ) {
+        wrapper.removeAttribute( 'aria-busy' );
+    }
+
+    if ( !flags.hasError ) {
+        releaseCovered();
+    }
+
+    setTimeout( function() {
+
+        let cover = document.getElementsByClassName( 'gvp-cover' )[0];
+
+        if ( !cover || cover.style.display === 'none' ) {
+            return;
         }
-        
+
+        let settled = false;
+
+        let finish = function() {
+
+            if ( settled ) {
+                return;
+            }
+
+            settled = true;
+            cover.removeEventListener( 'transitionend', finish );
+            cover.style.display = 'none';
+
+        };
+
+        cover.addEventListener( 'transitionend', finish );
+        cover.classList.add( 'is-hidden' );
+
+        // Fallback: if the transition never runs (reduced motion, or the class
+        // was never applied) the cover still has to go away.
+        setTimeout( finish, 600 );
+
     }, 250 );
     
 }
@@ -1766,6 +1892,11 @@ function setDownloadables() {
         }
     };
 
+    // Each non-video entry needs an async fileExist() check, so the pills used
+    // to appear one at a time as the checks resolved. Collect the promises and
+    // reveal the whole row once, so it never renders half-built.
+    let pendingChecks = [];
+
     supportedFiles.forEach( function( file ) {
 
         let fileLabel = file.label;
@@ -1806,7 +1937,7 @@ function setDownloadables() {
 
             let htmlPath = cleanString( fileName ) + '.html';
 
-            fileExist( htmlPath ).then( htmlFound => {
+            pendingChecks.push( fileExist( htmlPath ).then( htmlFound => {
 
                 if ( htmlFound ) {
                     createDownloadLink( htmlPath, fileLabel, true );
@@ -1814,26 +1945,52 @@ function setDownloadables() {
                     return;
                 }
 
-                fileExist( filePath ).then( pdfFound => {
+                return fileExist( filePath ).then( pdfFound => {
                     if ( pdfFound ) {
                         createDownloadLink( filePath, fileLabel );
                         attachTranscriptAnalytics();
                     }
                 } );
 
-            } );
+            } ) );
 
             return;
 
         }
 
-        fileExist( filePath ).then( result => {
+        pendingChecks.push( fileExist( filePath ).then( result => {
             if ( result ) {
                 createDownloadLink( filePath, fileLabel );
             }
-        } );
+        } ) );
 
     } );
+
+    // The pill icons are VideoJS-font glyphs. The face still loads async, so
+    // wait for it before revealing or the glyphs pop in; the reserved 1em box
+    // below means nothing moves either way. Capped so a slow load never holds
+    // the downloads hostage.
+    let fontReady = Promise.race( [
+
+        ( document.fonts && document.fonts.load )
+            ? document.fonts.load( '1em VideoJS' )
+            : Promise.resolve(),
+
+        new Promise( function( resolve ) { setTimeout( resolve, 1500 ); } )
+
+    ] ).catch( function() {} );
+
+    // Reveal the finished row in one go. This also becomes the gate the cover
+    // waits on, so the buttons are already in place when it clears.
+    splashWaitFor( Promise.allSettled( pendingChecks.concat( [ fontReady ] ) ).then( function() {
+
+        let splash = document.getElementsByClassName( 'gvp-splash-download-wrapper' )[0];
+
+        if ( splash ) {
+            splash.classList.add( 'is-visible' );
+        }
+
+    } ) );
     
     // Splash pill buttons render via CSS display:flex on .gvp-splash-downloads;
     // no JS toggling needed here. An empty flex container renders nothing.
@@ -2179,6 +2336,50 @@ function toSeconds( str ) {
 
 function showErrorMsgOnCover( str ) {
     
+/**
+ * Everything the loading cover is painted over. The cover itself and the error
+ * surfaces are deliberately excluded.
+ */
+// Deliberately NOT the <video> element. Sealing that before video.js
+// initialises achieves nothing -- a bare <video> with no controls attribute is
+// neither focusable nor interactive -- and it actively breaks the player:
+// video.js copies every attribute off the tag it takes over onto the wrapper it
+// builds, so `inert` was being duplicated onto the whole player. The player is
+// sealed separately, by reference, once it exists.
+const coveredRegions = [ '.gvp-splash-meta', '.gvp-splash-download-wrapper' ];
+
+/**
+ * The elements coverUp() actually sealed, so they can be released by reference.
+ *
+ * Selectors are not safe to re-resolve: video.js renames the element it takes
+ * over (`#gvp-video` becomes `#gvp-video_html5_api`, and the wrapper inherits
+ * the id), so between sealing and releasing a selector can come to mean a
+ * different element.
+ */
+let inertedRegions = [];
+
+/** Whether the loading cover is still up, and so still sealing the player. */
+let coverSealed = false;
+
+/**
+ * Takes one element out of the tab order and the accessibility tree, and
+ * remembers it so it can be released again.
+ *
+ * @function sealRegion
+ * @param {Element} el
+ */
+function sealRegion( el ) {
+
+    if ( !el || inertedRegions.indexOf( el ) !== -1 ) {
+        return;
+    }
+
+    el.setAttribute( 'inert', '' );
+    el.setAttribute( 'aria-hidden', 'true' );
+    inertedRegions.push( el );
+
+}
+
     let msg = document.getElementsByClassName( 'gvp-error-msg' )[0];
     
     msg.innerHTML = str;
