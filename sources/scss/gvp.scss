@@ -422,15 +422,36 @@ html {
                 justify-content: flex-end;
                 gap: rem( 8px );
 
+
+
                 a {
                     display: inline-flex;
                     align-items: center;
                     gap: rem( 6px );
-                    padding: rem( 6px ) rem( 12px );
-                    background-color: rgba( 0, 0, 0, 0.65 );
-                    color: #fff;
-                    font-size: rem( 14px );
-                    border-radius: rem( 4px );
+
+                    @include gvp-badge;
+
+                    // Icons come from the VideoJS font we already ship, not from
+                    // a third-party CDN. The box is reserved up front so a late
+                    // face cannot widen the pills.
+                    .gvp-icon {
+                        flex: 0 0 auto;
+                        display: inline-block;
+                        width: 1em;
+                        text-align: center;
+                        font-family: VideoJS;
+                        font-weight: normal;
+                        font-style: normal;
+                        line-height: 1;
+
+                        &::before {
+                            content: '\f110';   // file-download
+                        }
+
+                        &.gvp-icon-transcript::before {
+                            content: '\f10e';   // chapters
+                        }
+                    }
                     text-decoration: none;
                     cursor: pointer;
                     user-select: none;
@@ -493,27 +514,40 @@ html {
     }
 
     .video-js .vjs-downloads-button + .vjs-menu .vjs-menu-item::before {
-        content: '\f019';
-        font-family: 'FontAwesome';
+        content: '\f110';          // VideoJS file-download
+        font-family: VideoJS;
     }
 
     .video-js .vjs-captions-menu-item .vjs-menu-item-text .vjs-icon-placeholder {
         display: none;
     }
 
-    // The captions menu has a bold "Captions Settings" title that doesn't fit
-    // in video.js's default 10em menu width and gets clipped by the menu-content
-    // overflow:hidden. Widen just this menu and recenter it on the 4em button.
-    .video-js .vjs-subs-caps-button + .vjs-menu {
-        width: 13em;
-        left: -4.5em;
-    }
-
     // Zero out the video.js default `margin-bottom: 1.5em` on .vjs-menu so the
     // menu's box bottom sits flush with the bottom of the button; the calc()
     // offsets below are then measured from the button bottom directly.
     .video-js .vjs-menu-button-popup .vjs-menu {
+
         margin-bottom: 0;
+
+        // video.js positions this box with `width: 10em; left: -3em`, numbers
+        // calibrated so that a 10em menu centred on a 4em button lands at
+        // -3 + 5 = 2em, the old button's centre. Narrowing the buttons to
+        // 2.833em moved their centre to 1.42em and left every menu -- and the
+        // pointer triangle, which is drawn on this same box -- sitting ~7px to
+        // the right of the control that opened it.
+        //
+        // Rather than re-deriving an offset that breaks again the next time the
+        // button width changes, span the button exactly. 50% of this box is then
+        // the button's centre by definition, which is what both the menu content
+        // and the triangle already position against.
+        //
+        // This also supersedes the old captions-menu offset: the content sizes
+        // itself now (width: max-content, max-width: 22em), so no menu needs a
+        // hand-tuned width or left value any more.
+        left: 0;
+        right: 0;
+        width: auto;
+
     }
 
     // Lift the menu above the control bar (3em tall) so it doesn't occlude
@@ -772,8 +806,8 @@ and (min-device-width : 900px) {
             cursor: pointer;
 
             .vjs-icon-placeholder:before {
-                font-family: "FontAwesome";
-                content: "\f019";
+                font-family: VideoJS;
+                content: "\f110";          // file-download
                 font-size: 1.5em;
                 line-height: 2;
                 position: relative;

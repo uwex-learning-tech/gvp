@@ -2047,7 +2047,7 @@ function createDownloadLink( path, label, inline = false ) {
 
     let downloads = document.getElementsByClassName( 'gvp-download-list' )[0];
     let splashDownloads = document.getElementsByClassName( 'gvp-splash-downloads' )[0];
-    let icon = inline ? 'fa-file-text-o' : 'fa-download';
+    let icon = inline ? 'gvp-icon-transcript' : 'gvp-icon-download';
 
     // Hidden data-store link (plain text label; read by the control-bar download menu)
     let link = document.createElement( 'a' );
@@ -2064,7 +2064,7 @@ function createDownloadLink( path, label, inline = false ) {
     // so Kaltura/analytics handlers attached to the data-store link still fire.
     let splashLink = document.createElement( 'a' );
     splashLink.href = path;
-    splashLink.innerHTML = '<span class="fa ' + icon + '"></span> ' + label;
+    splashLink.innerHTML = '<span class="gvp-icon ' + icon + '" aria-hidden="true"></span> ' + label;
     if ( !inline ) {
         splashLink.download = path;
     }
