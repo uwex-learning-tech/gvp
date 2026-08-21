@@ -69,7 +69,9 @@ const GVP_VERSION = typeof __GVP_VERSION__ !== 'undefined' ? __GVP_VERSION__ : '
 // an object to hold the kaltura library
 let kaltura = {
     lib: null,
-    widget: null
+    widget: null,
+    // how long to wait for the Kaltura API before showing an error
+    apiTimeout: 20000
 };
 
 // an object to hold data from the XML
@@ -137,7 +139,14 @@ function initGVP() {
     loadGoogleAnalytics();
 
     // set the URL to the manifest JSON file
-    let manifestURL = document.getElementById( 'gvp-manifest' ).href;
+    let manifestLink = document.getElementById( 'gvp-manifest' );
+
+    if ( !manifestLink ) {
+        reportError( 'GVP-102' );
+        return;
+    }
+
+    let manifestURL = manifestLink.href;
     
     // parse directories from the URL
     reference.names = reference.names.split( '?' );
@@ -157,6 +166,14 @@ function initGVP() {
     // get the data from the manifest file
     getFile( manifestURL, true ).then( result => {
         
+        // getFile() resolves to undefined on a 404 or a network failure. This
+        // used to walk straight into `manifest.gvp_root_directory` and throw
+        // inside the promise, so the page just sat on its cover in silence.
+        if ( !result ) {
+            reportError( 'GVP-101', { source: manifestURL } );
+            return;
+        }
+
         // set JSON data to the manifest object
         manifest = result;
 
@@ -196,6 +213,8 @@ function initGVP() {
         // call to setup the program theme
         setProgram();
         
+    } ).catch( e => {
+        reportError( 'GVP-105', { stage: 'manifest', source: manifestURL, native: e && e.message } );
     } );
     
 }
@@ -262,6 +281,13 @@ function setProgram() {
         
         // get the program theme data
         getFile( manifest.gvp_program_themes, true ).then( results => {
+
+            // A missing theme file is survivable -- the player falls back to
+            // the default logo and colours -- so this warns rather than
+            // stopping, but it no longer disappears entirely.
+            if ( results == undefined ) {
+                console.warn( 'GVP: program themes could not be downloaded from ' + manifest.gvp_program_themes + '; falling back to the default theme.' );
+            }
             
             if ( results != undefined ) {
                 
@@ -288,8 +314,17 @@ function setProgram() {
             // call to setup the player template
             setGvpTemplate();
             
+        } ).catch( e => {
+            reportError( 'GVP-105', { stage: 'program theme', source: manifest.gvp_program_themes, native: e && e.message } );
         } );
-        
+
+    // Without a theme source nothing downstream ever runs: setGvpTemplate() is
+    // only reached from inside the branch above, so the player would hang on
+    // its cover with no explanation at all.
+    } else {
+
+        reportError( 'GVP-103' );
+
     }
     
 }
@@ -304,13 +339,35 @@ function setGvpTemplate() {
     // get the template file
     getFile( gvp.template ).then( result => {
         
-        if ( result ) {
+        // Nothing used to happen here on failure -- no markup, no player, no
+        // message. reportError() builds its own panel for exactly this case,
+        // since the panel it normally uses lives in the template that just
+        // failed to arrive.
+        if ( !result ) {
+            reportError( 'GVP-104', { source: gvp.template } );
+            return;
+        }
+
+        {
             
             // get the DOM element to hold the HTML template
             let gvpWrapper = document.getElementById( 'gvp-wrapper' );
             
             // set the HTML template to the DOM
             gvpWrapper.innerHTML = result;
+
+            // The cover is opaque from this moment, so seal off what it hides.
+            coverUp();
+
+            // The cover itself is opaque immediately; only the placeholder logo
+            // eases in, so the player behind can never show through early.
+            let coverLogo = gvpWrapper.querySelector( '.gvp-cover .gvp-program-logo' );
+
+            if ( coverLogo ) {
+                requestAnimationFrame( function() {
+                    coverLogo.classList.add( 'is-visible' );
+                } );
+            }
             
             // if it is not embeded in an iFrame
             if ( !flags.isIframe ) {
@@ -365,6 +422,8 @@ function setGvpTemplate() {
             
         }
         
+    } ).catch( e => {
+        reportError( 'GVP-105', { stage: 'template', source: gvp.template, native: e && e.message } );
     } );
     
 }
@@ -465,6 +524,24 @@ function getVideoSource() {
             let xmlParser = new DOMParser();
             
             xml.doc = xmlParser.parseFromString( result, 'text/xml' );
+
+            // DOMParser reports a malformed document by handing back a
+            // <parsererror> tree rather than throwing. Left unchecked, every
+            // tag lookup below quietly misses and the player falls through to
+            // playing video.mp4 -- so a broken description file used to surface
+            // as a playback error about a file nobody meant to play.
+            let parseError = xml.doc.querySelector( 'parsererror' );
+
+            if ( parseError ) {
+
+                reportError( 'GVP-201', {
+                    source: xml.file,
+                    native: parseError.textContent.trim().split( '\n' )[0]
+                } );
+
+                return;
+
+            }
 
             // check for caption language setting
             xml.captionLanguageTag = xml.doc.getElementsByTagName( 'captionLanguage' )[0];
@@ -629,6 +706,8 @@ function getVideoSource() {
         // call to setup the video player functionality
         setVideoJs();
 
+    } ).catch( e => {
+        reportError( 'GVP-105', { stage: 'video source', source: xml.file, native: e && e.message } );
     } );
     
 }
@@ -675,8 +754,12 @@ function loadYouTubeTech() {
  */
 function getKalturaLibrary() {
 
-    getScript( kaltura.lib, false, false );
-    getScript( kaltura.widget, false, loadKalturaSource );
+    let onLibraryError = function( file ) {
+        reportError( 'GVP-301', { source: file } );
+    };
+
+    getScript( kaltura.lib, false, false, onLibraryError );
+    getScript( kaltura.widget, false, loadKalturaSource, onLibraryError );
 
 }
 
@@ -686,8 +769,47 @@ function getKalturaLibrary() {
  * @function loadKalturaSource
  */
 function loadKalturaSource() {
-    
-    if ( kWidget ) {
+
+    // kWidget and kWidget.getSources are published by kwidget.getsources.js --
+    // the very script whose onload calls this function -- so testing for them
+    // alone could never fail. The dependency that actually goes missing is
+    // kWidget.api, which comes from mwembedloader.js and is called on the first
+    // line of getSources(); without it that call throws synchronously inside a
+    // script onload where nothing catches it, and the viewer waits out the full
+    // 20s timeout for a misleading "Kaltura did not respond" instead.
+    if ( typeof kWidget === 'undefined'
+         || typeof kWidget.api !== 'function'
+         || typeof kWidget.getSources !== 'function' ) {
+        reportError( 'GVP-302' );
+        return;
+    }
+
+    // kWidget.getSources() simply never calls back if the Kaltura API cannot be
+    // reached, which used to leave the player sitting on its cover forever with
+    // no message. Fail loudly instead.
+    // Validated before the timer is armed: this used to throw on the way into
+    // getSources(), leaving the already-running timer to report "Kaltura did not
+    // respond within 20 seconds" for what is really a configuration error.
+    if ( !manifest.gvp_kaltura || !manifest.gvp_kaltura.id ) {
+        reportError( 'GVP-106', { entry: gvp.source } );
+        return;
+    }
+
+    let settled = false;
+    let apiTimeout = kaltura.apiTimeout;
+
+    let apiTimer = setTimeout( function() {
+
+        if ( settled ) {
+            return;
+        }
+
+        settled = true;
+        reportError( 'GVP-303', { seconds: apiTimeout / 1000, entry: gvp.source } );
+
+    }, apiTimeout );
+
+    {
 
         // get the video source base on the provided
         // configrations
@@ -697,10 +819,33 @@ function loadKalturaSource() {
             'entryId': gvp.source,
             'callback': function( data ) {
 
+                if ( settled ) {
+                    return;
+                }
+
+                settled = true;
+                clearTimeout( apiTimer );
+
                 kaltura = data;
 
-                if ( kaltura.sources.length === 0 ) {
-                    showErrorMsgOnCover( 'Kaltura video Id (' + gvp.source + ') not found.' );
+                // An API exception is not the same thing as an entry with no
+                // media: the entry may exist and simply be restricted, or the
+                // ID may be wrong. Telling a viewer a restricted video "could
+                // not be found" sends whoever fields the report the wrong way.
+                if ( kaltura.apiError ) {
+
+                    reportError( 'GVP-304', {
+                        entry: gvp.source,
+                        apiCode: kaltura.apiError.code,
+                        native: kaltura.apiError.message
+                    } );
+
+                    return;
+
+                }
+
+                if ( !kaltura.sources || kaltura.sources.length === 0 ) {
+                    reportError( 'GVP-305', { entry: gvp.source } );
                     return;
                 }
 
@@ -710,7 +855,7 @@ function loadKalturaSource() {
                 kaltura.flavors = selectKalturaFlavors( kaltura.sources, manifest.gvp_kaltura );
 
                 if ( kaltura.flavors.length === 0 ) {
-                    showErrorMsgOnCover( 'No playable video found for Kaltura video Id (' + gvp.source + ').' );
+                    reportError( 'GVP-306', { entry: gvp.source } );
                     return;
                 }
 
@@ -1261,28 +1406,96 @@ function loadVideoJS() {
         // on encountering error
         self.on( 'error', function() {
             
-            let msg = 'Please double check the file name.<br>Expecting: ' + self.currentSrc() + '<br><br>';
-            showErrorMsgOnCover( msg + self.error_.message  );
+            let err = self.error();
+
+            // The four MEDIA_ERR_* codes the browser raises mean genuinely
+            // different things -- cancelled, connection lost, undecodable,
+            // refused outright -- and collapsing them into one sentence threw
+            // away the only signal that says whether to retry, to reload, or to
+            // report the video as broken.
+            let byMediaError = {
+                1: 'GVP-601',
+                2: 'GVP-602',
+                3: 'GVP-603',
+                4: 'GVP-604'
+            };
+
+            let code = byMediaError[ err && err.code ] || 'GVP-605';
+
+            let context = {
+                source: self.currentSrc() || gvp.source || 'unknown',
+                native: ( err && err.message ) ? err.message : ''
+            };
+
+            // A browser refuses a 404 and an unplayable codec in exactly the
+            // same way, so for a local file the far more likely cause -- the
+            // file simply is not there -- is worth one HEAD request to confirm
+            // before blaming the format.
+            if ( code === 'GVP-604' && flags.isLocal ) {
+
+                let file = gvp.source + '.mp4';
+
+                // Only a definite 404 earns the "not on the server" claim; a
+                // host that refuses HEAD would otherwise send triage looking for
+                // a missing file that is sitting right there.
+                fileStatus( file ).then( function( status ) {
+
+                    if ( status === 'missing' ) {
+                        reportError( 'GVP-501', { file: file, source: context.source } );
+                    } else {
+                        context.file = file;
+                        reportError( 'GVP-604', context );
+                    }
+
+                } );
+
+                return;
+
+            }
+
+            reportError( code, context );
             
         } );
         
-        // add forward and backward seconds button if video is longer than 1 minutes
-        addForwardButton( self );
-        addBackwardButton( self );
-        
-        // add download button if it is not indside
-        addDownloadFilesButton( self );
-        
-        // add markers if any
-        setupMarkers( gvp.player );
-        
-        // if youtube, hide cover on ready and reset markers
-        if ( flags.isYouTube ) {
-            
-            self.on( 'play', function() {
-                gvp.player.markers.reset(xml.markersCollection);
-            } );
-            
+        // Everything from here to hideCover() is decoration -- extra buttons
+        // and chapter markers -- but the cover is opaque, so a throw in any of
+        // it used to leave the viewer staring at a blank cover forever. The
+        // markers plugin in particular is only present once webpack has
+        // concatenated it, so serving straight from sources/ threw here. None
+        // of it is worth the whole player.
+        try {
+
+            // add forward and backward seconds button if video is longer than 1 minutes
+            addForwardButton( self );
+            addBackwardButton( self );
+
+            // add download button if it is not indside
+            addDownloadFilesButton( self );
+
+            // add markers if any -- the dots on the progress bar, plus the
+            // chapters menu that makes them reachable without a mouse
+            setupMarkers( gvp.player );
+            setupChapters( gvp.player );
+            clampMenus( gvp.player );
+            enableButtonTabbing( gvp.player );
+
+            // if youtube, hide cover on ready and reset markers
+            if ( flags.isYouTube ) {
+
+                self.on( 'play', function() {
+
+                    if ( gvp.player.markers ) {
+                        gvp.player.markers.reset( xml.markersCollection );
+                    }
+
+                } );
+
+            }
+
+        } catch ( e ) {
+
+            console.error( 'GVP: player decoration failed, continuing without it: ' + ( e && e.message ) );
+
         }
         
         // hide the program theme cover
@@ -2398,7 +2611,7 @@ function author( data ) {
 
 /****** HELPER FUNCTIONS ******/
 
-function getScript( file, isAsync = true, callback = false ) {
+function getScript( file, isAsync = true, callback = false, errorCallback = false ) {
 
     let script = document.createElement( 'script' );
     let head = document.getElementsByTagName( 'head' )[0];
@@ -2410,7 +2623,13 @@ function getScript( file, isAsync = true, callback = false ) {
     }
 
     script.onerror = function() {
+
         console.warn( 'Failed to load ' + file );
+
+        if ( errorCallback ) {
+            errorCallback( file );
+        }
+
     };
 
     script.src = file;
@@ -2419,25 +2638,48 @@ function getScript( file, isAsync = true, callback = false ) {
 }
 
 async function fileExist( file ) {
-    
-    let options = {
-        method: 'HEAD'
-    };
-    
+
+    return ( await fileStatus( file ) ) === 'found';
+
+}
+
+/**
+ * HEADs a file and classifies the answer.
+ *
+ * fileExist() collapses everything that is not a 200 into false, which is fine
+ * for deciding whether to offer a download but not for telling a viewer their
+ * video "is not on the server": plenty of hosts answer HEAD with 405 or 403 for
+ * a file that is perfectly present. Callers that are about to make a claim
+ * about the file need to know the difference.
+ *
+ * @function fileStatus
+ * @param {String} file
+ * @return {Promise<String>} 'found', 'missing', or 'unknown'
+ */
+async function fileStatus( file ) {
+
     try {
-        
-        let response = await fetch( file, options );
-        
+
+        let response = await fetch( file, { method: 'HEAD' } );
+
         if ( response.ok ) {
-            return true;
+            return 'found';
         }
-        
-        return false;
-        
+
+        // 404/410 are the only answers that actually mean "not there"
+        if ( response.status === 404 || response.status === 410 ) {
+            return 'missing';
+        }
+
+        return 'unknown';
+
     } catch ( e ) {
-        return false;
+
+        // network failure, CORS, offline -- says nothing about the file
+        return 'unknown';
+
     }
-    
+
 }
 
 async function getFile( file, isJson = false ) {
@@ -2592,8 +2834,436 @@ function toSeconds( str ) {
     
 }
 
-function showErrorMsgOnCover( str ) {
-    
+/**
+ * Every user-facing failure the player can report, one entry per distinct
+ * cause.
+ *
+ * The codes are the point. The on-screen prose has to stay short and free of
+ * Kaltura/video.js vocabulary, which means several very different failures
+ * used to read identically ("This video could not be played") and a viewer
+ * report was worthless for triage. The code narrows it to one line of source,
+ * and the console line beside it carries the technical detail the panel omits.
+ *
+ * Ranges: 1xx bootstrap, 2xx source XML, 3xx Kaltura, 4xx YouTube,
+ * 5xx local files, 6xx playback.
+ *
+ * `detail` may be a function when the message needs values that are only known
+ * at the point of failure; it receives the context object passed to
+ * reportError().
+ */
+const gvpErrors = {
+
+    // 1xx -- the player's own configuration, theme and markup
+    'GVP-101': {
+        title: 'The video player could not start.',
+        detail: 'Its configuration file could not be downloaded. Check your connection and reload the page.'
+    },
+    'GVP-102': {
+        title: 'The video player could not start.',
+        detail: 'The page is missing its player configuration link.'
+    },
+    'GVP-103': {
+        title: 'The video player is not set up correctly.',
+        detail: 'No program theme source is named in the player configuration.'
+    },
+    'GVP-104': {
+        title: 'The video player could not start.',
+        detail: 'Its layout file could not be downloaded. Check your connection and reload the page.'
+    },
+    'GVP-106': {
+        title: 'The video player is not set up correctly.',
+        detail: 'No Kaltura account is named in the player configuration.'
+    },
+    'GVP-105': {
+        title: 'The video player could not start.',
+        detail: c => 'It stopped unexpectedly while loading' + ( c.stage ? ' (' + c.stage + ')' : '' ) + '. Please reload the page.'
+    },
+
+    // 2xx -- the XML file that names which video to play
+    'GVP-201': {
+        title: 'This video is not configured correctly.',
+        detail: 'The `gvp.xml` could not be read properly, so the video it refers to is unknown.'
+    },
+
+    // 3xx -- Kaltura, the source for the overwhelming majority of videos
+    'GVP-301': {
+        title: 'The video player could not load.',
+        detail: 'A required Kaltura library failed to download. Check your connection and reload the page.'
+    },
+    'GVP-302': {
+        title: 'The video player could not load.',
+        detail: 'The Kaltura player library is unavailable. Please reload the page.'
+    },
+    'GVP-303': {
+        title: 'This video is taking too long to load.',
+        detail: c => 'Kaltura did not respond within ' + c.seconds + ' seconds. Check your connection and reload the page.'
+    },
+    'GVP-304': {
+        title: 'This video could not be loaded.',
+        detail: c => 'Kaltura rejected the request for video ID ' + literal( c.entry ) + ( c.apiCode ? ' (' + literal( c.apiCode ) + ')' : '' ) + '.'
+    },
+    'GVP-305': {
+        title: 'This video could not be found.',
+        detail: c => 'Kaltura video ID ' + literal( c.entry ) + ' returned no media. It may have been deleted, or it may not be published yet.'
+    },
+    'GVP-306': {
+        title: 'This video could not be played.',
+        detail: c => 'Kaltura video ID ' + literal( c.entry ) + ' has no quality level this player is allowed to offer.'
+    },
+
+    // 4xx -- YouTube
+    'GVP-401': {
+        title: 'This video could not be played.',
+        detail: 'The YouTube playback component failed to load. Check your connection and reload the page.'
+    },
+
+    // 5xx -- files served alongside the player
+    'GVP-501': {
+        title: 'This video could not be found.',
+        detail: c => 'The file ' + literal( c.file ) + ' is not on the server.'
+    },
+
+    // 6xx -- playback itself, mapped from the HTML5 media element error codes.
+    // These four used to collapse into one message, which threw away the only
+    // signal that says whether to retry, reload, or report the video as broken.
+    'GVP-601': {
+        // Usually self-inflicted -- the viewer navigated away mid-load and came
+        // back -- so this one is a passing notice rather than a panel. Blacking
+        // out a video that is still perfectly playable would be worse than the
+        // generic message it replaces.
+        notice: true,
+        title: 'Playback was stopped.',
+        detail: 'Loading was cancelled before the video could start. Press play to try again.'
+    },
+    'GVP-602': {
+        showSource: true,
+        title: 'This video stopped loading.',
+        detail: 'The connection to the video was lost. Check your connection and reload the page.'
+    },
+    'GVP-603': {
+        showSource: true,
+        title: 'This video could not be played.',
+        detail: 'The video data is damaged, or this browser cannot decode it. Try a different browser.'
+    },
+    'GVP-604': {
+        showSource: true,
+        title: 'This video could not be played.',
+        // The "missing file" half of this used to be a hedge, because a
+        // browser refuses a 404 and a bad codec identically. GVP-501 now
+        // answers that question with a HEAD request before this fires, so by
+        // the time a local file reaches here the file is known to exist and
+        // the format is the only remaining explanation.
+        detail: c => {
+
+            if ( !flags.isLocal ) {
+                return 'This browser cannot play the format that was returned. Try a different browser.';
+            }
+
+            return c.file
+                ? 'This browser cannot play the file ' + literal( c.file ) + '. Try a different browser.'
+                : 'This browser cannot play this video file. Try a different browser.';
+
+        }
+    },
+    'GVP-605': {
+        showSource: true,
+        title: 'This video could not be played.',
+        detail: 'An unexpected playback error occurred. Please reload the page.'
+    }
+
+};
+
+/**
+ * Single entry point for reporting a failure: shows the panel and writes the
+ * full technical line to the console.
+ *
+ * @function reportError
+ * @param {String} code - a key of gvpErrors
+ * @param {Object} [context] - values for the message, plus optional `source`
+ *                             (shown on the panel) and `native`/`stage`
+ *                             (console only)
+ */
+/**
+ * Wraps a value as a monospaced run for appendErrorText().
+ *
+ * Backticks are the delimiter, so a value that contains one would flip the
+ * parity of every delimiter after it and swallow the rest of the sentence into
+ * the chip. Entry IDs, file names and Kaltura error codes all come from
+ * outside, so none of them can be trusted to be backtick-free.
+ *
+ * @function literal
+ * @param {String} value
+ * @return {String}
+ */
+function literal( value ) {
+    return '`' + String( value ).replace( /`/g, "'" ) + '`';
+}
+
+function reportError( code, context ) {
+
+    context = context || {};
+
+    let entry = gvpErrors[ code ];
+
+    if ( !entry ) {
+        entry = gvpErrors['GVP-605'];
+        code = 'GVP-605';
+    }
+
+    // One fault, one report. Several codes can be raised by a single
+    // underlying failure -- both Kaltura libraries share an error callback, and
+    // video.js re-fires `error` on every player.src() -- and without this the
+    // panel is rebuilt and a duplicate analytics event pushed each time,
+    // inflating the counts for precisely the errors that happen most.
+    if ( flags.hasError ) {
+        console.error( 'GVP ' + code + ': suppressed, a fatal error is already on screen' );
+        return;
+    }
+
+    let detail = typeof entry.detail === 'function' ? entry.detail( context ) : entry.detail;
+
+    // The source URL is long, wraps badly and means nothing to most viewers, so
+    // it is shown only for playback failures -- the one case where knowing
+    // which flavour or file broke is worth the clutter. It always reaches the
+    // console regardless.
+    let panelSource = entry.showSource ? context.source : null;
+
+    // Never say the same thing twice. When the message already names the file
+    // -- a local video, where the source is just that file name again -- the
+    // Source line underneath adds a second copy of the same string and nothing
+    // else. Kaltura and YouTube are unaffected: there the message talks about
+    // the format and the source is a long CDN URL that genuinely is new
+    // information.
+    if ( panelSource
+         && ( panelSource === detail
+              || detail.indexOf( panelSource ) !== -1
+              || ( context.file && detail.indexOf( context.file ) !== -1 ) ) ) {
+
+        panelSource = null;
+
+    }
+
+    if ( entry.notice ) {
+        showErrorNotice( entry.title, detail );
+    } else {
+        showErrorMsgOnCover( entry.title, detail, panelSource, code );
+    }
+
+    sendErrorToAnalytics( code );
+
+    // Everything the panel deliberately leaves out lands here instead.
+    console.error( 'GVP ' + code + ': ' + entry.title + ' — ' + detail
+        + ( context.source ? ' [source: ' + context.source + ']' : '' )
+        + ( context.stage ? ' [stage: ' + context.stage + ']' : '' )
+        + ( context.native ? ' [native: ' + context.native + ']' : '' ) );
+
+}
+
+/**
+ * Reports a failure to Google Tag Manager.
+ *
+ * Which errors actually reach viewers, and how often, is otherwise invisible --
+ * the console line only exists on the one machine that hit it. The code and the
+ * video ID together are enough to tell a broken entry from a broken network.
+ *
+ * @function sendErrorToAnalytics
+ * @param {String} code - the GVP error code
+ */
+function sendErrorToAnalytics( code ) {
+
+    window.dataLayer = window.dataLayer || [];
+
+    window.dataLayer.push( {
+        'event': 'gvpError',
+        'pagePath': window.location.pathname,
+        'gvpErrorCode': code,
+        'gvpVideoId': gvp.source || ''
+    } );
+
+}
+
+/**
+ * Appends text to an element, rendering `backtick` runs as monospaced code.
+ *
+ * Written as nodes rather than innerHTML so a file name that arrives from XML
+ * or from a Kaltura response can never inject markup into the panel.
+ *
+ * @function appendErrorText
+ * @param {Element} el - element to append to
+ * @param {String} text - message text, optionally containing `marked` runs
+ */
+function appendErrorText( el, text ) {
+
+    String( text ).split( '`' ).forEach( function( part, i ) {
+
+        if ( part === '' ) {
+            return;
+        }
+
+        // odd-numbered segments are the ones that sat between backticks
+        if ( i % 2 === 1 ) {
+
+            let mono = document.createElement( 'code' );
+            mono.className = 'gvp-error-msg-mono';
+            mono.textContent = part;
+            el.appendChild( mono );
+
+        } else {
+
+            el.appendChild( document.createTextNode( part ) );
+
+        }
+
+    } );
+
+}
+
+/**
+ * A passing, non-blocking message across the top of the video.
+ *
+ * Used for failures the viewer can recover from without reloading, where the
+ * full panel would hide a video that still works.
+ *
+ * @function showErrorNotice
+ * @param {String} title
+ * @param {String} detail
+ */
+let noticeState = {
+    node: null,
+    timer: null,
+    onPlay: null
+};
+
+/**
+ * Tears down whatever notice is on screen, cancelling its timer and releasing
+ * its play handler.
+ *
+ * Without this a replaced notice left its 8s timer and its one('play')
+ * registration alive, so a repeated abort -- an autoplay-blocked retry loop,
+ * say -- accumulated one orphaned handler per event, each firing dismiss()
+ * against a node that had already been detached.
+ *
+ * @function dismissErrorNotice
+ */
+function dismissErrorNotice( fade ) {
+
+    clearTimeout( noticeState.timer );
+
+    if ( noticeState.onPlay && gvp.player ) {
+        gvp.player.off( 'play', noticeState.onPlay );
+    }
+
+    let node = noticeState.node;
+
+    noticeState.timer = null;
+    noticeState.onPlay = null;
+    noticeState.node = null;
+
+    if ( !node ) {
+        return;
+    }
+
+    if ( !fade ) {
+
+        if ( node.parentNode ) {
+            node.parentNode.removeChild( node );
+        }
+
+        return;
+
+    }
+
+    node.classList.remove( 'is-visible' );
+
+    setTimeout( function() {
+        if ( node.parentNode ) {
+            node.parentNode.removeChild( node );
+        }
+    }, 400 );
+
+}
+
+function showErrorNotice( title, detail ) {
+
+    let wrapper = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+
+    if ( !wrapper ) {
+        return;
+    }
+
+    // The cover is opaque and sits above this, and unlike the fatal panel a
+    // notice has no business tearing it down -- the player behind it is not
+    // ready to be looked at yet. An abort during load is harmless anyway, so
+    // rather than sliding an invisible message in behind the cover and quietly
+    // removing it 8s later, say nothing on screen and leave it to the console.
+    let cover = document.getElementsByClassName( 'gvp-cover' )[0];
+
+    if ( cover && cover.style.display !== 'none' && !cover.classList.contains( 'is-hidden' ) ) {
+        return;
+    }
+
+    dismissErrorNotice( false );
+
+    let notice = document.createElement( 'div' );
+    notice.className = 'gvp-error-notice';
+    notice.setAttribute( 'role', 'status' );
+
+    // Inserted empty and filled afterwards: a live region that already carries
+    // its content when it enters the document does not announce.
+    wrapper.appendChild( notice );
+
+    let titleEl = document.createElement( 'span' );
+    titleEl.className = 'gvp-error-notice-title';
+    appendErrorText( titleEl, title );
+    notice.appendChild( titleEl );
+
+    if ( detail ) {
+        let detailEl = document.createElement( 'span' );
+        detailEl.className = 'gvp-error-notice-detail';
+        appendErrorText( detailEl, detail );
+        notice.appendChild( detailEl );
+    }
+
+    requestAnimationFrame( function() {
+        notice.classList.add( 'is-visible' );
+    } );
+
+    noticeState.node = notice;
+
+    // whichever comes first: the viewer resolves it by pressing play, or it
+    // simply times out
+    noticeState.timer = setTimeout( function() {
+        dismissErrorNotice( true );
+    }, 8000 );
+
+    if ( gvp.player ) {
+
+        noticeState.onPlay = function() {
+            dismissErrorNotice( true );
+        };
+
+        gvp.player.one( 'play', noticeState.onPlay );
+
+    }
+
+}
+
+/**
+ * Takes a region out of the tab order AND out of the accessibility tree, or
+ * puts it back.
+ *
+ * The player has two opaque overlays -- the loading cover and the error panel --
+ * and until now neither did anything but paint over the player. Everything
+ * underneath stayed focusable and readable, so a keyboard user could tab to the
+ * big play button and start a video while the cover still said "loading", and a
+ * screen reader user could wander the controls of a video that had already
+ * failed. `inert` is the one attribute that closes both holes at once;
+ * aria-hidden is set alongside it for older engines that ignore `inert`.
+ *
+ * @function setRegionInert
+ * @param {String} selector - within .gvp-video-wrapper
+ * @param {Boolean} isInert
+ */
 /**
  * Says something to assistive tech without putting it on screen.
  *
@@ -2629,6 +3299,24 @@ function announce( message ) {
     setTimeout( function() {
         region.textContent = message;
     }, 100 );
+
+}
+
+function setRegionInert( selector, isInert ) {
+
+    let el = document.querySelector( selector );
+
+    if ( !el ) {
+        return;
+    }
+
+    if ( isInert ) {
+        el.setAttribute( 'inert', '' );
+        el.setAttribute( 'aria-hidden', 'true' );
+    } else {
+        el.removeAttribute( 'inert' );
+        el.removeAttribute( 'aria-hidden' );
+    }
 
 }
 
@@ -2676,9 +3364,128 @@ function sealRegion( el ) {
 
 }
 
+function showErrorMsgOnCover( title, detail, source, code ) {
+
+    // In native fullscreen only the fullscreen element and its descendants are
+    // rendered. The panel is a SIBLING of the player element, so in fullscreen
+    // it cannot paint at any z-index -- and because video.js's own error modal
+    // is suppressed in favour of this one, a failure during playback (the 6xx
+    // codes, exactly the ones that strike mid-playback) would leave the viewer
+    // staring at a frozen black screen with nothing to explain it. Drop out of
+    // fullscreen so the message is reachable.
+    if ( gvp.player
+         && typeof gvp.player.isFullscreen === 'function'
+         && gvp.player.isFullscreen() ) {
+
+        try {
+            gvp.player.exitFullscreen();
+        } catch ( e ) {
+            console.warn( 'GVP: could not exit fullscreen to show an error: ' + e.message );
+        }
+
+    }
+
     let msg = document.getElementsByClassName( 'gvp-error-msg' )[0];
-    
-    msg.innerHTML = str;
-    msg.style.display = 'block';
-    
+
+    // The panel normally comes from gvp.tpl, so a template that failed to
+    // download used to leave the player with no way to say so -- the one case
+    // where a message matters most. Build the element instead of giving up.
+    if ( !msg ) {
+
+        msg = document.createElement( 'div' );
+        msg.className = 'gvp-error-msg gvp-error-msg-bare';
+        msg.setAttribute( 'role', 'alert' );
+
+        // The panel's styles are scoped to .gvp-video-wrapper, which came from
+        // the same template that just failed. Recreate the one element they
+        // hang off rather than duplicating the rules for this case.
+        let host = document.querySelector( '.gvp-video-wrapper' );
+
+        if ( !host ) {
+
+            host = document.createElement( 'div' );
+            host.className = 'gvp-video-wrapper';
+
+            ( document.getElementById( 'gvp-wrapper' ) || document.body ).appendChild( host );
+
+        }
+
+        host.appendChild( msg );
+
+    }
+
+    let inner = document.createElement( 'div' );
+    inner.className = 'gvp-error-msg-inner';
+
+    let titleEl = document.createElement( 'span' );
+    titleEl.className = 'gvp-error-msg-title';
+    appendErrorText( titleEl, title );
+    inner.appendChild( titleEl );
+
+    if ( detail ) {
+        let detailEl = document.createElement( 'span' );
+        detailEl.className = 'gvp-error-msg-detail';
+        appendErrorText( detailEl, detail );
+        inner.appendChild( detailEl );
+    }
+
+    if ( source ) {
+        let sourceEl = document.createElement( 'span' );
+        sourceEl.className = 'gvp-error-msg-source';
+        sourceEl.appendChild( document.createTextNode( 'Source: ' ) );
+        appendErrorText( sourceEl, literal( source ) );
+        inner.appendChild( sourceEl );
+    }
+
+    // Small and dim: it is not for the viewer to act on, it is so a viewer can
+    // quote one token in a support request instead of paraphrasing the prose.
+    if ( code ) {
+        let codeEl = document.createElement( 'span' );
+        codeEl.className = 'gvp-error-msg-code';
+        codeEl.textContent = 'Error ' + code;
+        inner.appendChild( codeEl );
+    }
+
+    // role="alert" on an element that is still hidden does not announce, and
+    // simply un-hiding an already-populated region is not a content change
+    // either. Reveal the empty region first, then put the message into it.
+    msg.innerHTML = '';
+    msg.hidden = false;
+    msg.appendChild( inner );
+
+    // The cover sits above the splash overlays, so it has to go or the error
+    // would be stranded behind the loading screen.
+    let cover = document.getElementsByClassName( 'gvp-cover' )[0];
+
+    if ( cover ) {
+        cover.style.display = 'none';
+    }
+
+    // The panel owns the video area now. video.js leaves its control bar fully
+    // mounted after an error, so without this a screen reader user tabs straight
+    // into play/seek/volume for a video that will never play. The download pills
+    // are deliberately NOT included -- they sit above the panel on purpose and
+    // are the viewer's remaining way out.
+    setRegionInert( '#gvp-video', true );
+    setRegionInert( '.gvp-splash-meta', true );
+
+    // The cover is gone, so its own inerting must not outlive it.
+    setRegionInert( '.gvp-splash-download-wrapper', false );
+
+    flags.hasError = true;
+
+    // A live region is one announcement and we only ever raise the first error,
+    // so if it is missed the user gets nothing at all, ever. Moving focus is a
+    // second, independent channel that does not depend on the alert firing --
+    // and it also rescues focus that was sitting on a control we just inerted.
+    if ( typeof msg.focus === 'function' ) {
+
+        try {
+            msg.focus( { preventScroll: true } );
+        } catch ( e ) {
+            msg.focus();
+        }
+
+    }
+
 }

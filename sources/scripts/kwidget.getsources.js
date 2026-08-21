@@ -6,6 +6,72 @@ if( ! window.kWidget ){
 	window.kWidget = {};
 }
 ( function( kWidget ) {
+	/**
+	 * Returns a KalturaAPIException as { code, message }, or null.
+	 */
+	kWidget.asApiError = function( item ){
+
+		if( item && item.objectType === 'KalturaAPIException' ){
+			return {
+				'code': item.code || 'UNKNOWN',
+				'message': item.message || ''
+			};
+		}
+
+		return null;
+
+	};
+
+	/**
+	 * Returns the first API exception that would actually prevent playback,
+	 * or null.
+	 *
+	 * Only the first two sub-requests are load-bearing: the flavor list and the
+	 * entry metadata. The third is the caption list, and a partner with the
+	 * caption module disabled or unentitled answers THAT with an exception
+	 * while the video itself plays perfectly well. Treating it as fatal would
+	 * block a working video over a missing caption track, so it is deliberately
+	 * excluded here and left to degrade to "no captions" further down.
+	 *
+	 * A request that fails outright answers with the exception object on its
+	 * own rather than a multirequest array, so both shapes are handled.
+	 */
+	kWidget.getApiError = function( result ){
+
+		if( ! result || typeof result !== 'object' ){
+			return { 'code': 'NO_RESPONSE', 'message': 'The Kaltura API returned no usable result.' };
+		}
+
+		if( Object.prototype.toString.call( result ) !== '[object Array]' ){
+			return kWidget.asApiError( result )
+				|| { 'code': 'BAD_RESPONSE', 'message': 'Unexpected Kaltura API response shape.' };
+		}
+
+		// index 0 is the flavor list, index 1 the entry metadata; index 2 is
+		// the optional caption list and is intentionally not consulted
+		for( var i = 0; i < 2; i++ ){
+
+			var apiError = kWidget.asApiError( result[i] );
+
+			if( apiError ){
+				return apiError;
+			}
+
+		}
+
+		// A response too short to hold both would otherwise throw on
+		// result[0]['flavorAssets'] below -- inside an XHR callback, where
+		// nothing catches it -- and the player would sit waiting for a callback
+		// that never comes until its own 20s timeout fired with a misleading
+		// "Kaltura did not respond".
+		if( ! result[0] || ! result[1] ){
+			return { 'code': 'BAD_RESPONSE', 'message': 'The Kaltura API response was incomplete.' };
+		}
+
+		return null;
+
+	};
+
 	// Add master exported function:
 	kWidget.getSources = function( settings ){
 		var sourceApi = new kWidget.api( { 'wid' : '_' + settings.partnerId , 'serviceUrl': 'https://cdnapisec.kaltura.com' } );
@@ -31,7 +97,25 @@ if( ! window.kWidget ){
 			'action' : 'list',
 			'filter:entryIdEqual' : settings.entryId
 		}], function( result ){ // API result
-            
+
+			// A restricted, unpublished or misspelled entry answers with a
+			// KalturaAPIException rather than with assets. That used to fall
+			// through the loop below and reach the player as an empty source
+			// list, which reads as "this video does not exist" even when it
+			// does and the viewer simply is not entitled to it. Hand the
+			// exception up instead so the player can say which it was.
+			var apiError = kWidget.getApiError( result );
+
+			if( apiError ){
+				if( settings.callback ){
+					settings.callback({
+						'apiError': apiError,
+						'sources': []
+					});
+				}
+				return;
+			}
+
 			var ks = sourceApi.ks;
 			var ipadAdaptiveFlavors = [];
 			var iphoneAdaptiveFlavors = [];
@@ -190,7 +274,7 @@ if( ! window.kWidget ){
 					'entryId' :  result[1]['id'],
 					//'description': result[2]['description'],
                     //'captionId': ( ( result[2]['totalCount'] > 0 ) ? result[2]['objects'][0]['id'] : null ),
-					'caption': ( ( result[2]['totalCount'] > 0 ) ? result[2]['objects'] : null ),
+					'caption': ( ( result[2] && result[2]['totalCount'] > 0 ) ? result[2]['objects'] : null ),
 					'sources': deviceSources
 				});
 				

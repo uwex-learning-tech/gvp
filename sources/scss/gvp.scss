@@ -243,6 +243,163 @@ html {
             }
         }
 
+        // ---- error panel --------------------------------------------------
+        // Deliberately a sibling of .gvp-cover rather than a child: the cover
+        // fades itself to display:none as the player loads, which used to take
+        // any error message with it. This is the single error surface -- the
+        // video.js modal is suppressed below and routed here instead.
+        .gvp-error-msg {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: var( --gvp-inset );
+            right: var( --gvp-inset );
+            z-index: 100;
+            display: flex;
+            // `safe center` keeps the message centred until it is taller than
+            // the box, then pins it to the top instead of letting it overflow
+            // equally off both ends -- where the title, the most important
+            // line, is the first thing to become unreachable. Browsers without
+            // it fall back to plain centring on the line above.
+            align-items: center;
+            align-items: safe center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: rem( $gutter );
+            // Opaque enough that the poster underneath cannot compete with the
+            // text; the panel is centred but the copy is ranged left, which is
+            // far easier to read than centred prose and long wrapped URLs.
+            background-color: rgba( 0, 0, 0, 0.92 );
+            color: #fff;
+            font-size: rem( 15px );
+            line-height: 1.5;
+            text-align: left;
+            overflow-wrap: anywhere;
+
+            &[hidden] {
+                display: none;
+            }
+
+            .gvp-error-msg-inner {
+                // 25% narrower than the original 520px: shorter measure reads
+                // better than long lines of error prose.
+                max-width: rem( 390px );
+            }
+
+            .gvp-error-msg-title {
+                display: block;
+                font-weight: 700;
+                margin-bottom: rem( 8px );
+            }
+
+            .gvp-error-msg-detail {
+                display: block;
+                font-size: rem( 13px );
+                opacity: 0.8;
+                margin-top: rem( 8px );
+            }
+
+            // The source URL is its own paragraph, separated from the message.
+            // Only playback errors carry one; everywhere else it goes to the
+            // console instead, where it is useful without being clutter.
+            .gvp-error-msg-source {
+                display: block;
+                font-size: rem( 13px );
+                opacity: 0.8;
+                margin-top: rem( 16px );
+            }
+
+            // Quiet on purpose: the viewer is not meant to act on the code, it
+            // is there so a support request can quote one exact token instead
+            // of paraphrasing the message.
+            .gvp-error-msg-code {
+                display: block;
+                font-size: rem( 12px );
+                letter-spacing: 0.04em;
+                opacity: 0.55;
+                margin-top: rem( 16px );
+            }
+        }
+
+        // Literal values -- video IDs, file names, and error codes that come
+        // from Kaltura rather than from us -- are set as machine text on a
+        // faint plate, so a viewer copying one into a support request can see
+        // exactly where it starts and ends. Scoped to the wrapper rather than
+        // to the panel so the light notice gets the same treatment. Our own
+        // GVP-xxx code is deliberately excluded: it is a quiet footnote, not a
+        // value to be read out of the prose.
+        .gvp-error-msg-mono {
+            font-family: monospace;
+            font-size: 0.92em;
+            background-color: rgba( 255, 255, 255, 0.14 );
+            border-radius: rem( 3px );
+            padding: 0.1em 0.35em;
+            // a value that wraps keeps its plate on every line rather than
+            // being sliced open at the break
+            -webkit-box-decoration-break: clone;
+            box-decoration-break: clone;
+        }
+
+        // The panel normally comes from gvp.tpl. When the template itself is
+        // what failed to download, it is built in code and appended here with
+        // no player around it, so it has to carry its own footprint.
+        .gvp-error-msg-bare {
+            position: relative;
+            inset: auto;
+            min-height: rem( 220px );
+        }
+
+        // ---- light notice -------------------------------------------------
+        // For failures the viewer can clear themselves -- a cancelled load,
+        // typically from navigating away and back. Blacking out a video that
+        // still plays would be a worse message than the one it replaces, so
+        // this sits over the top edge and leaves the picture alone.
+        .gvp-error-notice {
+            position: absolute;
+            top: 0;
+            left: var( --gvp-inset );
+            right: var( --gvp-inset );
+            z-index: 90;
+            padding: rem( 12px ) rem( 16px );
+            background-color: rgba( 0, 0, 0, 0.82 );
+            color: #fff;
+            font-size: rem( 14px );
+            line-height: 1.45;
+            text-align: left;
+            opacity: 0;
+            transform: translateY( -100% );
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+
+            &.is-visible {
+                opacity: 1;
+                transform: translateY( 0 );
+            }
+
+            .gvp-error-notice-title {
+                display: block;
+                font-weight: 700;
+            }
+
+            .gvp-error-notice-detail {
+                display: block;
+                font-size: rem( 13px );
+                opacity: 0.8;
+                margin-top: rem( 4px );
+            }
+
+            @media ( prefers-reduced-motion: reduce ) {
+                transition: none;
+                transform: none;
+            }
+        }
+
+        // One error surface only: video.js's own modal is generic, is prefixed
+        // with "This is a modal window.", and sits on top of the download pills.
+        .vjs-error-display {
+            display: none;
+        }
+
         // ---- end-of-video card -------------------------------------------
         // The video fades down to black instead of snapping back to the poster.
         // This layer is injected right after .vjs-poster, so it covers the video
