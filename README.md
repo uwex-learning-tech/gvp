@@ -1,5 +1,5 @@
 # Generic Video Player
-**_version 4.0.17_**
+**_version 4.2.0_**
 
 Generic video player is utilizing and built upon VideoJS, a HTML5 video player, to deliver video contents.
 

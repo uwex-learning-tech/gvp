@@ -1,5 +1,20 @@
 # Version Change Log
 
+**4.2.0**
+* Updated VideoJS to version 8.24.0
+* Updated the VideoJS YouTube component to version 3.0.1
+* YouTube playback component is now loaded only for YouTube videos
+* Improved the appearance during initial load and upon video playback completion
+* Improved the appearance and usability of the main playback controls
+* Added support for chapter navigation via a menu and screen readers; this is powered by the markers system in gvp.xml
+* Improved error messages to be more specific and descriptive
+* Improved how error messages are rendered
+* Improved labeling and structure for screen readers and keyboard navigation
+* Removed the FontAwesome dependency; icons now come from the bundled VideoJS font, for now
+* Quality and download menus now size to their contents
+* Fixed an empty author label and the title bar reappearing on the end screen
+* Build now takes the version number from package.json
+
 **4.0.17**
 * Updated VideoJS to version 7.21.7, resolving known security advisories
 
