@@ -1624,13 +1624,332 @@ function sendToGoogleAnalytics( event, value = 0 ) {
  * 
  * @function setupMarkers
  */
+/**
+ * Gives every marker the label the player should display for it.
+ *
+ * Numbered by time order, not document order, so the generated names line up
+ * with the sequence a viewer actually sees on the progress bar. Written onto the
+ * marker objects themselves so the timeline tooltip and the chapters menu are
+ * reading the same string rather than each deriving its own.
+ *
+ * @function labelMarkers
+ */
+function labelMarkers() {
+
+    xml.markersCollection
+        .slice()
+        .sort( function( a, b ) { return a.time - b.time; } )
+        .forEach( function( marker, i ) {
+
+            marker.label = ( marker.text || '' ).trim() || ( 'Chapter ' + ( i + 1 ) );
+
+        } );
+
+}
+
 function setupMarkers( player ) {
+
+    labelMarkers();
     
     // add markers
     player.markers( {
-        markers: xml.markersCollection
+
+        markers: xml.markersCollection,
+
+        // A marker with no text between its tags used to get no tooltip at all
+        // -- the plugin suppresses the tip when the text is empty -- while the
+        // chapters menu showed a generated "Chapter N" for the same marker. Two
+        // surfaces, two different answers for one dot. Both read the label
+        // computed by labelMarkers() now, so they cannot disagree.
+        markerTip: {
+            text: function( marker ) {
+                return marker.label || marker.text || '';
+            }
+        }
+
+    } );
+
+    // A hovered chapter dot puts the marker's title above the progress bar, and
+    // video.js independently puts the hovered timecode there too -- so the two
+    // stack. The title is the more useful of the pair while it is up, so the
+    // timecode steps aside for it.
+    //
+    // This keys off whether the plugin actually SHOWED its tip rather than
+    // merely whether a dot is hovered: it hides the tip for a marker with no
+    // text (see markerTip visibility in videojs-markers.js), and blanking the
+    // timecode for those would leave the viewer with nothing at all.
+    let holder = player.el().querySelector( '.vjs-progress-holder' );
+
+    if ( holder ) {
+
+        let syncTipState = function() {
+
+            let tip = holder.querySelector( '.vjs-tip' );
+            let shown = !!( tip && tip.style.visibility === 'visible' );
+
+            player.el().classList.toggle( 'gvp-marker-tip-shown', shown );
+
+        };
+
+        holder.addEventListener( 'mouseover', function( e ) {
+
+            if ( e.target && e.target.classList.contains( 'vjs-marker' ) ) {
+                // after the plugin's own mouseover handler has set the tip
+                requestAnimationFrame( syncTipState );
+            }
+
+        } );
+
+        holder.addEventListener( 'mouseout', function( e ) {
+
+            if ( e.target && e.target.classList.contains( 'vjs-marker' ) ) {
+                player.el().classList.remove( 'gvp-marker-tip-shown' );
+            }
+
+        } );
+
+    }
+
+    // The plugin renders each chapter as a bare, unlabelled <div> on the progress
+    // bar with click handlers but no role, no text and no keyboard path. To a
+    // screen reader that is meaningless clutter sitting inside the seek control,
+    // so it is hidden from the accessibility tree rather than left as noise a
+    // user cannot act on. Chapters remain a sighted-mouse affordance; exposing
+    // them properly would mean a WebVTT chapters track, which video.js already
+    // has a keyboard-navigable menu for.
+    player.on( 'loadedmetadata', function() {
+
+        let markers = document.getElementsByClassName( 'vjs-marker' );
+
+        for ( let i = 0; i < markers.length; i++ ) {
+            markers[i].setAttribute( 'aria-hidden', 'true' );
+        }
+
     } );
     
+}
+
+/**
+ * Puts an explicit tabindex on the control-bar buttons.
+ *
+ * Semantically a no-op -- a <button> is already in the tab order -- but Safari
+ * on macOS ships with tabbing restricted to text fields and elements carrying an
+ * EXPLICIT tabindex, skipping buttons and links entirely. The seek bar and
+ * volume slider are divs that video.js gives `tabindex="0"`, so they take focus
+ * while every button beside them is passed over: a keyboard user reaches the
+ * scrubber but not Play.
+ *
+ * Other browsers are unaffected, and this changes nothing for screen readers,
+ * which navigate by their own cursor rather than by Tab.
+ *
+ * Only buttons with no tabindex of their own are touched -- menu items carry
+ * `tabindex="-1"` deliberately, because menus move focus themselves.
+ *
+ * @function enableButtonTabbing
+ * @param {Object} player
+ */
+function enableButtonTabbing( player ) {
+
+    let bar = player.el().querySelector( '.vjs-control-bar' );
+
+    if ( !bar ) {
+        return;
+    }
+
+    let apply = function() {
+
+        [].forEach.call( bar.querySelectorAll( 'button' ), function( btn ) {
+
+            if ( !btn.hasAttribute( 'tabindex' ) ) {
+                btn.setAttribute( 'tabindex', '0' );
+            }
+
+        } );
+
+    };
+
+    apply();
+
+    // The quality menu and the downloads button are mounted after ready, so
+    // watch for later arrivals rather than guessing at a delay.
+    if ( typeof MutationObserver === 'function' ) {
+
+        new MutationObserver( apply ).observe( bar, { childList: true, subtree: true } );
+
+    }
+
+}
+
+/**
+ * Keeps popup menus inside the player.
+ *
+ * The menus are centred on their button, which is fine mid-bar and breaks for
+ * the controls nearest the right edge: a chapters menu wide enough to hold a
+ * real chapter title hangs off the side of a narrow player. Capping the width
+ * does not solve it -- a button close enough to the edge overflows at any width
+ * -- so the box is measured after it opens and nudged back inside.
+ *
+ * @function clampMenus
+ * @param {Object} player
+ */
+function clampMenus( player ) {
+
+    let clamp = function() {
+
+        let playerEl = player.el();
+
+        if ( !playerEl ) {
+            return;
+        }
+
+        let bounds = playerEl.getBoundingClientRect();
+        let menus = playerEl.querySelectorAll( '.vjs-menu-button-popup .vjs-menu .vjs-menu-content' );
+
+        for ( let i = 0; i < menus.length; i++ ) {
+
+            let menu = menus[i];
+
+            // measure unshifted, or the previous nudge skews the reading
+            menu.style.setProperty( '--gvp-menu-shift', '0px' );
+
+            let rect = menu.getBoundingClientRect();
+
+            if ( !rect.width ) {
+                continue;
+            }
+
+            let shift = 0;
+            let edge = 8;
+
+            if ( rect.right > bounds.right - edge ) {
+                shift = ( bounds.right - edge ) - rect.right;
+            }
+
+            if ( rect.left + shift < bounds.left + edge ) {
+                shift = ( bounds.left + edge ) - rect.left;
+            }
+
+            if ( shift ) {
+                menu.style.setProperty( '--gvp-menu-shift', Math.round( shift ) + 'px' );
+            }
+
+        }
+
+    };
+
+    let controlBar = player.getChild( 'controlBar' );
+
+    if ( controlBar ) {
+
+        // after the menu has been laid out, not before
+        controlBar.el().addEventListener( 'click', function() {
+            requestAnimationFrame( clamp );
+        }, true );
+
+        controlBar.el().addEventListener( 'mouseover', function() {
+            requestAnimationFrame( clamp );
+        }, true );
+
+    }
+
+    player.on( 'playerresize', clamp );
+    window.addEventListener( 'resize', clamp );
+
+}
+
+/**
+ * Publishes the XML chapter markers as a WebVTT chapters track.
+ *
+ * The markers plugin draws the chapters as dots on the progress bar, which is a
+ * pointing affordance: you have to see them and click them. Nothing about it is
+ * reachable by keyboard or announced by a screen reader, so chapters simply did
+ * not exist for those users.
+ *
+ * video.js already ships a ChaptersButton in its default control bar -- it just
+ * renders nothing until a chapters track exists. Publishing the same marker data
+ * as that track gives a proper menu: keyboard operable, chapter names announced,
+ * seeks on selection. The dots stay exactly as they were (now aria-hidden), so
+ * this adds a second presentation of one data source rather than replacing it.
+ *
+ * Generated at runtime -- no authored .vtt file, no server involvement.
+ *
+ * @function setupChapters
+ * @param {Object} player
+ */
+function setupChapters( player ) {
+
+    if ( !xml.markersCollection.length ) {
+        return;
+    }
+
+    let Cue = window.VTTCue || window.TextTrackCue;
+
+    if ( !Cue ) {
+        console.warn( 'GVP: no VTTCue in this browser; the chapters menu is unavailable.' );
+        return;
+    }
+
+    let build = function() {
+
+        player.off( 'loadedmetadata', build );
+
+        let duration = player.duration();
+
+        if ( !duration || isNaN( duration ) ) {
+            return;
+        }
+
+        // Markers are points in time; chapters are ranges. Each one therefore
+        // runs until the next begins, and the last to the end of the video --
+        // which is the reason this cannot be built before the duration is known.
+        let points = xml.markersCollection
+            .slice()
+            .filter( function( m ) { return !isNaN( m.time ) && m.time >= 0 && m.time < duration; } )
+            .sort( function( a, b ) { return a.time - b.time; } );
+
+        if ( !points.length ) {
+            return;
+        }
+
+        let track = player.addTextTrack( 'chapters', 'Chapters', gvp.captionLanguage.code || 'en' );
+
+        points.forEach( function( point, i ) {
+
+            let end = ( i + 1 < points.length ) ? points[ i + 1 ].time : duration;
+
+            if ( end <= point.time ) {
+                return;
+            }
+
+            // labelMarkers() already worked this out, including the fallback
+            // for an untitled marker; deriving it a second time here would
+            // renumber whenever a marker is filtered out above.
+            let text = point.label || ( point.text || '' ).trim() || ( 'Chapter ' + ( i + 1 ) );
+
+            track.addCue( new Cue( point.time, end, text ) );
+
+        } );
+
+        // hidden: the cues drive the menu, they are not meant to be displayed
+        track.mode = 'hidden';
+
+        // The button normally refreshes itself off the track list's addtrack
+        // event; nudge it in case that already ran for this load.
+        let controlBar = player.getChild( 'controlBar' );
+        let chaptersButton = controlBar ? controlBar.getChild( 'ChaptersButton' ) : null;
+
+        if ( chaptersButton && typeof chaptersButton.update === 'function' ) {
+            chaptersButton.update();
+        }
+
+    };
+
+    if ( player.duration() && !isNaN( player.duration() ) ) {
+        build();
+    } else {
+        player.on( 'loadedmetadata', build );
+    }
+
 }
 
 /**

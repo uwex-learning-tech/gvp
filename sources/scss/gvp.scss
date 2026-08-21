@@ -643,17 +643,27 @@ html {
         padding: 0 rem( $gutter );
     }
 
-    .video-js .vjs-menu .vjs-menu-content {
-        min-width: 6em;
-    }
-
     .video-js .vjs-menu .vjs-menu-item {
         text-align: left;
+        // Video.js 8 made menu items `display:flex; justify-content:center`,
+        // which overrides `text-align` and floats the label away from the
+        // check mark. Pin it back to the start.
+        justify-content: flex-start;
         text-transform: capitalize;
         padding-left: rem( 28px );
         padding-right: rem( 12px );
-        white-space: nowrap;
+        // Labels wrap instead of being sliced off at the menu edge. Quality and
+        // download labels are short enough that this never triggers; chapter
+        // titles are author-written prose and regularly are not.
+        white-space: normal;
+        overflow-wrap: anywhere;
         position: relative;
+    }
+
+    // Chapter titles are content, not UI labels -- capitalising them rewrites
+    // what the author wrote ("Coefficient of Determination" became "Of").
+    .video-js .vjs-chapters-button .vjs-menu .vjs-menu-item {
+        text-transform: none;
     }
 
     .video-js .vjs-menu .vjs-menu-item::before {
@@ -713,6 +723,43 @@ html {
         bottom: calc( 3em + 10px );
         border: 1px solid rgba( 255, 255, 255, 0.3 );
         border-radius: rem( 4px );
+
+        // The box had no padding of its own, so the first and last items sat
+        // hard against its edges -- the gap between items came only from their
+        // own 0.2em and read as correct, which made the flush last item look
+        // like a mistake rather than a rhythm. This spaces the ends without
+        // touching the spacing between rows.
+        padding: rem( 8px ) 0;
+
+        // video.js gives every popup menu a fixed 10em box, which was sized
+        // for long labels like "Normal"/"Medium". Size to the content instead
+        // so the menu tracks whatever actually populates it -- the Downloads
+        // menu is narrow with just "Video" and wider once "Transcript" and
+        // "Supplement" appear. Centred on .vjs-menu, which is centred on the
+        // button, so the pointer triangle still lines up.
+        width: max-content;
+        min-width: 6em;
+
+        // One bound, declared once. The previous 16em clipped anything longer
+        // than it and hid the overflow, so a chapter name you cannot read in
+        // full became a chapter you cannot tell from its neighbour. Give it
+        // more room and let the label wrap inside that bound rather than be
+        // sliced -- 22em is still comfortably narrower than the player at the
+        // 530px breakpoint where these menus start appearing.
+        max-width: 22em;
+
+        // Likewise vertically: a video with many chapters would otherwise run
+        // off the end of a hidden box with no way to reach the rest.
+        max-height: 15em;
+        overflow-x: hidden;
+        overflow-y: auto;
+
+        // Centred on the button, then nudged by --gvp-menu-shift when that
+        // centring would push the box past the edge of the player. The shift is
+        // measured in JS (clampMenus) because a control near the right edge can
+        // overflow at any menu width -- capping the width alone cannot fix it.
+        left: 50%;
+        transform: translateX( calc( -50% + var( --gvp-menu-shift, 0px ) ) );
     }
 
     // Down-pointing triangle centered beneath the menu, pointing at the button.
@@ -931,25 +978,16 @@ and (min-device-width : 900px) {
     border-radius: rem( 5px );
     width: 98%;
     
-    .vjs-menu-button {
-        
-        .vjs-menu-content {
-            
-            overflow: hidden;
-            border: solid #ccc rem( 1px );
-            border-bottom: none;
-            
-            .vjs-texttrack-settings {
-                
-                .vjs-menu-item-text {
-                    font-size: rem( 12px );
-                    font-weight: bold;
-                }
-                
-            }
-            
-        }
-        
+    // The menu box itself is styled once, in the shared
+    // .vjs-menu-button-popup .vjs-menu .vjs-menu-content rule above -- border,
+    // radius, padding, sizing and scrolling all live there so every menu is the
+    // same object. A second copy used to sit here with its own overflow and a
+    // #ccc border, and only lost the cascade by accident (the shared rule is ID
+    // scoped). Whatever is left below must be genuine per-menu CONTENT, never
+    // box styling.
+    .vjs-menu-button .vjs-menu-content .vjs-texttrack-settings .vjs-menu-item-text {
+        font-size: rem( 12px );
+        font-weight: bold;
     }
     
 }
