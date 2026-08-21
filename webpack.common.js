@@ -98,6 +98,19 @@ module.exports = {
                 baseBackground: baseBackground
             },
         } ),
+        // The demonstration page ships with the app and loads the player from
+        // ../sources/, so it always runs the deployed build rather than a copy
+        // of its own. inject:false because its script and link tags are written
+        // by hand with the relative paths that arrangement needs.
+        new HtmlWebpackPlugin( {
+            template: 'demo/index.html',
+            filename: path.resolve( __dirname, 'dist', 'demo', 'index.html' ),
+            inject: false,
+            templateParameters: {
+                version: pkg.version,
+                baseBackground: baseBackground
+            },
+        } ),
         new webpack.DefinePlugin( {
             __GVP_VERSION__: JSON.stringify( pkg.version ),
         } ),
@@ -140,6 +153,10 @@ module.exports = {
                 {
                     from: 'sources/scripts/videojs/plugins/youtube/youtube.min.js',
                     to: 'sources/scripts/videojs/plugins/youtube/'
+                },
+                {
+                    from: 'demo/gvp.xml',
+                    to: 'demo/'
                 },
                 {
                     from: 'sources/scripts/kwidget.getsources.js',

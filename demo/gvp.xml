@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gvp>
+
+    <!-- Demonstration page for the Generic Video Player.
+
+         This page deliberately loads the player from ../sources/, so it always
+         runs whatever build is deployed alongside it. It is never a private
+         copy of the player and cannot drift from the release. -->
+
+    <settings>
+        <kalturaId>1_jzsl74em</kalturaId>
+    </settings>
+
+    <!-- The markers below carry no titles, so the player numbers them
+         Chapter 1, Chapter 2, and so on. Replace the empty tags with real
+         chapter names when the content of the demo video is described. -->
+
+    <markers>
+        <marker timecode="01:00" color=""></marker>
+        <marker timecode="03:00" color=""></marker>
+        <marker timecode="05:00" color=""></marker>
+        <marker timecode="07:00" color=""></marker>
+    </markers>
+
+</gvp>
