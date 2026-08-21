@@ -1615,15 +1615,30 @@ function addForwardButton( vjs ) {
     
     let secToSkip = 5;
     let Button = videojs.getComponent( 'Button' );
-    let forwardBtn = videojs.extend( Button, {
-        constructor: function( player, options ) {
+    let forwardBtn = class extends Button {
+        constructor( player, options ) {
             
-            Button.call( this, player, options );
-            this.el().setAttribute( 'aria-label','Skip Forward' );
-            this.controlText( 'Skip Forward' );
+            super( player, options );
+            this.updateSkipText();
 
-        },
-        handleClick: function() {
+            // The skip amount is derived from the duration, which is not known
+            // when this button is constructed -- so the name has to be rebuilt
+            // once it is, or it advertises a distance the button never moves.
+            player.on( [ 'loadedmetadata', 'durationchange' ], this.updateSkipText.bind( this ) );
+
+        }
+
+        // "Skip Forward" alone left the viewer to find out how far by pressing
+        // it and listening for the new position.
+        updateSkipText() {
+
+            let duration = vjs.duration();
+            let seconds = ( duration && !isNaN( duration ) ) ? getSecToSkip( duration ) : secToSkip;
+
+            this.controlText( 'Skip forward ' + seconds + ' seconds' );
+
+        }
+        handleClick() {
             
             if ( vjs.seekable() ) {
                 
@@ -1639,11 +1654,11 @@ function addForwardButton( vjs ) {
                 
             }
             
-        },
-        buildCSSClass: function() {
+        }
+        buildCSSClass() {
             return 'vjs-forward-button vjs-control vjs-button';
-        } 
-    } );
+        }
+    };
 
     videojs.registerComponent( 'ForwardBtn', forwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'ForwardBtn', {}, 1 );
@@ -1659,15 +1674,25 @@ function addBackwardButton( vjs ) {
     
     let secToSkip = 5;
     let Button = videojs.getComponent( 'Button' );
-    let backwardBtn = videojs.extend( Button, {
-        constructor: function( player, options ) {
+    let backwardBtn = class extends Button {
+        constructor( player, options ) {
             
-            Button.call( this, player, options );
-            this.el().setAttribute( 'aria-label','Skip Backward' );
-            this.controlText( 'Skip Backward' );
+            super( player, options );
+            this.updateSkipText();
 
-        },
-        handleClick: function() {
+            player.on( [ 'loadedmetadata', 'durationchange' ], this.updateSkipText.bind( this ) );
+
+        }
+
+        updateSkipText() {
+
+            let duration = vjs.duration();
+            let seconds = ( duration && !isNaN( duration ) ) ? getSecToSkip( duration ) : secToSkip;
+
+            this.controlText( 'Skip backward ' + seconds + ' seconds' );
+
+        }
+        handleClick() {
             
             if ( vjs.seekable() ) {
                 
@@ -1683,13 +1708,13 @@ function addBackwardButton( vjs ) {
                 
             }
             
-        },
+        }
         
-        buildCSSClass: function() {
+        buildCSSClass() {
             return 'vjs-backward-button vjs-control vjs-button';
         }
         
-    } );
+    };
 
     videojs.registerComponent( 'BackwardBtn', backwardBtn );
     vjs.getChild( 'controlBar' ).addChild( 'BackwardBtn', {}, 1 );
@@ -1740,6 +1765,7 @@ function getSecToSkip( duration ) {
         
 }
 
+
 /**
  * Add download drop down menu to the playback control.
  * 
@@ -1752,26 +1778,27 @@ function addDownloadFilesButton( vjs ) {
         setTimeout( function() {
             
             let MenuButton = videojs.getComponent( 'MenuButton' );
-            let downloadButton = videojs.extend( MenuButton, {
-                constructor: function( player, options ) {
+            let downloadButton = class extends MenuButton {
+                constructor( player, options ) {
                     
-                    MenuButton.call( this, player, options );
-                    this.el().setAttribute( 'aria-label','Downloads' );
+                    super( player, options );
                     this.controlText( 'Downloads' );
     
-                },
-                createItems: function() {
+                }
+                createItems() {
                     
                     return downloadables( vjs );
     
-                },
-                handleClick: function() {
-                    // do something but nothing in this case
-                },
-                buildCSSClass: function() {
+                }
+                // No override here. MenuButton wires the inner <button>'s click
+                // to handleClick, and a native button fires click on Enter and
+                // Space -- so stubbing this out left the menu openable by hover
+                // only, and aria-expanded never flipped. The inherited handler
+                // is what makes it keyboard-operable.
+                buildCSSClass() {
                     return 'vjs-downloads-button';
-                } 
-            } );
+                }
+            };
     
             videojs.registerComponent( 'DownloadButton', downloadButton );
 
@@ -1800,17 +1827,17 @@ function downloadables( vjs ) {
     
     let MenuItem = videojs.getComponent( 'MenuItem' );
     
-    let DownloadMenuItem = videojs.extend( MenuItem, {
+    let DownloadMenuItem = class extends MenuItem {
         
-      constructor: function( player, options ) {
+      constructor( player, options ) {
           
         options.selectable = true;
-        MenuItem.call( this, player, options );
+        super( player, options );
         this.src = options.src;
         
       }
       
-    } );
+    };
     
     DownloadMenuItem.prototype.handleClick = function() {
 
