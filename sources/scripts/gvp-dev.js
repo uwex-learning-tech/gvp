@@ -245,7 +245,16 @@ function loadGoogleAnalytics() {
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-NCB47RC');
     
+    // loadGoogleAnalytics() is the first thing initGVP() does, so a host page
+    // without a <noscript> element used to take the entire player down before
+    // it drew anything -- for the sake of a no-JS tracking fallback that cannot
+    // run here anyway.
     let noscript = document.getElementsByTagName( 'noscript' )[0];
+
+    if ( !noscript ) {
+        return;
+    }
+
     let gtagIframe = document.createElement( 'iframe' );
 
     gtagIframe.src = 'https://www.googletagmanager.com/ns.html?id=GTM-NCB47RC';
@@ -551,11 +560,16 @@ function getVideoSource() {
                 const childNode = xml.captionLanguageTag.childNodes[0];
                 const childNodeAttribute = xml.captionLanguageTag.getAttribute( 'code' );
 
-                if ( childNodeAttribute !== undefined && childNodeAttribute.trim() != '' ) {
+                // getAttribute() returns null -- not undefined -- for an
+                // absent attribute, so the old `!== undefined` test passed and
+                // null.trim() threw. That exception escaped into this uncaught
+                // .then and stranded the player on its cover for good, all
+                // because <captionLanguage> carried no code="" attribute.
+                if ( childNodeAttribute && childNodeAttribute.trim() != '' ) {
                     gvp.captionLanguage.code = childNodeAttribute;
                 }
 
-                if ( childNode !== undefined
+                if ( childNode && childNode.nodeValue
                     && childNode.nodeValue.trim() != '') {
                         gvp.captionLanguage.label = childNode.nodeValue.trim();
                 }
@@ -583,6 +597,16 @@ function getVideoSource() {
                                     markerColor = markerTag[i].attributes.color.nodeValue.trim();
                                 }
                                 
+                            }
+                            
+                            // The sibling colour lookup above is guarded and
+                            // this one was not: a <marker> with no timecode
+                            // threw here and stranded the player on its cover.
+                            // One malformed marker should cost that marker, not
+                            // the video.
+                            if ( markerTag[i].attributes.timecode === undefined ) {
+                                console.warn( 'GVP: skipping a marker with no timecode attribute' );
+                                continue;
                             }
                             
                             let marker = {
@@ -1057,8 +1081,12 @@ function loadVideoJS() {
 
                         self.addRemoteTextTrack( {
                             kind: 'captions',
-                            language: caption.languageCode,
-                            label: caption.language,
+                            // Same fallback the local .vtt path already applies:
+                            // a track with an empty lang is mislabelled by the
+                            // browser and cannot be matched by caption-language
+                            // preferences.
+                            language: caption.languageCode || 'en',
+                            label: caption.language || 'English',
                             src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + caption.id + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
                         }, true );
 
@@ -2817,7 +2845,20 @@ function setDownloadables() {
     if ( flags.isKaltura ) {
 
         // download video from Kaltura
-        document.getElementById( 'videoDl' ).addEventListener( 'click', function( evt ) {
+        // The id is derived from the manifest label, so a deployment that calls
+        // the entry anything other than "Video" -- or omits it -- has no such
+        // element, and this threw at the tail of setDownloadables() and took the
+        // Kaltura download handler with it.
+        let videoDlEl = document.getElementById( 'videoDl' );
+
+        if ( !videoDlEl ) {
+
+            console.warn( 'GVP: no "Video" download entry in the manifest; skipping the Kaltura download handler.' );
+            return;
+
+        }
+
+        videoDlEl.addEventListener( 'click', function( evt ) {
             downloadKalVid( 'videoDl' );
             evt.preventDefault();
         } );
@@ -3172,13 +3213,19 @@ function guid() {
 
 function toSeconds( str ) {
     
-    let arr = str.split( ':' );
+    let arr = String( str ).split( ':' );
     
     if ( arr.length >= 3 ) {
         return Number( arr[0] * 60 ) * 60 + Number( arr[1] * 60 ) + Number( arr[2] );
-    } else {
+    }
+
+    if ( arr.length === 2 ) {
         return Number( arr[0] * 60 ) + Number( arr[1] );
     }
+
+    // A bare "45" used to fall into the mm:ss branch and add an undefined
+    // seconds component, putting the marker at NaN on the progress bar.
+    return Number( arr[0] ) || 0;
     
 }
 
