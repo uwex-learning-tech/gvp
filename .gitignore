@@ -1,6 +1,9 @@
 # ignore the assets folder
 sources/assets/
 
+# local offline test rig (large media, not for version control)
+testrig/
+
 ### macOS ###
 # General
 .DS_Store
