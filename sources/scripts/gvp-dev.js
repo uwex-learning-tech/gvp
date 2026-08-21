@@ -188,6 +188,7 @@ function initGVP() {
         // set the URL to the Kaltura libraries
         kaltura.lib = manifest.gvp_root_directory + 'scripts/mwembedloader.js';
         kaltura.widget = manifest.gvp_root_directory + 'scripts/kwidget.getsources.js';
+        gvp.youtubeTech = manifest.gvp_root_directory + 'scripts/videojs/plugins/youtube/youtube.min.js';
 
         // set the URL to the player template file
         gvp.template = manifest.gvp_root_directory + 'scripts/templates/gvp.tpl';
@@ -579,7 +580,7 @@ function getVideoSource() {
                     
                         flags.isLocal = false;
                         flags.isYouTube = true;
-                        setVideoJs();
+                        loadYouTubeTech();
                         return;
                         
                     }
@@ -642,6 +643,29 @@ function setVideoJs() {
     setTitle();
     loadVideoJS();
     setDownloadables();
+}
+
+/**
+ * Fetches the video.js YouTube tech, then starts the player.
+ *
+ * The tech used to be concatenated into the main video.js bundle, which meant
+ * every page -- including the Kaltura ones, which are the overwhelming majority
+ * -- shipped it and had it request youtube.com/iframe_api on load. It is only
+ * needed when the XML actually names a youtubeId.
+ *
+ * @function loadYouTubeTech
+ */
+function loadYouTubeTech() {
+
+    if ( typeof videojs !== 'undefined' && videojs.getTech && videojs.getTech( 'Youtube' ) ) {
+        setVideoJs();
+        return;
+    }
+
+    getScript( gvp.youtubeTech, false, setVideoJs, function( file ) {
+        reportError( 'GVP-401', { source: file } );
+    } );
+
 }
 
 /**

@@ -135,6 +135,10 @@ module.exports = {
                     to: 'sources/scripts/videojs/'
                 },
                 {
+                    from: 'sources/scripts/videojs/plugins/youtube/youtube.min.js',
+                    to: 'sources/scripts/videojs/plugins/youtube/'
+                },
+                {
                     from: 'sources/scripts/kwidget.getsources.js',
                     to: 'sources/scripts/'
                 },
