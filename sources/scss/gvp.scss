@@ -466,6 +466,13 @@ html {
             z-index: 1;
             user-select: none;
             filter: invert(1);
+
+            // This watermark sits in the same corner as the control bar's
+            // right-hand buttons. Being a positioned box on top of them, it was
+            // swallowing the clicks meant for Quality, Downloads and Fullscreen
+            // -- those three were simply not clickable at their centres. It is
+            // decoration (and aria-hidden), so it should never be a hit target.
+            pointer-events: none;
         }
 
         .gvp-duration-badge {
@@ -1018,53 +1025,42 @@ and (min-device-width : 900px) {
 
 .video-js .vjs-control-bar {
     
-    .vjs-forward-button:before {
-
-        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIzLjAuNiwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDEwMjQgMTAyNDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOiNGRkZGRkY7fQo8L3N0eWxlPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNNzU4LjIsNDM2LjZsMTMzLjUtNzcuMWwtMTMzLjUtNzcuMWwtMTMzLjUtNzcuMXYxNTMuOWwtMTMyLjktNzYuOGwtMTMzLjUtNzcuMXYxMDMuNAoJYy01Nyw2LjYtMTA5LjgsMzItMTUxLDczLjJjLTQ4LjQsNDguMy03NSwxMTIuNi03NSwxODFzMjYuNiwxMzIuNiw3NC45LDE4MWM0OC4zLDQ4LjMsMTEyLjYsNzQuOSwxODEsNzQuOWgzMzkuOXYtMTEwSDM4OC4yCgljLTgwLjQsMC0xNDUuOS02NS41LTE0NS45LTE0NS45YzAtNzAuMiw0OS44LTEyOSwxMTYtMTQyLjh2OTMuNWwxMzMuNS03N2wxMzIuOS03Ni44djE1My44TDc1OC4yLDQzNi42eiIvPgo8L3N2Zz4K");
-        background-repeat: no-repeat;
-        content: ' ';
-        width: 33px;
-        height: 25px;
-        margin: 0 auto;
-        display: block;
-        padding: 8px 0 0 0;
-        font-size: 10px;
-        text-align: center;
-        
-    }
-    
-    .vjs-forward-button:hover::before {
-        text-shadow: none;
-    }
-    
-    .vjs-forward-button {
-        display: none;
-        cursor: pointer
-    }
-    
-    .vjs-backward-button:before {
-
-        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDIzLjAuNiwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IgoJIHZpZXdCb3g9IjAgMCAxMDI0IDEwMjQiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDEwMjQgMTAyNDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOiNGRkZGRkY7fQo8L3N0eWxlPgo8cGF0aCBjbGFzcz0ic3QwIiBkPSJNODE2LjcsMzgxLjljLTQxLjItNDEuMi05NC02Ni42LTE1MS03My4yVjIwNS4zbC0xMzMuNSw3Ny4xbC0xMzIuOSw3Ni44VjIwNS4zbC0xMzMuNSw3Ny4xbC0xMzMuNSw3Ny4xCglsMTMzLjUsNzcuMWwxMzMuNSw3N1YzNTkuOGwxMzIuOSw3Ni44bDEzMy41LDc3VjQyMGM2Ni4yLDEzLjgsMTE2LDcyLjYsMTE2LDE0Mi44YzAsODAuNC02NS41LDE0NS45LTE0NS45LDE0NS45SDI5NS45djExMGgzMzkuOQoJYzY4LjQsMCwxMzIuNi0yNi42LDE4MS03NC45YzQ4LjMtNDguMyw3NC45LTExMi42LDc0LjktMTgxQzg5MS43LDQ5NC41LDg2NS4xLDQzMC4yLDgxNi43LDM4MS45eiIvPgo8L3N2Zz4K");
-        background-repeat: no-repeat;
-        content: ' ';
-        width: 33px;
-        height: 25px;
-        margin: 0 auto;
-        display: block;
-        padding: 8px 0 0 0;
-        font-size: 10px;
-        text-align: center;
-        
-    }
-    
-    .vjs-backward-button:hover::before {
-        text-shadow: none;
-    }
-    
+    // Skip icons come from the shipped VideoJS font. They used to be base64
+    // SVGs pinned to a hard-coded 33x25 box with `padding: 8px 0 0 0`, which
+    // never sat on the same optical centre as the font glyphs beside them --
+    // and went visibly off once the buttons were trimmed to 34px. As glyphs
+    // they inherit the same sizing and baseline as every other icon on the bar.
+    //
+    // The font has a plain circular arrow only for `replay`; every forward glyph
+    // has a number baked into its face. So the pair is one glyph, mirrored --
+    // which also keeps the two arrows exactly symmetrical, and leaves the skip
+    // distance free to vary by video length without the icon contradicting it.
+    .vjs-forward-button,
     .vjs-backward-button {
+
         display: none;
-        cursor: pointer
+        cursor: pointer;
+
+        // font-family is not optional here: video.js 8 draws its own controls
+        // with SVG icons and never sets it on .vjs-icon-placeholder, so a bare
+        // private-use codepoint falls back to the UI font and renders as a row
+        // of tofu bars. Every glyph rule in this file declares it for the same
+        // reason.
+        .vjs-icon-placeholder:before {
+            font-family: VideoJS;
+            font-weight: normal;
+            font-style: normal;
+            content: '\f11b';   // replay -- the plain round arrow
+        }
+
     }
+
+    .vjs-forward-button .vjs-icon-placeholder:before {
+        display: inline-block;
+        transform: scaleX( -1 );
+    }
+
+
     
 }
 
@@ -1128,19 +1124,137 @@ $center-big-play-button: true; // true default
     }
 }
 
+/* On a small embed the 3em ring is most of the frame -- at 420px wide the video
+   is ~214px tall and the circle is 144px of it. Tighten the ring instead of
+   shrinking the glyph: the play symbol stays exactly as legible, it just stops
+   carrying so much empty padding around it. */
+@media ( max-width: 600px ) {
+
+    .vjs-default-skin .vjs-big-play-button {
+
+        $big-play-sm: 2em;
+
+        line-height: $big-play-sm;
+        height: $big-play-sm;
+        width: $big-play-sm;
+
+        @if $center-big-play-button {
+            margin-left: -( math.div( $big-play-sm, 2 ) );
+            margin-top: -( math.div( $big-play-sm, 2 ) );
+        }
+
+    }
+
+}
+
 .video-js .vjs-big-play-button.replay .vjs-icon-placeholder:before {
-    content: '\f116';
+    /* videojs-font 4.x (Video.js 8): replay moved \f116 -> \f11b.
+       \f116 is now `circle`. */
+    content: '\f11b';
+}
+
+// ---- control bar density and states ---------------------------------------
+// Ten buttons share this bar now. At video.js's stock 4em they claimed 480px
+// before the time display and seek track got anything, which is why the skip
+// buttons had to hide on narrow players -- the bar had simply run out of room.
+// 2.833em is 34px at the 12px base: still well clear of the 24px WCAG 2.5.8
+// target floor (height is 36px, so only width was ever in question) and it
+// hands roughly 140px back to the seek track.
+.video-js .vjs-control-bar {
+
+    // The gap around a chip should read the same on every side. The vertical
+    // gap is fixed by the bar's own height -- 6px top and bottom is what leaves
+    // a sensibly proportioned 24px chip inside a 36px bar -- so the horizontal
+    // gap is matched to it rather than the other way round: 12px all round
+    // would mean a 12px-tall chip, which the bar has no room for.
+    //
+    // This padding is only part of the horizontal gap. The rest comes from the
+    // chip's own 4px side inset, so 2 + 4 lands on the same 6px as the vertical.
+    padding: 0 rem( 2px );
+
+    // Width goes on .vjs-button so the time displays keep their `width: auto`
+    // and the progress control keeps flexing. A menu button carries the class on
+    // both its wrapper and its inner <button>; both taking the same width is
+    // what keeps the glyph centred.
+    .vjs-button {
+        width: 2.833em;
+    }
+
+    // Not a button itself, but it boxes one -- left at 4em it would sit beside
+    // the trimmed buttons with a 14px gap. Its expanded width on hover is set by
+    // a more specific video.js rule, so the slider still opens as before.
+    .vjs-volume-panel {
+        width: 2.833em;
+    }
+
+    // States are scoped to `button.vjs-button` rather than `.vjs-button`: on a
+    // menu button the wrapper is a <div> carrying the same classes as the inner
+    // <button>, and styling both would stack two chips on one control.
+    button.vjs-button {
+
+        position: relative;
+        transition: background-color 120ms ease;
+
+        // There was no hover state on these controls at all -- the pointer got
+        // no feedback whatsoever before a click. An inset chip rather than a
+        // full-height wash: at this width the gaps between chips are what let
+        // the eye separate one target from the next.
+        // The button stays the full 36px height -- that is the click target and
+        // it should not shrink -- so the vertical breathing room comes from
+        // insetting the chip instead. 6px top and bottom leaves the chip clear
+        // of the bar edges without costing a pixel of target size.
+        &:hover::before {
+            content: '';
+            position: absolute;
+            inset: rem( 6px ) rem( 4px );
+            border-radius: rem( 4px );
+            background-color: rgba( 255, 255, 255, 0.18 );
+        }
+
+        // :focus-visible only, so a mouse click never draws the ring. video.js
+        // ships a soft white glow here, which disappears over a bright frame;
+        // this is the same ring-plus-dark-halo the splash download pills use, so
+        // the player has one focus language throughout. Inset, so it cannot be
+        // clipped by the edge of the bar.
+        &:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: -4px;
+            border-radius: rem( 3px );
+            box-shadow: inset 0 0 0 6px rgba( 0, 0, 0, 0.75 );
+        }
+
+        @media ( prefers-reduced-motion: reduce ) {
+            transition: none;
+        }
+
+    }
+
+}
+
+// The control bar has to paint above the corner watermark, which shares the
+// bottom-right corner with it. pointer-events on the watermark keeps the buttons
+// clickable; this keeps them legible, by putting the bar's own ground over the
+// logo instead of letting the logo show through the middle of the button row.
+.video-js .vjs-control-bar {
+    z-index: 2;
 }
 
 /* The default color of control backgrounds is mostly black but with a little
 bit of blue so it can still be seen on all-black video frames, which are common. */
+// The control bar, the big play button and the menu grounds all composite over
+// whatever frame is behind them, so their contrast is only as good as the
+// brightest video they sit on. At the old 0.7 a white frame lifted this ground
+// to ~rgb(107,112,121), leaving the white control text at roughly 5:1 -- barely
+// over AA, and worse for the small glyphs. At 0.95 the same worst case lands
+// near rgb(54,61,73) and about 11:1, and the video is still faintly visible
+// through it.
 .video-js .vjs-control-bar,
 .video-js .vjs-big-play-button,
 .video-js .vjs-menu-button .vjs-menu-content {
     /* IE8 - has no alpha support */
     background-color: $primary-background-color;
     /* Opacity: 1.0 = 100%, 0.0 = 0% */
-    background-color: rgba($primary-background-color, 0.7);
+    background-color: rgba($primary-background-color, 0.95);
 }
 
 // Make a slightly lighter version of the main background
@@ -1167,7 +1281,74 @@ $slider-bg-color: lighten($primary-background-color, 33%);
 
 .video-js .vjs-play-progress::before {
     z-index: 2;
-    top: -0.3em;
+    /* Video.js 8 centres this dot with `line-height: 0.35em` instead of v7's
+       `top: -0.333em`. Overriding `top` here would push it above the bar. */
+}
+
+/* Video.js puts a time tooltip on the playhead AS WELL AS on the pointer, and
+   reveals both whenever the progress control is hovered. With the playhead at
+   0:00 and the cursor at 2:07 that reads as two competing timecodes rather than
+   one readout. The pointer one is the useful half -- it previews where a click
+   would seek to -- and the current position is already spelled out by the
+   remaining-time display, so the playhead tooltip goes. It is also the light
+   one, which sat oddly against the rest of the chrome. */
+/* Specificity matters here: video.js reveals this with
+   `.video-js .vjs-progress-control:hover .vjs-time-tooltip { display: block }`,
+   which is (0,4,0). A plain `.vjs-play-progress .vjs-time-tooltip` is (0,2,0)
+   and loses, so the tooltip stayed on screen. Both selectors below outrank it. */
+.video-js .vjs-progress-control .vjs-play-progress .vjs-time-tooltip,
+.video-js .vjs-progress-control:hover .vjs-play-progress .vjs-time-tooltip {
+    display: none;
+}
+
+/* The timecode tooltip and the chapter tip are separate components that surface
+   in the same spot, so they are given one shared geometry -- same size, same
+   line box, same padding -- and both are anchored from the SAME edge. That last
+   part is what stops them moving: anchored by `top`, this plate grew downward
+   into the control bar as its content changed, while the chapter tip (anchored
+   by `bottom`) stayed put. Pinned by `bottom`, a longer label grows upward and
+   the baseline never moves.
+   
+   `line-height` is explicit for the same reason -- left to the font's own
+   metrics the plate height drifts with the glyphs in it.
+   
+   Sizes are in rem, not em: video.js changes this element's em basis as the
+   tooltip becomes visible, which is what made the original value so hard to
+   reason about. */
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip,
+.video-js .vjs-progress-control:hover .vjs-mouse-display .vjs-time-tooltip {
+    font-size: rem( 14px );
+    line-height: rem( 18px );
+    padding: rem( 6px ) rem( 10px );
+    top: auto;
+    bottom: rem( 25px );
+}
+
+/* The position line under the cursor. video.js draws it 1px and black, which
+   all but disappears against the dark track it sits on; white reads against
+   both the played (white) and unplayed portions at 2px. The negative margin
+   keeps the thicker line centred on the pointer rather than hanging to its
+   right, since the component positions itself by its left edge. */
+.video-js .vjs-progress-control .vjs-mouse-display {
+    width: rem( 2px );
+    margin-left: rem( -1px );
+    background-color: #fff;
+}
+
+/* line-height comes with it: video.js sets `3em`, which tracks the font size,
+   so bumping to 14px would make it 42px inside a 36px bar and knock the digits
+   off centre. Pinned to the bar's height instead. */
+.video-js .vjs-time-control {
+    font-size: rem( 14px );
+    line-height: rem( 36px );
+}
+
+/* While a chapter title is up, the hovered timecode gets out of its way. The
+   class is set from gvp-dev.js only when the marker tip is genuinely showing,
+   so an untitled marker keeps its timecode. Specificity has to clear video.js's
+   own (0,4,0) `.vjs-progress-control:hover .vjs-time-tooltip` reveal. */
+.video-js.gvp-marker-tip-shown .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip {
+    visibility: hidden;
 }
 
 /* Hide the hover-percentage readout on the volume slider (the thumb/tooltip
@@ -1262,11 +1443,13 @@ smaller disconnected loaded time ranges */
 .vjs-tip {
     visibility: hidden;
     display: block;
-    opacity: 0.8;
     padding: 5px;
     font-size: 14px;
     position: absolute;
-    bottom: 14px;
+    /* Clears the top edge of the control bar. The plate used to bottom out ~1px
+       inside it: the arrow is 5px, so the old 14px put the plate's underside at
+       19px above the progress holder while the bar's top edge sits at ~20px. */
+    bottom: rem( 20px );
     z-index: 100000;
 }
 
@@ -1283,8 +1466,17 @@ smaller disconnected loaded time ranges */
 
 .vjs-tip .vjs-tip-inner {
     border-radius: rem( 3px );
-    padding: 5px 8px 4px 8px;
-    background-color: #000;
+    /* Matches the timecode plate exactly, so the two share a baseline. The
+       container's own 5px padding-bottom lifts this plate to the same 25px
+       above the progress holder that the timecode plate is pinned to, leaving
+       room underneath for the arrow. */
+    padding: rem( 6px ) rem( 10px );
+    line-height: rem( 18px );
+    /* The transparency lives here, on the plate, rather than as `opacity` on
+       the whole tip -- opacity fades the label along with its background, which
+       is what made the chapter title look washed out against every other piece
+       of chrome. */
+    background-color: rgba( 0, 0, 0, 0.9 );
     color: #fff;
     max-width: 200px;
     text-align: center;
