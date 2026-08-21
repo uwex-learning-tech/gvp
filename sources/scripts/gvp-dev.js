@@ -816,8 +816,7 @@ function loadVideoJS() {
         fluid: true,
         controlBar: {
             pictureInPictureToggle: false
-        },
-        plugins: {}
+        }
     };
     
     // additional options if the video is from YouTube
@@ -826,17 +825,6 @@ function loadVideoJS() {
         playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
     }
     
-    // add video quality functionality if video is from YouTube or Kaltura
-    if ( ( flags.isYouTube || flags.isKaltura ) && flags.isLocal === false ) {
-
-        // Kaltura: start on the best flavor that exists for this entry (see
-        // pickDefaultFlavor) so the default never points at a missing flavor;
-        // YouTube: the plugin resolves the available qualities itself
-        let defaultRes = ( flags.isKaltura && kaltura.defaultFlavor ) ? kaltura.defaultFlavor.res : 720;
-
-        Object.assign( playerOptions.plugins, { videoJsResolutionSwitcher: { 'default': defaultRes } } );
-
-    }
     
     // initialize the video player bases options/configurations
     gvp.player = videojs( 'gvp-video', playerOptions, function() {
@@ -868,8 +856,9 @@ function loadVideoJS() {
         // mulitple Kaltura flavors
         if ( flags.isKaltura && flags.isLocal === false ) {
             
-            self.poster( kaltura.poster + '/width/900/quality/100' );
-            self.updateSrc( kaltura.flavors );
+            let posterUrl = kaltura.poster + '/width/900/quality/100';
+
+            self.poster( posterUrl );
 
             // video.js only sets the poster as a background image; nothing waits
             // for it to arrive. Without this the cover would clear over an empty
@@ -884,6 +873,11 @@ function loadVideoJS() {
                 probe.src = posterUrl;
 
             } ) );
+            // Kaltura only, deliberately. YouTube serves its own adaptive
+            // stream and treats quality requests from the embed API as advisory,
+            // so a menu there would promise control the player does not have.
+            // Local files have a single source and nothing to choose between.
+            setupQualityMenu( self, kaltura.flavors, kaltura.defaultFlavor );
             
             // setup the caption if applicable
             if ( kaltura.caption ) {
@@ -1604,6 +1598,188 @@ function startCoverFade() {
 
     }, 250 );
     
+}
+
+/**
+ * Quality menu.
+ *
+ * Replaces videojs-resolution-switcher, which was abandoned in 2016, leaned on
+ * private video.js internals, and shipped a chooseSrc() that silently fell back
+ * to the LOWEST quality whenever the requested one was missing. GVP already
+ * works out its own flavor list (selectKalturaFlavors) and starting quality
+ * (pickDefaultFlavor), so all this needs to do is present them and switch.
+ *
+ * Keeps the class and aria-label the stylesheet hooks onto:
+ *   .vjs-menu-button-popup[aria-label="Quality"]  -- show/hide by breakpoint
+ *   .vjs-resolution-button .vjs-icon-placeholder  -- the cog glyph
+ *
+ * @function setupQualityMenu
+ * @param {Object} player   - the video.js player
+ * @param {Array}  flavors  - from selectKalturaFlavors(), highest first
+ * @param {Object} startAt  - from pickDefaultFlavor()
+ */
+function setupQualityMenu( player, flavors, startAt ) {
+
+    if ( !flavors || flavors.length === 0 ) {
+        return;
+    }
+
+    let current = startAt || flavors[0];
+
+    player.gvpQualityFlavors = flavors;
+
+    player.gvpCurrentQuality = function() {
+        return current;
+    };
+
+    player.gvpSetQuality = function( label ) {
+
+        let next = flavors.find( function( f ) { return f.label === label; } );
+
+        if ( !next || next.label === current.label ) {
+            return;
+        }
+
+        // Preserve where the viewer was and whether they were watching.
+        let resumeAt = player.currentTime();
+        let wasPaused = player.paused();
+
+        // `current` only advances once the new source has actually loaded. It
+        // used to be assigned up front, so a flavor that failed to load left the
+        // menu showing a quality that was never playing.
+        let settleQuality = function() {
+
+            player.off( 'loadedmetadata', onLoaded );
+            player.off( 'error', onFailed );
+
+        };
+
+        let onLoaded = function() {
+
+            settleQuality();
+
+            current = next;
+            player.currentTime( resumeAt );
+
+            if ( !wasPaused ) {
+                player.play();
+            }
+
+            player.trigger( 'gvpqualitychange' );
+            announce( 'Quality changed to ' + next.label + '.' );
+
+        };
+
+        // Without this the one-shot loadedmetadata handler was never consumed,
+        // and the NEXT successful switch fired both it and its own -- seeking to
+        // a stale position and resuming playback the viewer had paused.
+        let onFailed = function() {
+
+            settleQuality();
+            player.trigger( 'gvpqualitychange' );
+            announce( 'Could not switch to ' + next.label + '. Staying on ' + current.label + '.' );
+
+        };
+
+        player.one( 'loadedmetadata', onLoaded );
+        player.one( 'error', onFailed );
+
+        player.src( { src: next.src, type: next.type } );
+
+    };
+
+    // Register the components once, then mount the button.
+    if ( !videojs.getComponent( 'GvpQualityMenuButton' ) ) {
+
+        let MenuItem = videojs.getComponent( 'MenuItem' );
+        let MenuButton = videojs.getComponent( 'MenuButton' );
+
+        let GvpQualityMenuItem = class extends MenuItem {
+
+            constructor( p, options ) {
+                options.selectable = true;
+                options.multiSelectable = false;
+                super( p, options );
+                p.on( 'gvpqualitychange', this.update.bind( this ) );
+            }
+
+            handleClick( event ) {
+                super.handleClick( event );
+                this.player_.gvpSetQuality( this.options_.label );
+            }
+
+            update() {
+                this.selected( this.player_.gvpCurrentQuality().label === this.options_.label );
+            }
+
+        };
+
+        let GvpQualityMenuButton = class extends MenuButton {
+
+            constructor( p, options ) {
+                options = options || {};
+                options.label = 'Quality';
+                super( p, options );
+                this.controlText( 'Quality' );
+            }
+
+            createItems() {
+
+                let p = this.player_;
+
+                if ( !p.gvpQualityFlavors ) {
+                    return [];
+                }
+
+                return p.gvpQualityFlavors.map( function( f ) {
+                    return new GvpQualityMenuItem( p, {
+                        label: f.label,
+                        selected: f.label === p.gvpCurrentQuality().label
+                    } );
+                } );
+
+            }
+
+            // v8 puts the wrapper class through buildWrapperCSSClass() and the
+            // inner <button> through buildCSSClass(); the stylesheet needs the
+            // hook on the wrapper, so set it on both.
+            buildWrapperCSSClass() {
+                // gvp-quality-control is the stylesheet's hook for showing and
+                // hiding this control responsively. It goes on the wrapper only,
+                // where vjs-resolution-button (kept for the cog glyph styling)
+                // cannot discriminate -- video.js puts that class on both the
+                // wrapper and the inner button.
+                return super.buildWrapperCSSClass() + ' vjs-resolution-button gvp-quality-control';
+            }
+
+            buildCSSClass() {
+                return super.buildCSSClass() + ' vjs-resolution-button';
+            }
+
+        };
+
+        videojs.registerComponent( 'GvpQualityMenuItem', GvpQualityMenuItem );
+        videojs.registerComponent( 'GvpQualityMenuButton', GvpQualityMenuButton );
+
+    }
+
+    player.src( { src: current.src, type: current.type } );
+
+    player.ready( function() {
+
+        let controlBar = player.getChild( 'controlBar' );
+
+        if ( !controlBar || controlBar.getChild( 'GvpQualityMenuButton' ) ) {
+            return;
+        }
+
+        let fullscreen = controlBar.getChild( 'FullscreenToggle' );
+        let index = fullscreen ? controlBar.children().indexOf( fullscreen ) : undefined;
+
+        controlBar.addChild( 'GvpQualityMenuButton', {}, index );
+
+    } );
+
 }
 
 /**
@@ -2394,6 +2570,44 @@ function toSeconds( str ) {
 
 function showErrorMsgOnCover( str ) {
     
+/**
+ * Says something to assistive tech without putting it on screen.
+ *
+ * Several state changes here are conveyed only by a visual change -- the
+ * quality menu closes and re-sources the player, the video reaches its end card
+ * -- so a screen reader user got no confirmation that anything happened. The
+ * menu has already closed by the time a switch settles, so its own live text is
+ * no longer exposed; this region is independent of it.
+ *
+ * @function announce
+ * @param {String} message
+ */
+function announce( message ) {
+
+    let region = document.getElementById( 'gvp-live-region' );
+
+    if ( !region ) {
+
+        let host = document.getElementsByClassName( 'gvp-video-wrapper' )[0] || document.body;
+
+        region = document.createElement( 'p' );
+        region.id = 'gvp-live-region';
+        region.className = 'gvp-visually-hidden';
+        region.setAttribute( 'role', 'status' );
+
+        host.appendChild( region );
+
+    }
+
+    // Re-setting identical text does not re-announce, so clear first.
+    region.textContent = '';
+
+    setTimeout( function() {
+        region.textContent = message;
+    }, 100 );
+
+}
+
 /**
  * Everything the loading cover is painted over. The cover itself and the error
  * surfaces are deliberately excluded.

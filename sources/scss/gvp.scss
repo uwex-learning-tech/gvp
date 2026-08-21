@@ -998,11 +998,25 @@ smaller disconnected loaded time ranges */
     background: rgba($slider-bg-color, 0.75);
 }
 
-// resolution plugin
-                            
+// ---- quality menu ---------------------------------------------------------
+// The menu itself is built in gvp-dev.js (setupQualityMenu), which replaced the
+// retired videojs-resolution-switcher but kept its .vjs-resolution-button class
+// so this styling still applies.
+//
+// NOTE: the display:none below is NOT dead code. It is the first half of a pair
+// -- the quality button is hidden by default and switched back on inside the
+// control bar at >=530px, in the media query further down, the same treatment
+// the forward/backward buttons get. On a narrow player the control bar has no
+// room for it. Removing this rule makes the button reappear on small embeds.
+//
+// The hook is .gvp-quality-control, set on the wrapper in buildWrapperCSSClass().
+// It used to be [aria-label="Quality"], which coupled a responsive layout rule to
+// an ARIA attribute -- so an accessibility fix could silently break the
+// breakpoint, and vice versa.
+
 .video-js { 
     
-    .vjs-menu-button-popup[aria-label="Quality"] {
+    .gvp-quality-control {
         display: none;
     }
     
@@ -1011,7 +1025,9 @@ smaller disconnected loaded time ranges */
         .vjs-icon-placeholder:before {
             
             font-family: VideoJS;
-            content: '\f110';
+            /* videojs-font 4.x (Video.js 8): cog moved \f110 -> \f114.
+               \f110 is now `file-download`. */
+            content: '\f114';
         
         }
         
@@ -1101,7 +1117,9 @@ and (min-device-width : 530px) {
             display: inline-block;
         }
         
-        .vjs-menu-button-popup[aria-label="Quality"] {
+        // Second half of the pair: hidden by default above, restored here once
+        // the control bar is wide enough to carry it.
+        .gvp-quality-control {
             display: inline-block;
         }
         

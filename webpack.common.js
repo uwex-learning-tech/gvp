@@ -150,9 +150,13 @@ module.exports = {
                 dest: './dist/sources/scripts/videojs/video.js',
                 src: [
                     './sources/scripts/videojs/video.js',
-                    './sources/scripts/videojs/plugins/markers/videojs-markers.js',
-                    './sources/scripts/videojs/plugins/resolution/videojs-resolution-switcher.js',
-                    './sources/scripts/videojs/plugins/youtube/youtube.min.js'
+                    './sources/scripts/videojs/plugins/markers/videojs-markers.js'
+                    // videojs-resolution-switcher was retired in favour of the
+                    // in-house quality menu (setupQualityMenu in gvp-dev.js).
+                    // youtube.min.js is deliberately NOT bundled here: it is only
+                    // needed for YouTube-sourced videos and is fetched on demand
+                    // (see loadYouTubeTech in gvp-dev.js). Bundling it also made
+                    // every Kaltura page pull youtube.com/iframe_api for nothing.
                 ],
                 transforms: {
                     after: async (code) => {
