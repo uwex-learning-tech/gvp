@@ -1,6 +1,6 @@
 {
   "name": "generic-video-player",
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "A generic video player for delivering video content at UWEX.",
   "private": true,
   "scripts": {

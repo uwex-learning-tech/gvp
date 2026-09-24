@@ -1,5 +1,9 @@
 # Version Change Log
 
+**4.2.1**
+* Added support for a local caption file for Kaltura videos, named after the project folder (e.g. apc410_lab-assignments.vtt); it replaces the Kaltura caption track in the same language
+* The captionLanguage tag in gvp.xml now also applies to Kaltura videos' local caption file
+
 **4.2.0**
 * Updated VideoJS to version 8.24.0
 * Updated the VideoJS YouTube component to version 3.0.1
