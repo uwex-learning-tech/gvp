@@ -1,5 +1,8 @@
 # Version Change Log
 
+**4.2.4**
+* Fixed a small empty caption box appearing during silent parts of a video
+
 **4.2.3**
 * Captions now display in a single rounded box with more space around the text
 * Captions sit clear of the playback controls instead of touching or overlapping them
