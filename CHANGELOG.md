@@ -1,5 +1,10 @@
 # Version Change Log
 
+**4.2.3**
+* Captions now display in a single rounded box with more space around the text
+* Captions sit clear of the playback controls instead of touching or overlapping them
+* Captions no longer shrink below a readable size on small players
+
 **4.2.2**
 * Fixed captions appearing underneath the playback controls in Safari
 
