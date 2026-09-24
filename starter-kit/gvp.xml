@@ -11,10 +11,18 @@
               the name from the URL
          * kalturaId tag is required for video hosted on Kaltura.
          * youtubeId tag is required for video hosted on YouTube.
-         * captionLanguage tag is optional (for YouTube and local video)
+         * captionLanguage tag is optional
            - use for specifying caption language code and label
            - defaulted to "en" for code and "English" for label
-         
+           - applies to the local caption file described below
+         * A local caption file can be placed next to this file, ending in
+           ".vtt" and named after:
+            - Kaltura: the project folder, lowercase, like the transcript
+              download -- e.g. apc410_lab-assignments.vtt. It replaces
+              Kaltura's caption track in the same language.
+            - YouTube: the youtubeId -- e.g. bXo_cKEdVvw.vtt
+            - Local: the fileName value, or "video" -- e.g. video.vtt
+
          !!! kalturaId has higher priority over youtubeId if both tag exists !!!
          
          Examples:

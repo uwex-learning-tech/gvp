@@ -1060,29 +1060,55 @@ function loadVideoJS() {
             // Local files have a single source and nothing to choose between.
             setupQualityMenu( self, kaltura.flavors, kaltura.defaultFlavor );
             
-            // setup the caption if applicable
-            if ( kaltura.caption ) {
-                
-                kaltura.caption.forEach( caption => {
-                    
-                    if ( caption.label.toLowerCase() !== "english (autocaption)" ) {
+            // A local <project name>.vtt next to gvp.xml lets an author supply
+            // corrected captions without touching the Kaltura entry. It is
+            // named like the transcript download, not after the entry ID. It
+            // replaces Kaltura's track in the same language, so the menu never
+            // lists a language twice. Kaltura's other languages are still
+            // offered.
+            let localCaption = null;
+            let captionFile = getProjectName() + '.vtt';
 
-                        self.addRemoteTextTrack( {
-                            kind: 'captions',
-                            // Same fallback the local .vtt path already applies:
-                            // a track with an empty lang is mislabelled by the
-                            // browser and cannot be matched by caption-language
-                            // preferences.
-                            language: caption.languageCode || 'en',
-                            label: caption.language || 'English',
-                            src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + caption.id + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
-                        }, true );
+            fileExist( captionFile ).then( result => {
 
-                    }
+                if ( result ) {
 
-                } );
-                
-            }
+                    localCaption = getLocalCaptionTrack( captionFile );
+                    self.addRemoteTextTrack( localCaption, true );
+
+                }
+
+                // setup the caption if applicable
+                if ( kaltura.caption ) {
+
+                    kaltura.caption.forEach( caption => {
+
+                        // Same fallback the local .vtt path already applies:
+                        // a track with an empty lang is mislabelled by the
+                        // browser and cannot be matched by caption-language
+                        // preferences.
+                        let language = caption.languageCode || 'en';
+
+                        if ( localCaption && language === localCaption.language ) {
+                            return;
+                        }
+
+                        if ( caption.label.toLowerCase() !== "english (autocaption)" ) {
+
+                            self.addRemoteTextTrack( {
+                                kind: 'captions',
+                                language: language,
+                                label: caption.language || 'English',
+                                src: 'https://www.kaltura.com/api_v3/?service=caption_captionasset&action=servewebvtt&captionAssetId=' + caption.id + '&segmentDuration=' + kaltura.duration + '&segmentIndex=1'
+                            }, true );
+
+                        }
+
+                    } );
+
+                }
+
+            } );
             
         } else {
 
@@ -1093,22 +1119,7 @@ function loadVideoJS() {
             fileExist( gvp.source + '.vtt' ).then( result => {
                 
                 if ( result ) {
-
-                    let code = 'en';
-                    let label = 'English';
-
-                    if ( gvp.captionLanguage ) {
-                        code = gvp.captionLanguage.code.length ? gvp.captionLanguage.code : code;
-                        label = gvp.captionLanguage.label.length ? gvp.captionLanguage.label : label;
-                    }
-                    
-                    self.addRemoteTextTrack( {
-                        kind: 'captions',
-                        language: code,
-                        label: label,
-                        src: gvp.source + '.vtt'
-                    }, true );
-
+                    self.addRemoteTextTrack( getLocalCaptionTrack( gvp.source + '.vtt' ), true );
                 }
 
             } );
@@ -2672,6 +2683,33 @@ function downloadables( vjs ) {
 }
 
 /**
+ * Returns the project name: the last folder of the page URL, cleaned the way
+ * downloadable file names are, or 'video' when the URL has no such folder.
+ * Kaltura and YouTube videos name their companion files (transcripts, local
+ * captions) after it, since their source is an ID nobody would name a file by.
+ *
+ * @function getProjectName
+ * @return {String}
+ */
+function getProjectName() {
+
+    let lastIndex = reference.names.length;
+
+    if ( lastIndex <= 2 ) {
+        lastIndex = -1;
+    } else {
+        lastIndex--;
+    }
+
+    if ( reference.names[lastIndex] !== undefined ) {
+        return cleanString( reference.names[lastIndex] );
+    }
+
+    return 'video';
+
+}
+
+/**
  * Set the downloadable file type with proper name.
  * 
  * @function setDownloadables
@@ -2693,30 +2731,8 @@ function setDownloadables() {
         
     }
     
-    if ( flags.isYouTube ) {
-        
-        if ( reference.names[lastIndex] !== undefined ) {
-                    
-            fileName = reference.names[lastIndex];
-            
-        } else {
-            
-            fileName = 'video';
-            
-        }
-        
-    } else if ( flags.isKaltura ) {
-        
-        if ( reference.names[lastIndex] !== undefined ) {
-                    
-            fileName = reference.names[lastIndex];
-            
-        } else {
-            
-            fileName = 'video';
-            
-        }
-        
+    if ( flags.isYouTube || flags.isKaltura ) {
+        fileName = getProjectName();
     }
     
     // Wire the Kaltura transcript-download analytics event onto whichever
@@ -3013,6 +3029,25 @@ function getScript( file, isAsync = true, callback = false, errorCallback = fals
 
     script.src = file;
     head.appendChild( script );
+
+}
+
+/**
+ * Builds the text track for a local caption file, labelled from
+ * <captionLanguage> in gvp.xml and defaulting to English.
+ *
+ * @function getLocalCaptionTrack
+ * @param {String} file - path to the .vtt file
+ * @return {Object} options for player.addRemoteTextTrack()
+ */
+function getLocalCaptionTrack( file ) {
+
+    return {
+        kind: 'captions',
+        language: gvp.captionLanguage.code || 'en',
+        label: gvp.captionLanguage.label || 'English',
+        src: file
+    };
 
 }
 
