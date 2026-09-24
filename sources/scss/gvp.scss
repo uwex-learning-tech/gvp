@@ -1374,6 +1374,39 @@ smaller disconnected loaded time ranges */
     background: rgba($slider-bg-color, 0.75);
 }
 
+// ---- captions -------------------------------------------------------------
+// video.js reserves 3em under the captions for the control bar, which is the
+// bar's height but not its 2% lift off the bottom edge, so captions sat right
+// on (and at some sizes under) the floating bar. Clear the bar plus a gap. The
+// inactive/playing state, where the bar is hidden, keeps video.js's 1em.
+.video-js:not(.vjs-controls-disabled):not(.vjs-user-inactive.vjs-playing) .vjs-text-track-display {
+    bottom: calc( 3.5em + 2% );
+}
+
+// video.js paints the caption background straight onto inline text, so each
+// wrapped line gets its own tight strip. As an inline-block the same element
+// becomes one rounded box as wide as the longest line, with room around the
+// text. Colours and opacity are video.js inline styles driven by the viewer's
+// caption settings, and are deliberately not touched.
+//
+// The font-size floor: video.js sizes captions at 5% of the player's height,
+// which is unreadable on a small embed (about 12px at 420px wide, and falling).
+// It is set on this inner box as max(1em, ...) so it inherits the size video.js
+// put on the cue -- including the viewer's font-size setting -- and only steps
+// in below the floor.
+//
+// The selector is structural on purpose. video.js lays each cue out and works
+// out its position BEFORE it adds the .vjs-text-track-cue class, so a rule keyed
+// on that class is missing from the measurement: the box is placed at its
+// unstyled size and then grows past it, into the control bar. Matching on the
+// markup (display > cue root > cue box > text) applies during layout.
+.video-js .vjs-text-track-display > div > div > div {
+    font-size: max( 1em, 14px );
+    display: inline-block !important;
+    padding: 0.2em 0.5em;
+    border-radius: 0.3em;
+}
+
 // ---- quality menu ---------------------------------------------------------
 // The menu itself is built in gvp-dev.js (setupQualityMenu), which replaced the
 // retired videojs-resolution-switcher but kept its .vjs-resolution-button class
