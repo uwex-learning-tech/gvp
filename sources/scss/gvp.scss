@@ -1405,6 +1405,13 @@ smaller disconnected loaded time ranges */
     display: inline-block !important;
     padding: 0.2em 0.5em;
     border-radius: 0.3em;
+
+    // Kaltura writes an empty cue for every stretch of silence. As plain inline
+    // text an empty cue drew nothing; as a padded box it draws a small black
+    // chip, so hide the box when there is no text in it.
+    &:empty {
+        display: none !important;
+    }
 }
 
 // ---- quality menu ---------------------------------------------------------
