@@ -997,6 +997,15 @@ function loadVideoJS() {
         fluid: true,
         controlBar: {
             pictureInPictureToggle: false
+        },
+        html5: {
+            // Safari defaults to native caption rendering, which pins cues to
+            // the bottom edge of the video -- underneath the floating control
+            // bar. video.js's own rendering lifts them clear of the controls,
+            // as it already does in every other browser. iPhone keeps native
+            // captions: its fullscreen is the system player, which shows only
+            // native tracks, so video.js-drawn captions would vanish there.
+            nativeTextTracks: videojs.browser.IS_IPHONE
         }
     };
     
