@@ -43,8 +43,39 @@ const BUILD_DATE = ( () => {
 const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const WebpackConcatPlugin = require('webpack-concat-files-plugin');
 const terser = require('terser');
+
+// Bundles VideoJS and its plugins into a single minified video.js. Built in
+// rather than using webpack-concat-files-plugin, which is unmaintained and
+// pulls in outdated, vulnerable dependencies.
+class ConcatVideoJsPlugin {
+
+    constructor( { dest, src } ) {
+        this.dest = dest;
+        this.src = src.map( ( file ) => path.resolve( __dirname, file ) );
+    }
+
+    apply( compiler ) {
+        compiler.hooks.thisCompilation.tap( 'ConcatVideoJsPlugin', ( compilation ) => {
+            compilation.hooks.processAssets.tapPromise(
+                {
+                    name: 'ConcatVideoJsPlugin',
+                    stage: webpack.Compilation.PROCESS_ASSETS_STAGE_PRE_PROCESS,
+                },
+                async () => {
+                    // rebuild in watch mode when any source file changes
+                    this.src.forEach( ( file ) => compilation.fileDependencies.add( file ) );
+
+                    const code = this.src.map( ( file ) => fs.readFileSync( file, 'utf8' ) ).join( '\n' );
+                    const minified = await terser.minify( code );
+
+                    compilation.emitAsset( this.dest, new webpack.sources.RawSource( minified.code ), { minimized: true } );
+                }
+            );
+        } );
+    }
+
+}
 
 module.exports = {
 
@@ -79,7 +110,7 @@ module.exports = {
                         loader: 'sass-loader',
                         options: {
                           // Prefer `dart-sass`
-                          implementation: require.resolve('sass'),
+                          implementation: require('sass'),
                         },
                     },
                 ],
@@ -172,29 +203,19 @@ module.exports = {
                 }
             ],
         } ),
-        new WebpackConcatPlugin({
-            bundles: [
-              {
-                dest: './dist/sources/scripts/videojs/video.js',
-                src: [
-                    './sources/scripts/videojs/video.js',
-                    './sources/scripts/videojs/plugins/markers/videojs-markers.js'
-                    // videojs-resolution-switcher was retired in favour of the
-                    // in-house quality menu (setupQualityMenu in gvp-dev.js).
-                    // youtube.min.js is deliberately NOT bundled here: it is only
-                    // needed for YouTube-sourced videos and is fetched on demand
-                    // (see loadYouTubeTech in gvp-dev.js). Bundling it also made
-                    // every Kaltura page pull youtube.com/iframe_api for nothing.
-                ],
-                transforms: {
-                    after: async (code) => {
-                      const minifiedCode = await terser.minify(code);
-                      return minifiedCode.code;
-                    },
-                },
-              },
+        new ConcatVideoJsPlugin( {
+            dest: 'sources/scripts/videojs/video.js',
+            src: [
+                './sources/scripts/videojs/video.js',
+                './sources/scripts/videojs/plugins/markers/videojs-markers.js'
+                // videojs-resolution-switcher was retired in favour of the
+                // in-house quality menu (setupQualityMenu in gvp-dev.js).
+                // youtube.min.js is deliberately NOT bundled here: it is only
+                // needed for YouTube-sourced videos and is fetched on demand
+                // (see loadYouTubeTech in gvp-dev.js). Bundling it also made
+                // every Kaltura page pull youtube.com/iframe_api for nothing.
             ],
-        }),
+        } ),
         new MiniCssExtractPlugin({
             filename: 'sources/css/[name].css',
             chunkFilename: 'sources/css/[id].css',

@@ -27,7 +27,15 @@
  *
  */
 
+@use 'sass:color';
 @use 'sass:math';
+
+// Same result as the retired lighten(): raises the HSL lightness and stops
+// at white (color.adjust alone can go past 100% and emit an invalid color).
+@function lighter( $color, $amount ) {
+    $lightness: math.min( 100%, color.channel( $color, 'lightness', $space: hsl ) + $amount );
+    @return color.to-space( color.change( $color, $lightness: $lightness, $space: hsl ), rgb );
+}
 
 $base: 16px;
 $gutter: 20px;
@@ -594,6 +602,9 @@ html {
                     gap: rem( 6px );
 
                     @include gvp-badge;
+                    text-decoration: none;
+                    cursor: pointer;
+                    user-select: none;
 
                     // Icons come from the VideoJS font we already ship, not from
                     // a third-party CDN. The box is reserved up front so a late
@@ -616,9 +627,6 @@ html {
                             content: '\f10e';   // chapters
                         }
                     }
-                    text-decoration: none;
-                    cursor: pointer;
-                    user-select: none;
                 }
 
                 a:hover {
@@ -1259,7 +1267,7 @@ bit of blue so it can still be seen on all-black video frames, which are common.
 
 // Make a slightly lighter version of the main background
 // for the slider background.
-$slider-bg-color: lighten($primary-background-color, 33%);
+$slider-bg-color: lighter($primary-background-color, 33%);
 
 /* Slider - used for Volume bar and Progress bar */
 .video-js .vjs-slider {
@@ -1360,7 +1368,7 @@ $slider-bg-color: lighten($primary-background-color, 33%);
 /* The main progress bar also has a bar that shows how much has been loaded. */
 .video-js .vjs-load-progress {
     /* For IE8 we'll lighten the color */
-    background: lighten($slider-bg-color, 25%);
+    background: lighter($slider-bg-color, 25%);
     /* Otherwise we'll rely on stacked opacities */
     background: rgba($slider-bg-color, 0.5);
 }
@@ -1369,7 +1377,7 @@ $slider-bg-color: lighten($primary-background-color, 33%);
 smaller disconnected loaded time ranges */
 .video-js .vjs-load-progress div {
     /* For IE8 we'll lighten the color */
-    background: lighten($slider-bg-color, 50%);
+    background: lighter($slider-bg-color, 50%);
     /* Otherwise we'll rely on stacked opacities */
     background: rgba($slider-bg-color, 0.75);
 }
