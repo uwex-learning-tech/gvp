@@ -5,14 +5,12 @@
  * @author: Bryan Bortz
  * @url: https://github.com/uwex-learning-tech/gvp
  *
- * The version and build date are injected at build time from package.json --
- * see the banner at the top of the built file, and __GVP_VERSION__ below.
- *
  * @license: GNU GENERAL PUBLIC LICENSE v3
  *
     Generic Video Player is a video player build on top of VideoJS to serve
     video contents.
-    Copyright (C) 2013-2026  Ethan S. Lin, UW Extended Campus
+    Copyright (C) 2013-2026  Ethan S. Lin, Media Services, Universities of
+    Wisconsin Office of Online & Professional Learning Resources
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
