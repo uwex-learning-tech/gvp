@@ -4,6 +4,9 @@ sources/assets/
 # local offline test rig (large media, not for version control)
 testrig/
 
+# feature plans (working notes, not for version control)
+plans/
+
 ### macOS ###
 # General
 .DS_Store
