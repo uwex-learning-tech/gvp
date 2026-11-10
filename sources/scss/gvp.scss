@@ -679,6 +679,79 @@ html {
     // what the author wrote ("Coefficient of Determination" became "Of").
     .video-js .vjs-chapters-button .vjs-menu .vjs-menu-item {
         text-transform: none;
+        counter-increment: gvp-chapter;
+        // check column, then a number column; wrapped lines hang under the
+        // title rather than under the number
+        padding-left: calc( #{rem( 10px )} + 1.25em + var( --gvp-chapter-digits ) + 0.5em );
+    }
+
+    // The title bar sits flush with the top of the box, so the menu's own top
+    // padding would leave a gap above it.
+    .video-js .vjs-chapters-button.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+        counter-reset: gvp-chapter;
+        padding-top: 0;
+
+        // Keyboard focus scrolls an item just into view -- which, at the top,
+        // is underneath the sticky title bar. Keep that band clear (title:
+        // 1.1em x (1.4em line + 0.7em padding), plus its border and margin).
+        scroll-padding-top: calc( 2.35em + #{rem( 7px )} );
+
+        // The number column is only as wide as the widest number, so a short
+        // list keeps its numbers tight against the marker column. The first
+        // child is the title, hence 11 and 101. Two digits is the default so
+        // a browser without :has() overlaps nothing, just sits a little wider.
+        --gvp-chapter-digits: 2ch;
+
+        &:not( :has( > li:nth-child( 11 ) ) ) {
+            --gvp-chapter-digits: 1ch;
+        }
+
+        &:has( > li:nth-child( 101 ) ) {
+            --gvp-chapter-digits: 3ch;
+        }
+    }
+
+    .video-js .vjs-chapters-button .vjs-menu .vjs-menu-item::before,
+    .video-js .vjs-chapters-button .vjs-menu .vjs-menu-item::after {
+        // Pin the check and number to the first line of a wrapped title, not
+        // to the middle of the whole block.
+        top: 0.2em;
+        transform: none;
+        line-height: 1.4em;
+    }
+
+    .video-js .vjs-chapters-button .vjs-menu .vjs-menu-item::after {
+        // The empty alt keeps screen readers from reading the number after the
+        // title ("Coefficient of Determination 3"); the menu already announces
+        // each title and which one is current.
+        content: counter( gvp-chapter );
+        content: counter( gvp-chapter ) / '';
+        position: absolute;
+        // just past the 1em check column, with a hair of air
+        left: calc( #{rem( 10px )} + 1.25em );
+        width: var( --gvp-chapter-digits );
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        opacity: 0.8;
+    }
+
+    // A title bar rather than a small caps label floating in the list: an
+    // opaque strip with a hairline under it, and sticky, so the heading stays
+    // put while a long chapter list scrolls beneath it.
+    .video-js .vjs-chapters-button .vjs-menu li.vjs-menu-title {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        justify-content: center;
+        margin: 0 0 rem( 6px );
+        padding: 0.35em 1em;
+        background-color: rgb( 30, 36, 44 );
+        border-bottom: 1px solid rgba( 255, 255, 255, 0.2 );
+        font-size: 1.1em;
+        font-weight: 600;
+        line-height: 1.4em;
+        text-transform: none;
+        letter-spacing: 0.01em;
     }
 
     .video-js .vjs-menu .vjs-menu-item::before {
@@ -693,6 +766,14 @@ html {
 
     .video-js .vjs-menu .vjs-menu-item.vjs-selected::before {
         content: '\2713';
+    }
+
+    // The current chapter is where playback is, not a choice the viewer ticked,
+    // so it gets the player's own play glyph rather than a checklist mark.
+    .video-js .vjs-chapters-button .vjs-menu .vjs-menu-item.vjs-selected::before {
+        content: '\f101';          // VideoJS play
+        content: '\f101' / '';
+        font-family: VideoJS;
     }
 
     .video-js .vjs-downloads-button + .vjs-menu .vjs-menu-item::before {
@@ -773,8 +854,17 @@ html {
         // centring would push the box past the edge of the player. The shift is
         // measured in JS (clampMenus) because a control near the right edge can
         // overflow at any menu width -- capping the width alone cannot fix it.
-        left: 50%;
-        transform: translateX( calc( -50% + var( --gvp-menu-shift, 0px ) ) );
+        //
+        // Centred without a transform: Safari mis-paints a sticky child (the
+        // chapters title bar) inside a transformed scroller, letting the rows
+        // scrolled under it show through its top edge. Instead the box gets
+        // equal, far-out offsets on both sides and auto margins split the
+        // slack, which centres it on the button; moving both offsets by the
+        // shift moves the centre by the same amount.
+        left: calc( -100vw + var( --gvp-menu-shift, 0px ) );
+        right: calc( -100vw - var( --gvp-menu-shift, 0px ) );
+        margin-left: auto;
+        margin-right: auto;
     }
 
     // Down-pointing triangle centered beneath the menu, pointing at the button.
