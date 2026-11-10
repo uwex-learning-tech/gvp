@@ -1,5 +1,18 @@
 # Version Change Log
 
+**4.2.5**
+* Chapters in the chapters menu are now numbered
+* The chapters menu has a title bar that stays in place while the list scrolls
+* The chapters menu grows taller to show more chapters before scrolling
+* The current chapter is marked with a play symbol instead of a check mark
+* Selected items in the other menus use a bolder check mark
+* Improved keyboard and screen reader use of the chapters menu
+* Fixed untitled chapters sometimes showing a different number than the menu
+* Fixed the chapters menu sometimes staying empty, mainly for YouTube videos
+* Added Apache caching rules to the build
+* Updated build tools to resolve security advisories; building now requires Node.js 22.15 or later
+* Fixed an invalid comment in the sample gvp.xml
+
 **4.2.4**
 * Fixed a small empty caption box appearing during silent parts of a video
 
