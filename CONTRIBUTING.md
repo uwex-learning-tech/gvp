@@ -8,7 +8,7 @@ Nothing is committed directly to `master`. Every change goes through a pull requ
 2. Make small, logical commits.
 3. Push the branch and open a pull request describing what changed and how it was tested.
 4. The CI check (`npm ci` and `npm run build`) must pass.
-5. Squash-merge. The branch is deleted automatically.
+5. Merge with "Rebase and merge", so each commit lands on `master` as is. The branch is deleted automatically.
 
 Feature work doesn't change the version number or `CHANGELOG.md`; that happens at release time.
 
