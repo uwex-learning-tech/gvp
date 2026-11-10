@@ -1995,13 +1995,16 @@ function setupChapters( player ) {
 
     let build = function() {
 
-        player.off( 'loadedmetadata', build );
-
         let duration = player.duration();
 
-        if ( !duration || isNaN( duration ) ) {
+        // Not known yet (YouTube, or a stream before its manifest): keep
+        // listening rather than give up, or the menu stays empty for good.
+        // Infinite (live) has no last chapter to end, so no menu at all.
+        if ( !duration || !isFinite( duration ) ) {
             return;
         }
+
+        player.off( [ 'loadedmetadata', 'durationchange' ], build );
 
         // Markers are points in time; chapters are ranges. Each one therefore
         // runs until the next begins, and the last to the end of the video --
@@ -2048,11 +2051,8 @@ function setupChapters( player ) {
 
     };
 
-    if ( player.duration() && !isNaN( player.duration() ) ) {
-        build();
-    } else {
-        player.on( 'loadedmetadata', build );
-    }
+    player.on( [ 'loadedmetadata', 'durationchange' ], build );
+    build();
 
 }
 
