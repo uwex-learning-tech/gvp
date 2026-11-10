@@ -765,7 +765,13 @@ html {
     }
 
     .video-js .vjs-menu .vjs-menu-item.vjs-selected::before {
-        content: '\2713';
+        // Heavy check mark; FE0E keeps it a text glyph, not an emoji. Arial has
+        // no check, so name the Windows symbol font before the system falls
+        // back to its colour emoji one. The empty alt keeps it silent: the
+        // item already announces ", selected".
+        content: '\2714\FE0E';
+        content: '\2714\FE0E' / '';
+        font-family: 'Segoe UI Symbol', Arial, Helvetica, sans-serif;
     }
 
     // The current chapter is where playback is, not a choice the viewer ticked,
