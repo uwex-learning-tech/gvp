@@ -1695,16 +1695,30 @@ function sendToGoogleAnalytics( event, value = 0 ) {
  * marker objects themselves so the timeline tooltip and the chapters menu are
  * reading the same string rather than each deriving its own.
  *
+ * The number must also match the one the chapters menu shows beside it, so it
+ * counts chapters the way setupChapters() builds them: markers with no usable
+ * time are skipped, and markers sharing a time are one chapter. Markers past
+ * the end of the video are dropped there too, but they sort last, so they
+ * cannot shift anyone else's number.
+ *
  * @function labelMarkers
  */
 function labelMarkers() {
 
-    xml.markersCollection
-        .slice()
-        .sort( function( a, b ) { return a.time - b.time; } )
-        .forEach( function( marker, i ) {
+    let number = 0;
+    let lastTime = null;
 
-            marker.label = ( marker.text || '' ).trim() || ( 'Chapter ' + ( i + 1 ) );
+    xml.markersCollection
+        .filter( function( m ) { return !isNaN( m.time ) && m.time >= 0; } )
+        .sort( function( a, b ) { return a.time - b.time; } )
+        .forEach( function( marker ) {
+
+            if ( marker.time !== lastTime ) {
+                number++;
+                lastTime = marker.time;
+            }
+
+            marker.label = ( marker.text || '' ).trim() || ( 'Chapter ' + number );
 
         } );
 
@@ -1987,7 +2001,7 @@ function setupChapters( player ) {
             // labelMarkers() already worked this out, including the fallback
             // for an untitled marker; deriving it a second time here would
             // renumber whenever a marker is filtered out above.
-            let text = point.label || ( point.text || '' ).trim() || ( 'Chapter ' + ( i + 1 ) );
+            let text = point.label || ( point.text || '' ).trim();
 
             track.addCue( new Cue( point.time, end, text ) );
 
