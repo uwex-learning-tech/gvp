@@ -1864,7 +1864,9 @@ function enableButtonTabbing( player ) {
  * the controls nearest the right edge: a chapters menu wide enough to hold a
  * real chapter title hangs off the side of a narrow player. Capping the width
  * does not solve it -- a button close enough to the edge overflows at any width
- * -- so the box is measured after it opens and nudged back inside.
+ * -- so the box is measured after it opens and nudged back inside. The same
+ * measurement sets how tall the box may grow: into the room above it, up to
+ * 70% of the player's height.
  *
  * @function clampMenus
  * @param {Object} player
@@ -1910,7 +1912,35 @@ function clampMenus( player ) {
                 menu.style.setProperty( '--gvp-menu-shift', Math.round( shift ) + 'px' );
             }
 
+            // The box is anchored by its bottom, so it grows upward into the
+            // room above it, and a list longer than that scrolls. Capped at
+            // 70% of the player so a long list on a big screen does not bury
+            // the whole picture, but never taller than the room there is.
+            let room = Math.floor( rect.bottom - bounds.top - edge );
+            let cap = Math.max( 120, Math.round( bounds.height * 0.7 ) );
+
+            menu.style.setProperty( '--gvp-menu-max-height', Math.max( 0, Math.min( room, cap ) ) + 'px' );
+
         }
+
+    };
+
+    // Once per frame, after the menu has been laid out -- mouseover fires for
+    // every child the pointer crosses, and each pass forces a layout.
+    let pending = false;
+
+    let schedule = function() {
+
+        if ( pending ) {
+            return;
+        }
+
+        pending = true;
+
+        requestAnimationFrame( function() {
+            pending = false;
+            clamp();
+        } );
 
     };
 
@@ -1918,14 +1948,11 @@ function clampMenus( player ) {
 
     if ( controlBar ) {
 
-        // after the menu has been laid out, not before
-        controlBar.el().addEventListener( 'click', function() {
-            requestAnimationFrame( clamp );
-        }, true );
+        controlBar.el().addEventListener( 'click', schedule, true );
+        controlBar.el().addEventListener( 'mouseover', schedule, true );
 
-        controlBar.el().addEventListener( 'mouseover', function() {
-            requestAnimationFrame( clamp );
-        }, true );
+        // menus opened from the keyboard never see a mouseover
+        controlBar.el().addEventListener( 'keydown', schedule, true );
 
     }
 

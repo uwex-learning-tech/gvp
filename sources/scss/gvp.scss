@@ -844,9 +844,11 @@ html {
         // 530px breakpoint where these menus start appearing.
         max-width: 22em;
 
-        // Likewise vertically: a video with many chapters would otherwise run
-        // off the end of a hidden box with no way to reach the rest.
-        max-height: 15em;
+        // Vertically, the menu may use all the room between the control bar
+        // and the top of the player -- measured in JS (clampMenus) into
+        // --gvp-menu-max-height. 15em is the fallback before the first
+        // measurement; anything still longer scrolls.
+        max-height: var( --gvp-menu-max-height, 15em );
         overflow-x: hidden;
         overflow-y: auto;
 
