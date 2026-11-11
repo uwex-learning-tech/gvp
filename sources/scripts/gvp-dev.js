@@ -58,7 +58,9 @@ let gvp = {
     captionLanguage: {
         code: '',
         label: ''
-    }
+    },
+    // <captionSearch>false</captionSearch> in gvp.xml turns the find bar off
+    captionSearch: true
 };
 
 // injected by webpack.DefinePlugin from package.json
@@ -562,6 +564,20 @@ function getVideoSource() {
 
             }
             
+            // Caption search is on unless the author says otherwise. Only an
+            // explicit false, 0 or no turns it off; an empty tag leaves it on.
+            let captionSearchTag = xml.doc.getElementsByTagName( 'captionSearch' )[0];
+
+            if ( captionSearchTag ) {
+
+                let value = captionSearchTag.textContent.trim().toLowerCase();
+
+                if ( [ 'false', '0', 'no' ].indexOf( value ) !== -1 ) {
+                    gvp.captionSearch = false;
+                }
+
+            }
+
             // check to see is there are markers
             if ( xml.doc != null ) {
                 
@@ -1560,6 +1576,20 @@ function loadVideoJS() {
             console.error( 'GVP: player decoration failed, continuing without it: ' + ( e && e.message ) );
 
         }
+
+        // A try of its own, so a failure here costs only the find bar and can
+        // never skip the decoration above.
+        try {
+
+            if ( gvp.captionSearch ) {
+                setupCaptionSearch( self );
+            }
+
+        } catch ( e ) {
+
+            console.error( 'GVP: caption search failed, continuing without it: ' + ( e && e.message ) );
+
+        }
         
         // hide the program theme cover
         hideCover();
@@ -2053,6 +2083,962 @@ function setupChapters( player ) {
 
     player.on( [ 'loadedmetadata', 'durationchange' ], build );
     build();
+
+}
+
+/**
+ * Caption search: a find bar for what is said in the video.
+ *
+ * A magnifier in the control bar opens a strip at the top of the player with a
+ * field, a match count, previous and next, and Done -- the Find bar from
+ * Safari, Preview and Pages. Each step seeks to the start of the caption that
+ * holds the match. There is deliberately no list of results: the feature is
+ * find, not a transcript.
+ *
+ * Only text GVP already loads as a captions or subtitles track is searchable.
+ * The cues are fetched and parsed here rather than read off the player,
+ * because Safari on iPhone uses native tracks and hands over no cues for a
+ * track that is turned off.
+ *
+ * @function setupCaptionSearch
+ * @param {Object} player
+ */
+function setupCaptionSearch( player ) {
+
+    let controlBar = player.getChild( 'controlBar' );
+
+    if ( !controlBar || controlBar.getChild( 'GvpSearchButton' ) ) {
+        return;
+    }
+
+    // ---- state ----
+
+    // per track: { track, label, language, cues, joined, offsets }
+    let sources = [];
+    let cueCache = {};
+
+    let search = {
+        open: false,
+        query: '',
+        source: null,
+        hits: [],           // indexes into source.cues, in time order
+        current: -1,
+        typing: null,       // debounce timer
+        speaking: null,     // announcement debounce timer
+        lastSpoken: '',
+        ownSeek: false
+    };
+
+    // ---- the bar ----
+
+    let bar = document.createElement( 'div' );
+    bar.className = 'gvp-find-bar';
+    bar.id = 'gvp-find-bar';
+    bar.setAttribute( 'role', 'group' );
+    bar.hidden = true;
+
+    let field = document.createElement( 'label' );
+    field.className = 'gvp-find-field';
+    field.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.5 1a5.5 5.5 0 0 1 4.38 8.82l3.65 3.65-1.06 1.06-3.65-3.65A5.5 5.5 0 1 1 6.5 1Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>';
+
+    let input = document.createElement( 'input' );
+    input.type = 'search';
+    input.dir = 'auto';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.setAttribute( 'aria-label', 'Search the video' );
+    input.setAttribute( 'aria-describedby', 'gvp-find-snippet' );
+    input.placeholder = 'Search the video';
+    field.appendChild( input );
+
+    let count = document.createElement( 'span' );
+    count.className = 'gvp-find-count';
+    count.setAttribute( 'aria-hidden', 'true' );
+
+    let nav = document.createElement( 'span' );
+    nav.className = 'gvp-find-nav';
+
+    let prev = document.createElement( 'button' );
+    prev.type = 'button';
+    prev.className = 'gvp-find-prev';
+    prev.setAttribute( 'aria-label', 'Previous match' );
+    prev.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M8.2 1.4 3.6 6l4.6 4.6-1 1L1.6 6l5.6-5.6z"/></svg>';
+
+    let next = document.createElement( 'button' );
+    next.type = 'button';
+    next.className = 'gvp-find-next';
+    next.setAttribute( 'aria-label', 'Next match' );
+    next.innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M3.8 1.4 8.4 6l-4.6 4.6 1 1L10.4 6 4.8.4z"/></svg>';
+
+    nav.appendChild( prev );
+    nav.appendChild( next );
+
+    let done = document.createElement( 'button' );
+    done.type = 'button';
+    done.className = 'gvp-find-done';
+    done.textContent = 'Done';
+
+    // the current match's words, for a screen reader to read on request
+    let snippet = document.createElement( 'span' );
+    snippet.id = 'gvp-find-snippet';
+    snippet.className = 'gvp-visually-hidden';
+    snippet.setAttribute( 'aria-hidden', 'true' );
+
+    let spacer = document.createElement( 'span' );
+    spacer.className = 'gvp-find-spacer';
+
+    bar.appendChild( field );
+    bar.appendChild( count );
+    bar.appendChild( spacer );
+    bar.appendChild( nav );
+    bar.appendChild( done );
+    bar.appendChild( snippet );
+
+    // Before the control bar in the page, so Tab order matches the screen, and
+    // inside the player, so it follows it into fullscreen.
+    player.el().insertBefore( bar, controlBar.el() );
+
+    // ---- the button ----
+
+    if ( !videojs.getComponent( 'GvpSearchButton' ) ) {
+
+        let Button = videojs.getComponent( 'Button' );
+
+        let GvpSearchButton = class extends Button {
+
+            constructor( p, options ) {
+
+                super( p, options );
+                this.controlText( 'Search the Video' );
+                this.setAttribute( 'aria-expanded', 'false' );
+                this.setAttribute( 'aria-controls', 'gvp-find-bar' );
+                this.hide();
+
+            }
+
+            handleClick() {
+                this.trigger( 'gvpsearchtoggle' );
+            }
+
+            buildCSSClass() {
+                return 'gvp-search-button ' + super.buildCSSClass();
+            }
+
+        };
+
+        videojs.registerComponent( 'GvpSearchButton', GvpSearchButton );
+
+    }
+
+    let captionsButton = controlBar.getChild( 'SubsCapsButton' );
+    let index = captionsButton ? controlBar.children().indexOf( captionsButton ) : undefined;
+    let button = controlBar.addChild( 'GvpSearchButton', {}, index );
+
+    button.on( 'gvpsearchtoggle', function() {
+
+        if ( search.open ) {
+            close();
+        } else {
+            open();
+        }
+
+    } );
+
+    // ---- open and close ----
+
+    let open = function() {
+
+        if ( search.open ) {
+            return;
+        }
+
+        search.open = true;
+        search.current = -1;
+
+        bar.setAttribute( 'aria-label', 'Search the video: ' + videoTitle() );
+        bar.hidden = false;
+        button.setAttribute( 'aria-expanded', 'true' );
+        player.addClass( 'gvp-search-open' );
+
+        // Reopening reruns the last search without jumping, query selected so
+        // typing replaces it.
+        input.value = search.query;
+        run( search.query, false );
+
+        input.focus();
+        input.select();
+
+    };
+
+    // Focus goes back to the magnifier, or to `focusTo` when the magnifier
+    // itself is about to disappear.
+    let close = function( focusTo ) {
+
+        if ( !search.open ) {
+            return;
+        }
+
+        let hadFocus = bar.contains( document.activeElement );
+
+        clearTimeout( search.typing );
+        clearTimeout( search.speaking );
+
+        search.open = false;
+        search.current = -1;
+
+        bar.hidden = true;
+        button.setAttribute( 'aria-expanded', 'false' );
+        player.removeClass( 'gvp-search-open' );
+
+        if ( focusTo ) {
+            if ( hadFocus ) {
+                focusTo.focus();
+            }
+        } else {
+            button.focus();
+        }
+
+    };
+
+    done.addEventListener( 'click', function() { close(); } );
+
+    // ---- typing ----
+
+    let queue = function() {
+
+        clearTimeout( search.typing );
+
+        search.typing = setTimeout( function() {
+            run( input.value, true );
+        }, 150 );
+
+    };
+
+    // While an input method is composing characters, nothing runs; the
+    // search waits for the finished characters.
+    input.addEventListener( 'input', function( e ) {
+
+        if ( e.isComposing ) {
+            return;
+        }
+
+        queue();
+
+    } );
+
+    input.addEventListener( 'compositionend', queue );
+
+    input.addEventListener( 'keydown', function( e ) {
+
+        // Keys typed here are text, not player shortcuts. Tab still moves on.
+        if ( e.key !== 'Tab' ) {
+            e.stopPropagation();
+        }
+
+        if ( e.key === 'Enter' ) {
+
+            // Confirming Japanese, Chinese or Korean input never seeks.
+            if ( e.isComposing || e.keyCode === 229 ) {
+                return;
+            }
+
+            e.preventDefault();
+
+            // Return before the pause is over searches at once, then steps.
+            if ( input.value !== search.query ) {
+                clearTimeout( search.typing );
+                run( input.value, true );
+            }
+
+            step( e.shiftKey ? -1 : 1 );
+
+        } else if ( e.key === 'Escape' ) {
+
+            // In fullscreen the browser owns Esc; the bar stays, Done closes it.
+            if ( player.isFullscreen() ) {
+                return;
+            }
+
+            // Without this the search field would just clear itself.
+            e.preventDefault();
+            close();
+
+        }
+
+    } );
+
+    prev.addEventListener( 'click', function() { step( -1 ); } );
+    next.addEventListener( 'click', function() { step( 1 ); } );
+
+    // Space or the arrows on the bar's own buttons must not reach the player.
+    bar.addEventListener( 'keydown', function( e ) {
+
+        if ( e.target !== input && e.key !== 'Tab' ) {
+
+            e.stopPropagation();
+
+            if ( e.key === 'Escape' && !player.isFullscreen() ) {
+                e.preventDefault();
+                close();
+            }
+
+        }
+
+    } );
+
+    // ---- searching ----
+
+    let run = function( query, speak ) {
+
+        search.query = query;
+        search.source = pickSource();
+        search.current = -1;
+        search.hits = search.source ? findHits( search.source, query ) : [];
+
+        updatePlaceholder();
+        render();
+
+        if ( speak ) {
+            speakResult();
+        }
+
+    };
+
+    let isQueryLongEnough = function( query ) {
+
+        let q = normaliseForSearch( query ).trim();
+
+        if ( !q ) {
+            return false;
+        }
+
+        // A single character of a script written without spaces is a word.
+        return q.length >= 2 || NO_SPACE_SCRIPT.test( q );
+
+    };
+
+    // ---- stepping and seeking ----
+
+    let step = function( dir ) {
+
+        if ( !search.hits.length ) {
+            return;
+        }
+
+        let n = search.hits.length;
+        let k;
+
+        if ( search.current >= 0 ) {
+
+            k = ( search.current + dir + n ) % n;
+
+        } else {
+
+            // No current match: go from the playhead.
+            let t = player.currentTime() || 0;
+            let cues = search.source.cues;
+
+            if ( dir > 0 ) {
+
+                k = search.hits.findIndex( function( ci ) { return cues[ ci ].start > t; } );
+
+                if ( k < 0 ) {
+                    k = 0;
+                }
+
+            } else {
+
+                k = -1;
+
+                search.hits.forEach( function( ci, i ) {
+
+                    if ( cues[ ci ].start < t ) {
+                        k = i;
+                    }
+
+                } );
+
+                if ( k < 0 ) {
+                    k = n - 1;
+                }
+
+            }
+
+        }
+
+        jump( k );
+
+    };
+
+    let jump = function( k ) {
+
+        let cue = search.source.cues[ search.hits[ k ] ];
+
+        search.current = k;
+
+        // The exact start of the caption: a lead-in would show the previous
+        // line and look like a wrong match. Play or pause is left alone.
+        search.ownSeek = true;
+        player.currentTime( cue.start );
+
+        render();
+
+        clearTimeout( search.speaking );
+        search.lastSpoken = '';
+        announce( ( k + 1 ) + ' of ' + search.hits.length + ', ' + formatDuration( cue.start ) );
+
+    };
+
+    // A seek the student made themselves lets go of the current match, so the
+    // next step starts from wherever they went. Playback alone does not.
+    player.on( 'seeked', function() {
+
+        if ( search.ownSeek ) {
+            search.ownSeek = false;
+            return;
+        }
+
+        if ( !search.open || search.current < 0 ) {
+            return;
+        }
+
+        let start = search.source.cues[ search.hits[ search.current ] ].start;
+
+        if ( Math.abs( ( player.currentTime() || 0 ) - start ) > 0.5 ) {
+            search.current = -1;
+            render();
+        }
+
+    } );
+
+    // ---- drawing ----
+
+    let render = function() {
+
+        let n = search.hits.length;
+        let valid = isQueryLongEnough( search.query );
+        let missing = valid && !n;
+
+        field.classList.toggle( 'gvp-find-missing', missing );
+
+        if ( missing ) {
+            input.setAttribute( 'aria-invalid', 'true' );
+        } else {
+            input.removeAttribute( 'aria-invalid' );
+        }
+
+        prev.disabled = !n;
+        next.disabled = !n;
+
+        if ( !valid ) {
+            count.textContent = '';
+        } else if ( !n ) {
+            count.textContent = 'Not found';
+        } else if ( search.current < 0 ) {
+            count.textContent = n === 1 ? '1 match' : n + ' matches';
+        } else {
+
+            let text = ( search.current + 1 ) + ' of ' + n;
+
+            // The timestamp goes first when room runs short.
+            if ( player.el().offsetWidth >= 480 ) {
+                text += ' · ' + formatDuration( search.source.cues[ search.hits[ search.current ] ].start );
+            }
+
+            count.textContent = text;
+
+        }
+
+        snippet.textContent = search.current >= 0
+            ? snippetFor( search.source, search.hits[ search.current ], search.query )
+            : '';
+
+    };
+
+    // "12 matches" waits for typing to settle; "Not found" is said once.
+    let speakResult = function() {
+
+        clearTimeout( search.speaking );
+
+        search.speaking = setTimeout( function() {
+
+            let n = search.hits.length;
+            let message = '';
+
+            if ( !isQueryLongEnough( search.query ) ) {
+                search.lastSpoken = '';
+                return;
+            }
+
+            if ( !n ) {
+                message = 'Not found';
+            } else {
+                message = n === 1 ? '1 match' : n + ' matches';
+            }
+
+            if ( message === search.lastSpoken && !n ) {
+                return;
+            }
+
+            search.lastSpoken = message;
+            announce( message );
+
+        }, 700 );
+
+    };
+
+    let updatePlaceholder = function() {
+
+        let searchable = sources.filter( function( s ) { return s.cues.length; } );
+
+        if ( searchable.length > 1 && search.source ) {
+            input.placeholder = 'Search the video (' + search.source.label + ')';
+        } else {
+            input.placeholder = 'Search the video';
+        }
+
+    };
+
+    let videoTitle = function() {
+
+        let heading = document.querySelector( '.gvp-title-bar h1' );
+        let title = heading ? heading.textContent.trim() : '';
+
+        return title || document.title;
+
+    };
+
+    // ---- which track ----
+
+    // The track showing; with captions off, the one in gvp.xml's language,
+    // else English, else the first.
+    let pickSource = function() {
+
+        let searchable = sources.filter( function( s ) { return s.cues.length; } );
+
+        if ( !searchable.length ) {
+            return null;
+        }
+
+        let showing = searchable.find( function( s ) { return s.track.mode === 'showing'; } );
+
+        if ( showing ) {
+            return showing;
+        }
+
+        let want = ( gvp.captionLanguage.code || '' ).toLowerCase();
+        let byLanguage = function( code ) {
+            return searchable.find( function( s ) {
+                return code && ( s.language === code || s.language.split( '-' )[0] === code );
+            } );
+        };
+
+        return byLanguage( want ) || byLanguage( 'en' ) || searchable[0];
+
+    };
+
+    // ---- the tracks ----
+
+    let isCaptionTrack = function( track ) {
+        return track && ( track.kind === 'captions' || track.kind === 'subtitles' );
+    };
+
+    let trackSrc = function( track ) {
+
+        if ( track.src ) {
+            return track.src;
+        }
+
+        let els = player.remoteTextTrackEls ? player.remoteTextTrackEls() : null;
+
+        if ( els ) {
+
+            for ( let i = 0; i < els.length; i++ ) {
+
+                if ( els[ i ].track === track ) {
+                    return els[ i ].src;
+                }
+
+            }
+
+        }
+
+        return '';
+
+    };
+
+    let refreshButton = function() {
+
+        let any = sources.some( function( s ) { return s.cues.length; } );
+
+        if ( any ) {
+            button.show();
+        } else {
+
+            button.hide();
+
+            // The magnifier is gone, so focus that was in the bar lands on
+            // Play rather than dropping to the top of the page.
+            if ( search.open ) {
+                let play = controlBar.getChild( 'PlayToggle' );
+                close( play ? play.el() : player.el() );
+            }
+
+        }
+
+    };
+
+    let addSource = function( track ) {
+
+        if ( !isCaptionTrack( track ) || sources.some( function( s ) { return s.track === track; } ) ) {
+            return;
+        }
+
+        let entry = {
+            track: track,
+            label: track.label || track.language || 'Captions',
+            language: ( track.language || '' ).toLowerCase(),
+            cues: [],
+            joined: '',
+            offsets: []
+        };
+
+        sources.push( entry );
+
+        loadCues( track ).then( function( cues ) {
+
+            // removed while loading
+            if ( sources.indexOf( entry ) === -1 ) {
+                return;
+            }
+
+            indexCues( entry, cues );
+            refreshButton();
+
+            // A track arriving while the bar is open joins the search.
+            if ( search.open && cues.length ) {
+                run( search.query, false );
+            }
+
+        } );
+
+    };
+
+    let removeSource = function( track ) {
+
+        let removed = sources.find( function( s ) { return s.track === track; } );
+
+        sources = sources.filter( function( s ) { return s.track !== track; } );
+        refreshButton();
+
+        // An open search on the track that just left moves to another one,
+        // rather than stepping through cue times that no longer exist.
+        if ( search.open && removed && search.source === removed ) {
+            run( search.query, false );
+        }
+
+    };
+
+    // Fetch and parse the track's own file, falling back to cues the player
+    // has already loaded. One request per URL, shared by every caller.
+    let loadCues = function( track ) {
+
+        let src = trackSrc( track );
+        let fromPlayer = function() {
+
+            let list = track.cues;
+            let out = [];
+
+            if ( list ) {
+                for ( let i = 0; i < list.length; i++ ) {
+                    out.push( { start: list[ i ].startTime, end: list[ i ].endTime, text: list[ i ].text } );
+                }
+            }
+
+            return out;
+
+        };
+
+        if ( !src ) {
+            return Promise.resolve( fromPlayer() );
+        }
+
+        if ( !cueCache[ src ] ) {
+
+            cueCache[ src ] = fetch( src )
+                .then( function( response ) {
+
+                    if ( !response.ok ) {
+                        throw new Error( 'HTTP ' + response.status );
+                    }
+
+                    return response.text();
+
+                } )
+                .then( parseVtt );
+
+        }
+
+        return cueCache[ src ].then( function( cues ) {
+            return cues.length ? cues : fromPlayer();
+        }, function( err ) {
+
+            console.warn( 'GVP: caption search could not load ' + src + ' (' + ( err && err.message ) + ')' );
+            delete cueCache[ src ];
+
+            return fromPlayer();
+
+        } );
+
+    };
+
+    let tracks = player.textTracks();
+
+    tracks.addEventListener( 'addtrack', function( e ) { addSource( e.track ); } );
+    tracks.addEventListener( 'removetrack', function( e ) { removeSource( e.track ); } );
+
+    for ( let i = 0; i < tracks.length; i++ ) {
+        addSource( tracks[ i ] );
+    }
+
+}
+
+// Chinese, Japanese, Korean and Thai: written without spaces between words, so
+// any substring is a match and one character is a query.
+const NO_SPACE_SCRIPT = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Thai}]/u;
+
+/**
+ * Parses WebVTT text into plain cues with the parser video.js itself uses.
+ *
+ * @function parseVtt
+ * @param {String} text
+ * @return {Array} [{ start, end, text }]
+ */
+function parseVtt( text ) {
+
+    let cues = [];
+
+    if ( typeof window.WebVTT !== 'function' || !window.WebVTT.Parser ) {
+        return cues;
+    }
+
+    try {
+
+        let parser = new window.WebVTT.Parser( window, window.vttjs, window.WebVTT.StringDecoder() );
+
+        parser.oncue = function( cue ) {
+            cues.push( { start: cue.startTime, end: cue.endTime, text: cue.text } );
+        };
+
+        parser.onparsingerror = function() {};
+        parser.parse( text );
+        parser.flush();
+
+    } catch ( e ) {
+
+        console.warn( 'GVP: caption search could not parse a caption file (' + ( e && e.message ) + ')' );
+
+    }
+
+    return cues;
+
+}
+
+/**
+ * Lowercases and strips what a search should not care about: Latin accents,
+ * apostrophes (removed, so "dont" finds "don't") and every other mark or
+ * punctuation (a space, so "thirty two" finds "thirty-two").
+ *
+ * @function normaliseForSearch
+ * @param {String} text
+ * @return {String}
+ */
+function normaliseForSearch( text ) {
+
+    return String( text )
+        .normalize( 'NFD' )
+        .replace( /[̀-ͯ]/g, '' )      // Latin-style accents only
+        .normalize( 'NFC' )                      // put Hangul and the rest back together
+        .toLowerCase()
+        .replace( /['‘’ʼ`´]/g, '' )
+        .replace( /[^\p{L}\p{N}\p{M}]+/gu, ' ' )
+        .replace( / +/g, ' ' );
+
+}
+
+/**
+ * Caption text without its WebVTT markup: tags, speaker voices and entities.
+ *
+ * @function plainCueText
+ * @param {String} text
+ * @return {String}
+ */
+function plainCueText( text ) {
+
+    return String( text || '' )
+        .replace( /<[^>]*>/g, '' )
+        .replace( /&amp;/g, '&' )
+        .replace( /&lt;/g, '<' )
+        .replace( /&gt;/g, '>' )
+        .replace( /&nbsp;/g, ' ' )
+        .replace( /&lrm;|&rlm;/g, '' )
+        .replace( /\s+/g, ' ' )
+        .trim();
+
+}
+
+/**
+ * Builds a track's search index: its cues in time order, as one normalised
+ * string with an offset back to each cue, so a phrase can run across a cue
+ * break and still be found.
+ *
+ * @function indexCues
+ * @param {Object} entry - the track's search source; filled in place
+ * @param {Array} cues - [{ start, end, text }]
+ */
+function indexCues( entry, cues ) {
+
+    let sorted = cues
+        .filter( function( c ) { return isFinite( c.start ); } )
+        .map( function( c ) { return { start: c.start, end: c.end, text: plainCueText( c.text ) }; } )
+        .filter( function( c ) { return c.text; } )
+        .sort( function( a, b ) { return a.start - b.start; } );
+
+    let kept = [];
+    let joined = '';
+    let offsets = [];
+    let last = null;
+
+    sorted.forEach( function( c ) {
+
+        let norm = normaliseForSearch( c.text ).trim();
+
+        // Roll-up captions repeat the same line in back-to-back cues; count it once.
+        if ( !norm || norm === last ) {
+            return;
+        }
+
+        last = norm;
+        kept.push( c );
+
+        joined += ' ';
+        offsets.push( joined.length );
+        joined += norm;
+
+    } );
+
+    entry.cues = kept;
+    entry.joined = joined + ' ';
+    entry.offsets = offsets;
+
+}
+
+/**
+ * Every cue a query matches, in time order, each counted once. Words match
+ * from their start; scripts without spaces match anywhere.
+ *
+ * @function findHits
+ * @param {Object} source
+ * @param {String} query
+ * @return {Array} indexes into source.cues
+ */
+function findHits( source, query ) {
+
+    let q = normaliseForSearch( query ).trim();
+
+    if ( !q || ( q.length < 2 && !NO_SPACE_SCRIPT.test( q ) ) ) {
+        return [];
+    }
+
+    let anywhere = NO_SPACE_SCRIPT.test( q.charAt( 0 ) );
+    let hits = [];
+    let i = 0;
+
+    while ( ( i = source.joined.indexOf( q, i ) ) !== -1 ) {
+
+        if ( anywhere || source.joined.charAt( i - 1 ) === ' ' ) {
+
+            let ci = cueAtOffset( source.offsets, i );
+
+            if ( hits[ hits.length - 1 ] !== ci ) {
+                hits.push( ci );
+            }
+
+        }
+
+        i++;
+
+    }
+
+    return hits;
+
+}
+
+/**
+ * The cue a character of the joined index belongs to.
+ *
+ * @function cueAtOffset
+ * @param {Array} offsets
+ * @param {Number} offset
+ * @return {Number}
+ */
+function cueAtOffset( offsets, offset ) {
+
+    let lo = 0;
+    let hi = offsets.length - 1;
+
+    while ( lo < hi ) {
+
+        let mid = ( lo + hi + 1 ) >> 1;
+
+        if ( offsets[ mid ] <= offset ) {
+            lo = mid;
+        } else {
+            hi = mid - 1;
+        }
+
+    }
+
+    return lo;
+
+}
+
+/**
+ * About six words around a match, for a screen reader to read on request.
+ *
+ * @function snippetFor
+ * @param {Object} source
+ * @param {Number} ci - cue index
+ * @param {String} query
+ * @return {String}
+ */
+function snippetFor( source, ci, query ) {
+
+    let q = normaliseForSearch( query ).trim();
+    let text = source.cues[ ci ].text;
+
+    // a phrase that runs into the next caption brings it along
+    if ( normaliseForSearch( text ).indexOf( q ) === -1 && source.cues[ ci + 1 ] ) {
+        text += ' ' + source.cues[ ci + 1 ].text;
+    }
+
+    let words = text.split( ' ' );
+    let first = q.split( ' ' )[0];
+    let at = 0;
+
+    for ( let k = 0; k < words.length; k++ ) {
+
+        if ( normaliseForSearch( words[ k ] ).trim().indexOf( first ) === 0 ) {
+            at = k;
+            break;
+        }
+
+    }
+
+    let from = Math.max( 0, at - 3 );
+    let to = Math.min( words.length, from + 7 );
+
+    return ( from > 0 ? '…' : '' ) + words.slice( from, to ).join( ' ' ) + ( to < words.length ? '…' : '' );
 
 }
 
