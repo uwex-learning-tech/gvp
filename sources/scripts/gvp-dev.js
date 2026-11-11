@@ -994,7 +994,14 @@ function loadVideoJS() {
         playbackRates: [0.5, 1, 1.5, 2],
         fluid: true,
         controlBar: {
-            pictureInPictureToggle: false
+            pictureInPictureToggle: false,
+            // Every menu opens under a heading naming what it controls, styled
+            // like the chapters title bar (which video.js titles from the
+            // track). Quality and Downloads set theirs where they are built.
+            playbackRateMenuButton: { title: 'Speed' },
+            subsCapsButton: { title: 'Captions' },
+            descriptionsButton: { title: 'Descriptions' },
+            audioTrackButton: { title: 'Audio Track' }
         },
         html5: {
             // Safari defaults to native caption rendering, which pins cues to
@@ -1012,8 +1019,9 @@ function loadVideoJS() {
         playerOptions.techOrder = ['youtube'];
         playerOptions.sources = [{ type: "video/youtube", src: "https://www.youtube.com/watch?v=" + gvp.source }];
     }
-    
-    
+
+    nameMenusByTheirHeadings();
+
     // initialize the video player bases options/configurations
     gvp.player = videojs( 'gvp-video', playerOptions, function() {
         
@@ -1542,6 +1550,15 @@ function loadVideoJS() {
             clampMenus( gvp.player );
             enableButtonTabbing( gvp.player );
 
+            // video.js names this control "Playback Rate". Speed is the plain
+            // word for it, and the one its menu heading uses.
+            let rateBar = self.getChild( 'controlBar' );
+            let rateButton = rateBar ? rateBar.getChild( 'PlaybackRateMenuButton' ) : null;
+
+            if ( rateButton ) {
+                rateButton.controlText( 'Playback Speed' );
+            }
+
             // if youtube, hide cover on ready and reset markers
             if ( flags.isYouTube ) {
 
@@ -1854,6 +1871,50 @@ function enableButtonTabbing( player ) {
         new MutationObserver( apply ).observe( bar, { childList: true, subtree: true } );
 
     }
+
+}
+
+/**
+ * Names each popup menu by its heading.
+ *
+ * video.js adds the heading as a bare list item inside the role="menu" list,
+ * where only menu items belong, so screen readers read it as a stray row or
+ * skip it. Marked presentational and used as the menu's label instead, it is
+ * announced once, as the menu's name ("Speed, menu").
+ *
+ * Patched on the prototype before any player exists, so it covers every menu
+ * button, including chapters (whose createMenu calls this one) and menus
+ * rebuilt later.
+ *
+ * @function nameMenusByTheirHeadings
+ */
+function nameMenusByTheirHeadings() {
+
+    let MenuButton = videojs.getComponent( 'MenuButton' );
+
+    if ( MenuButton.prototype.gvpNamesMenus ) {
+        return;
+    }
+
+    let createMenu = MenuButton.prototype.createMenu;
+
+    MenuButton.prototype.createMenu = function() {
+
+        let menu = createMenu.apply( this, arguments );
+        let list = menu.contentEl();
+        let title = list.querySelector( ':scope > .vjs-menu-title' );
+
+        if ( title ) {
+            title.id = 'gvp-menu-title-' + this.id();
+            title.setAttribute( 'role', 'presentation' );
+            list.setAttribute( 'aria-labelledby', title.id );
+        }
+
+        return menu;
+
+    };
+
+    MenuButton.prototype.gvpNamesMenus = true;
 
 }
 
@@ -2381,6 +2442,7 @@ function setupQualityMenu( player, flavors, startAt ) {
             constructor( p, options ) {
                 options = options || {};
                 options.label = 'Quality';
+                options.title = 'Quality';
                 super( p, options );
                 this.controlText( 'Quality' );
             }
@@ -2619,6 +2681,8 @@ function addDownloadFilesButton( vjs ) {
             let downloadButton = class extends MenuButton {
                 constructor( player, options ) {
                     
+                    options = options || {};
+                    options.title = 'Downloads';
                     super( player, options );
                     this.controlText( 'Downloads' );
     

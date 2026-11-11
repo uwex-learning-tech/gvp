@@ -685,16 +685,8 @@ html {
         padding-left: calc( #{rem( 10px )} + 1.25em + var( --gvp-chapter-digits ) + 0.5em );
     }
 
-    // The title bar sits flush with the top of the box, so the menu's own top
-    // padding would leave a gap above it.
     .video-js .vjs-chapters-button.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
         counter-reset: gvp-chapter;
-        padding-top: 0;
-
-        // Keyboard focus scrolls an item just into view -- which, at the top,
-        // is underneath the sticky title bar. Keep that band clear (title:
-        // 1.1em x (1.4em line + 0.7em padding), plus its border and margin).
-        scroll-padding-top: calc( 2.35em + #{rem( 7px )} );
 
         // The number column is only as wide as the widest number, so a short
         // list keeps its numbers tight against the marker column. The first
@@ -735,10 +727,22 @@ html {
         opacity: 0.8;
     }
 
+    // Every menu has a heading (see loadVideoJS, setupQualityMenu and
+    // addDownloadFilesButton). The title bar sits flush with the top of the
+    // box, so the menu's own top padding would leave a gap above it.
+    .video-js .vjs-menu-button-popup .vjs-menu .vjs-menu-content:has( > li.vjs-menu-title ) {
+        padding-top: 0;
+
+        // Keyboard focus scrolls an item just into view -- which, at the top,
+        // is underneath the sticky title bar. Keep that band clear (title:
+        // 1.1em x (1.4em line + 0.7em padding), plus its border and margin).
+        scroll-padding-top: calc( 2.35em + #{rem( 7px )} );
+    }
+
     // A title bar rather than a small caps label floating in the list: an
     // opaque strip with a hairline under it, and sticky, so the heading stays
-    // put while a long chapter list scrolls beneath it.
-    .video-js .vjs-chapters-button .vjs-menu li.vjs-menu-title {
+    // put while a long list (chapters, mostly) scrolls beneath it.
+    .video-js .vjs-menu li.vjs-menu-title {
         position: sticky;
         top: 0;
         z-index: 1;
@@ -1090,19 +1094,11 @@ and (min-device-width : 900px) {
     right: unset;
     border-radius: rem( 5px );
     width: 98%;
-    
-    // The menu box itself is styled once, in the shared
-    // .vjs-menu-button-popup .vjs-menu .vjs-menu-content rule above -- border,
-    // radius, padding, sizing and scrolling all live there so every menu is the
-    // same object. A second copy used to sit here with its own overflow and a
-    // #ccc border, and only lost the cascade by accident (the shared rule is ID
-    // scoped). Whatever is left below must be genuine per-menu CONTENT, never
-    // box styling.
-    .vjs-menu-button .vjs-menu-content .vjs-texttrack-settings .vjs-menu-item-text {
-        font-size: rem( 12px );
-        font-weight: bold;
-    }
-    
+
+    // Menus are styled once, in the shared .vjs-menu rules above -- the box,
+    // the heading and the rows -- so every menu looks the same. Keep per-menu
+    // styling out of here.
+
 }
 
 /* VIDEOJS DOWNLOADS BUTTON */
