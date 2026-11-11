@@ -1442,7 +1442,8 @@ $slider-bg-color: lighter($primary-background-color, 33%);
    class is set from gvp-dev.js only when the marker tip is genuinely showing,
    so an untitled marker keeps its timecode. Specificity has to clear video.js's
    own (0,4,0) `.vjs-progress-control:hover .vjs-time-tooltip` reveal. */
-.video-js.gvp-marker-tip-shown .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip {
+.video-js.gvp-marker-tip-shown .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip,
+.video-js.gvp-find-tip-shown .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip {
     visibility: hidden;
 }
 
@@ -1849,4 +1850,115 @@ and (min-device-width : 680px) {
         min-width: 44px;
     }
 
+}
+
+// Ticks: one mark per match on the seek bar. Sizes are in px because video.js
+// changes the progress holder's em basis on hover. Amber, apart from the green
+// chapter dots; the dark outline keeps them at 3:1 or better over the white
+// played portion as well as the track.
+// z-index 0: above the played and loaded bars, below the chapter dots (1) and
+// the playhead (2), so a chapter dot near a match stays clickable and the
+// playhead can always be dragged.
+.video-js .gvp-find-ticks {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.video-js .gvp-find-tick {
+    position: absolute;
+    top: 50%;
+    width: 3px;
+    height: 14px;
+    margin-left: -1.5px;
+    transform: translateY( -50% );
+    border-radius: 1px;
+    background-color: #F2B544;
+    box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.7 );
+    pointer-events: auto;
+    cursor: pointer;
+
+    // A target 24px tall around a mark too thin to hit, but only a little
+    // wider than the mark: 24px wide would tile the whole bar for a common
+    // word and leave no bare track to click or drag. Where targets overlap,
+    // the match nearest the pointer wins (matchAtPointer).
+    &::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        bottom: -5px;
+        left: -2px;
+        right: -2px;
+    }
+
+}
+
+// The current match: brighter and taller, so it differs by size, not colour alone.
+.video-js .gvp-find-tick-current {
+    width: 4px;
+    height: 20px;
+    margin-left: -2px;
+    z-index: 1;
+    background-color: #FFE3A3;
+
+    // stays 24px tall like the others: (24 - 20) / 2
+    &::before {
+        top: -2px;
+        bottom: -2px;
+        left: -2px;
+        right: -2px;
+    }
+}
+
+@media ( forced-colors: active ) {
+
+    .video-js .gvp-find-tick {
+        background-color: CanvasText;
+        forced-color-adjust: none;
+    }
+
+    .video-js .gvp-find-tick-current {
+        background-color: Highlight;
+        outline: 2px solid CanvasText;
+    }
+
+}
+
+// The snippet over a hovered tick. Same plate as the chapter tip and the
+// hovered timecode, which steps aside while this is up.
+.video-js .gvp-find-tip {
+    position: absolute;
+    bottom: calc( 50% + #{rem( 25px )} );
+    z-index: 3;
+    transform: translateX( -50% );
+    box-sizing: border-box;
+    width: max-content;
+    max-width: min( #{rem( 280px )}, 90% );
+    padding: rem( 6px ) rem( 10px );
+    border-radius: rem( 3px );
+    background-color: rgba( 0, 0, 0, 0.9 );
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: rem( 13px );
+    line-height: rem( 18px );
+    text-align: center;
+    white-space: normal;
+    pointer-events: none;
+
+    &[hidden] {
+        display: none;
+    }
+
+    b {
+        color: #FFE3A3;
+    }
+
+}
+
+.video-js .gvp-find-tip-time {
+    display: block;
+    color: rgba( 255, 255, 255, 0.75 );
+    font-size: rem( 12px );
+    font-variant-numeric: tabular-nums;
 }
