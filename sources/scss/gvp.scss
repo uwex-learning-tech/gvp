@@ -1682,6 +1682,31 @@ and (min-device-width : 680px) {
     }
     
 }
+
+// When the control bar does not fit (measured -- see watchPlayerWidth), the
+// time display goes, so Fullscreen stays on the bar; the position still shows
+// on the progress bar. On a phone-width player the buttons alone fill it.
+.video-js.gvp-player-narrow .vjs-control-bar {
+
+    .vjs-remaining-time {
+        display: none;
+    }
+
+    // and the buttons give up 3px each (34 -> 31px, still well over the
+    // 24px target floor), so all of them fit on a 320px player
+    .vjs-button,
+    .vjs-volume-panel {
+        width: 2.6em;
+    }
+
+    // With every optional menu present (downloads, audio tracks, chapters,
+    // captions, rate, search) nine buttons need 281px; the progress bar's
+    // 48px floor would then overflow a 320px player, so it may go to 24px.
+    .vjs-progress-control {
+        min-width: 2em;
+    }
+
+}
 // ---- caption search -------------------------------------------------------
 // A find bar at the top of the player, the same inset, height and ground as the
 // control bar, opened from a magnifier in the control bar (setupCaptionSearch).
@@ -1866,7 +1891,8 @@ and (min-device-width : 680px) {
     border-radius: rem( 3px );
     background-color: rgba( 255, 255, 255, 0.1 );
     font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.95em;
+    // a size below the words around it, so the keys read as a key, not a word
+    font-size: 0.82em;
     line-height: 1.35;
     text-align: center;
 }
@@ -1891,10 +1917,18 @@ and (min-device-width : 680px) {
 }
 
 // The arrows' tooltips, under the nav, centred on their button and kept inside
-// the video (left set by placeTip). Shown on hover after a short pause, and at
-// once on keyboard focus.
+// the video (left set by placeTip). Two lines: what the button does, then the
+// keys that do the same. Shown on hover after a short pause, and at once on
+// keyboard focus.
 .video-js .gvp-find-keytip {
     left: 0;
+    text-align: center;
+
+    .gvp-find-keys {
+        display: block;
+        margin-top: 0.2em;
+    }
+
     // the nav is centred in the bar too, so the same sum as the hint lands
     // both plates the same distance below the bar
     top: calc( 50% + 1.5em + 0.4em );
@@ -1955,6 +1989,40 @@ and (min-device-width : 680px) {
     .gvp-find-hint {
         left: 0;
         transform: none;
+    }
+}
+
+// Stacked, below a 400px player: the field on a row of its own, the count,
+// arrows and Done on a second row under it. The hint and the arrows'
+// tooltips hang below the whole bar.
+.video-js .gvp-find-bar.gvp-find-stacked {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 0.4em;
+    padding: 0.4em;
+
+    .gvp-find-fieldbox {
+        flex: 1 1 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .gvp-find-countbox {
+        flex: 1 1 auto;
+    }
+
+    .gvp-find-spacer {
+        display: none;
+    }
+
+    // from the field's top: the field, the second row and the bar's bottom
+    // padding (measured), then the usual gap
+    .gvp-find-hint {
+        top: calc( 100% + 3.35em );
+    }
+
+    .gvp-find-keytip {
+        top: calc( 100% + 0.9em );
     }
 }
 
