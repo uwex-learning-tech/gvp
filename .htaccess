@@ -7,9 +7,11 @@
     # Last-Modified still works for that check.
     Header unset ETag
 
-    # Player code and settings: browsers always check for a newer copy
-    # before using a saved one, so updates reach everyone right away.
-    <FilesMatch "\.(js|css|json|html)$">
+    # Player code, its page template and settings: browsers always check
+    # for a newer copy before using a saved one, so updates reach everyone
+    # right away. The template (.tpl) must match the script that fills it,
+    # and without a rule browsers keep it for days.
+    <FilesMatch "\.(js|css|json|html|tpl|xml)$">
         Header set Cache-Control "no-cache"
     </FilesMatch>
 
