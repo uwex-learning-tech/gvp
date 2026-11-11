@@ -1,5 +1,16 @@
 # Version Change Log
 
+**4.3.0**
+* Added caption search: a magnifier in the control bar opens a find bar for searching what is said in a video and jumping to each place it comes up
+* Search matches are marked on the progress bar; hover a mark to see the words around it, click it to jump there
+* Search covers Kaltura captions and local caption files (autocaptions are not searched); turn it off for a video with `<captionSearch>false</captionSearch>` in gvp.xml
+* Every control bar menu now has a heading like the chapters menu's, and screen readers announce each menu by its heading
+* Menus open only when clicked or chosen from the keyboard, no longer when the pointer passes over the control bar
+* The chapters button now sits before the speed button, next to the timeline
+* The chapters menu grows wider before long chapter titles wrap
+* The speed button's tooltip now reads "Playback Speed"
+* On small players whose control bar overflows, the time display hides so the fullscreen button stays on screen
+
 **4.2.5**
 * Chapters in the chapters menu are now numbered
 * The chapters menu has a title bar that stays in place while the list scrolls
