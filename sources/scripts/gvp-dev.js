@@ -1542,6 +1542,13 @@ function loadVideoJS() {
             clampMenus( gvp.player );
             enableButtonTabbing( gvp.player );
 
+            // Menus open on click (or Enter/Space), never on hover. video.js
+            // adds this class on every browser but iOS, and it is all that
+            // lets its hover state show a menu -- so a pointer passing over
+            // the control bar on its way somewhere else popped menus open
+            // over the video.
+            self.removeClass( 'vjs-workinghover' );
+
             // if youtube, hide cover on ready and reset markers
             if ( flags.isYouTube ) {
 
@@ -1925,8 +1932,8 @@ function clampMenus( player ) {
 
     };
 
-    // Once per frame, after the menu has been laid out -- mouseover fires for
-    // every child the pointer crosses, and each pass forces a layout.
+    // Once per frame, after the menu has been laid out -- a burst of key
+    // presses would otherwise force a layout for each one.
     let pending = false;
 
     let schedule = function() {
@@ -1948,10 +1955,8 @@ function clampMenus( player ) {
 
     if ( controlBar ) {
 
+        // menus open only by click or from the keyboard
         controlBar.el().addEventListener( 'click', schedule, true );
-        controlBar.el().addEventListener( 'mouseover', schedule, true );
-
-        // menus opened from the keyboard never see a mouseover
         controlBar.el().addEventListener( 'keydown', schedule, true );
 
     }

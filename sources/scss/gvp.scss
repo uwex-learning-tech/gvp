@@ -892,17 +892,6 @@ html {
         border-top: 8px solid rgba( 43, 51, 63, 0.7 );
     }
 
-    // Invisible bridge covering the gap between the button top and the menu
-    // so the cursor can transit without leaving the hover target.
-    .video-js .vjs-menu-button-popup .vjs-menu::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 2em;
-        height: calc( 1em + 10px );
-    }
-
 }
 
 #gvp-wrapper.embedded {
