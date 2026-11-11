@@ -1662,3 +1662,191 @@ and (min-device-width : 680px) {
     }
     
 }
+// ---- caption search -------------------------------------------------------
+// A find bar at the top of the player, the same inset, height and ground as the
+// control bar, opened from a magnifier in the control bar (setupCaptionSearch).
+
+.video-js .vjs-control-bar .gvp-search-button .vjs-icon-placeholder:before {
+    content: '';
+    background-color: currentColor;
+    -webkit-mask: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'/%3E%3C/svg%3E" ) no-repeat center / 0.8em;
+    mask: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'/%3E%3C/svg%3E" ) no-repeat center / 0.8em;
+}
+
+// While the bar is open the control bar stays put, as video.js does for audio
+// mode: a student reading the count should not lose the controls under it.
+.video-js.gvp-search-open.vjs-has-started.vjs-user-inactive.vjs-playing .vjs-control-bar {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-js .gvp-find-bar {
+
+    position: absolute;
+    top: 2%;
+    left: 1%;
+    width: 98%;
+    height: 3em;
+    z-index: 3;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 0 0.5em 0 0.6em;
+    border-radius: rem( 5px );
+    background-color: $primary-background-color;
+    background-color: rgba( $primary-background-color, 0.95 );
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1em;
+
+    &[hidden] {
+        display: none;
+    }
+
+    button {
+        font: inherit;
+        color: inherit;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    button:focus-visible {
+        outline: 2px solid #fff;
+        outline-offset: 1px;
+    }
+
+}
+
+.video-js .gvp-find-field {
+
+    flex: 1 1 18em;
+    min-width: 10em;
+    max-width: 26em;
+    height: 2.1em;
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+    padding: 0 0.5em 0 0.55em;
+    box-sizing: border-box;
+    background-color: rgba( 0, 0, 0, 0.35 );
+    border: 1px solid rgba( 255, 255, 255, 0.3 );
+    border-radius: rem( 4px );
+
+    svg {
+        flex: none;
+        width: 1.05em;
+        height: 1.05em;
+        fill: rgba( 255, 255, 255, 0.7 );
+    }
+
+    input {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #fff;
+        font: inherit;
+        font-size: 1.1em;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    input::placeholder {
+        color: rgba( 255, 255, 255, 0.7 );
+    }
+
+    &:focus-within {
+        border-color: rgba( 255, 255, 255, 0.8 );
+        box-shadow: 0 0 0 2px rgba( 255, 255, 255, 0.35 );
+    }
+
+    // Not found: a border as well as the words, never colour alone.
+    &.gvp-find-missing {
+        border-color: #ff8a8a;
+        box-shadow: 0 0 0 1px #ff8a8a;
+    }
+
+}
+
+.video-js .gvp-find-count {
+    flex: none;
+    font-size: 1.05em;
+    color: rgba( 255, 255, 255, 0.8 );
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.video-js .gvp-find-spacer {
+    flex: 1 1 0;
+}
+
+.video-js .gvp-find-nav {
+
+    flex: none;
+    display: inline-flex;
+    border: 1px solid rgba( 255, 255, 255, 0.3 );
+    border-radius: rem( 4px );
+    overflow: hidden;
+
+    button {
+        width: 2.4em;
+        height: 2em;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        display: grid;
+        place-items: center;
+    }
+
+    button + button {
+        border-left: 1px solid rgba( 255, 255, 255, 0.3 );
+    }
+
+    button:hover:not( :disabled ) {
+        background-color: rgba( 255, 255, 255, 0.18 );
+    }
+
+    button:disabled {
+        color: rgba( 255, 255, 255, 0.35 );
+        cursor: default;
+    }
+
+    svg {
+        width: 1em;
+        height: 1em;
+        fill: currentColor;
+    }
+
+}
+
+.video-js .gvp-find-done {
+
+    flex: none;
+    height: 2em;
+    padding: 0 0.9em;
+    border: 1px solid rgba( 255, 255, 255, 0.3 );
+    border-radius: rem( 4px );
+    background-color: rgba( 255, 255, 255, 0.12 );
+    font-weight: bold;
+
+    &:hover {
+        background-color: rgba( 255, 255, 255, 0.22 );
+    }
+
+}
+
+// Touch: targets at least 44px wide.
+@media ( pointer: coarse ) {
+
+    .video-js .gvp-find-nav button,
+    .video-js .gvp-find-done {
+        min-width: 44px;
+    }
+
+}
