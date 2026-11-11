@@ -2131,6 +2131,7 @@ function setupCaptionSearch( player ) {
         hits: [],           // indexes into source.cues, in time order
         outside: [],        // matches outside the ?start= / ?end= clip
         current: -1,
+        next: -1,           // where Return goes while there is no current match
         saved: null,        // caption modes to put back on close
         recorded: null,     // caption modes as search last left them
         applied: false,     // captions shown for the search yet
@@ -2214,11 +2215,54 @@ function setupCaptionSearch( player ) {
     snippet.className = 'gvp-visually-hidden';
     snippet.setAttribute( 'aria-hidden', 'true' );
 
+    // A one-time nudge, the first time a student searches in a session:
+    // what to press to go to the matches.
+    let hint = document.createElement( 'span' );
+    hint.className = 'gvp-find-hint';
+    hint.setAttribute( 'aria-hidden', 'true' );
+    hint.hidden = true;
+    hint.textContent = window.matchMedia && window.matchMedia( '( pointer: coarse )' ).matches
+        ? 'Tap \u203a to jump'
+        : 'Press Return to jump';
+
+    let hintKey = 'gvp-find-hint-seen';
+    let hintDone = false;
+
+    try {
+        hintDone = window.sessionStorage.getItem( hintKey ) === '1';
+    } catch ( e ) {
+        // storage blocked: the hint simply shows once per page
+    }
+
+    let showHint = function( wanted ) {
+        hint.hidden = hintDone || !wanted;
+    };
+
+    let hintSeen = function() {
+
+        hintDone = true;
+        hint.hidden = true;
+
+        try {
+            window.sessionStorage.setItem( hintKey, '1' );
+        } catch ( e ) {
+            // see above
+        }
+
+    };
+
     let spacer = document.createElement( 'span' );
     spacer.className = 'gvp-find-spacer';
 
+    // The hint shares a box with the count, so it stays under it at any width
+    // without being measured.
+    let countBox = document.createElement( 'span' );
+    countBox.className = 'gvp-find-countbox';
+    countBox.appendChild( count );
+    countBox.appendChild( hint );
+
     bar.appendChild( field );
-    bar.appendChild( count );
+    bar.appendChild( countBox );
     bar.appendChild( spacer );
     bar.appendChild( nav );
     bar.appendChild( done );
@@ -2479,6 +2523,38 @@ function setupCaptionSearch( player ) {
 
     // ---- stepping and seeking ----
 
+    // With no current match, the match a step goes to is decided by the
+    // playhead: forward, the first starting after it; back, the last before.
+    let fromPlayhead = function( dir ) {
+
+        let n = search.hits.length;
+        let t = player.currentTime() || 0;
+        let cues = search.source.cues;
+        let k = -1;
+
+        if ( dir > 0 ) {
+
+            k = search.hits.findIndex( function( ci ) { return cues[ ci ].start > t; } );
+
+            return k < 0 ? 0 : k;
+
+        }
+
+        // A jump lands 50ms into its caption, so a match counts as before the
+        // playhead only once it starts clearly earlier -- otherwise Previous
+        // would land on the caption already showing.
+        search.hits.forEach( function( ci, i ) {
+
+            if ( cues[ ci ].start < t - 0.1 ) {
+                k = i;
+            }
+
+        } );
+
+        return k < 0 ? n - 1 : k;
+
+    };
+
     let step = function( dir ) {
 
         if ( !search.hits.length ) {
@@ -2486,50 +2562,8 @@ function setupCaptionSearch( player ) {
         }
 
         let n = search.hits.length;
-        let k;
 
-        if ( search.current >= 0 ) {
-
-            k = ( search.current + dir + n ) % n;
-
-        } else {
-
-            // No current match: go from the playhead.
-            let t = player.currentTime() || 0;
-            let cues = search.source.cues;
-
-            if ( dir > 0 ) {
-
-                k = search.hits.findIndex( function( ci ) { return cues[ ci ].start > t; } );
-
-                if ( k < 0 ) {
-                    k = 0;
-                }
-
-            } else {
-
-                k = -1;
-
-                // A jump lands 50ms into its caption, so a match counts as
-                // before the playhead only once it starts clearly earlier --
-                // otherwise Previous would land on the caption already showing.
-                search.hits.forEach( function( ci, i ) {
-
-                    if ( cues[ ci ].start < t - 0.1 ) {
-                        k = i;
-                    }
-
-                } );
-
-                if ( k < 0 ) {
-                    k = n - 1;
-                }
-
-            }
-
-        }
-
-        jump( k );
+        jump( search.current >= 0 ? ( search.current + dir + n ) % n : fromPlayhead( dir ) );
 
     };
 
@@ -2538,6 +2572,7 @@ function setupCaptionSearch( player ) {
         let cue = search.source.cues[ search.hits[ k ] ];
 
         search.current = k;
+        hintSeen();
 
         // The first jump shows the searched captions, so the line on screen
         // is the one with the match -- unless the student has chosen their
@@ -2586,6 +2621,15 @@ function setupCaptionSearch( player ) {
 
     } );
 
+    // While nothing is current, "next" follows the playhead as the video plays.
+    player.on( 'timeupdate', function() {
+
+        if ( search.open && !search.endHidden && search.current < 0 && search.hits.length && fromPlayhead( 1 ) !== search.next ) {
+            render();
+        }
+
+    } );
+
     // ---- drawing ----
 
     let render = function() {
@@ -2593,6 +2637,8 @@ function setupCaptionSearch( player ) {
         let n = search.hits.length;
         let valid = isQueryLongEnough( search.query );
         let elsewhere = search.outside.length;
+
+        search.next = n && search.current < 0 ? fromPlayhead( 1 ) : -1;
         let missing = valid && !n && !elsewhere;
 
         field.classList.toggle( 'gvp-find-missing', missing );
@@ -2613,7 +2659,17 @@ function setupCaptionSearch( player ) {
         } else if ( !n ) {
             count.textContent = 'Not found';
         } else if ( search.current < 0 ) {
-            count.textContent = n === 1 ? '1 match' : n + ' matches';
+
+            // Say where Return will go, without going there: typing never
+            // moves the video, so the first jump has to be predictable.
+            let text = n === 1 ? '1 match' : n + ' matches';
+
+            if ( player.el().offsetWidth >= 480 ) {
+                text += ' \u00b7 next ' + formatDuration( search.source.cues[ search.hits[ search.next ] ].start );
+            }
+
+            count.textContent = text;
+
         } else {
 
             let text = ( search.current + 1 ) + ' of ' + n;
@@ -2630,6 +2686,8 @@ function setupCaptionSearch( player ) {
         snippet.textContent = search.current >= 0
             ? snippetFor( search.source, search.hits[ search.current ], search.query )
             : '';
+
+        showHint( valid && n > 0 && search.current < 0 );
 
         drawTicks();
 
@@ -2655,7 +2713,17 @@ function setupCaptionSearch( player ) {
             } else if ( !n ) {
                 message = 'Not found';
             } else {
+
                 message = n === 1 ? '1 match' : n + ' matches';
+
+                if ( search.current < 0 && search.next >= 0 ) {
+                    message += ', next at ' + formatDuration( search.source.cues[ search.hits[ search.next ] ].start );
+                }
+
+                if ( !hint.hidden ) {
+                    message += '. ' + hint.textContent;
+                }
+
             }
 
             if ( message === search.lastSpoken && !n ) {
@@ -2789,6 +2857,16 @@ function setupCaptionSearch( player ) {
         layout( search.hits ).forEach( function( g ) {
             place( g.x0, g.x1, g.ks, false, false );
         } );
+
+        // Where Return will go: an outlined mark of its own.
+        if ( search.current < 0 && search.next >= 0 ) {
+
+            let x = Math.min( width, Math.max( 0, cues[ search.hits[ search.next ] ].start / duration * width ) );
+
+            place( x, x, [ search.next ], false, false );
+            tickLayer.lastChild.classList.add( 'gvp-find-tick-next' );
+
+        }
 
         // The current match keeps a tall mark of its own, even inside a band.
         if ( search.current >= 0 ) {
