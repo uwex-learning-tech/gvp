@@ -1576,14 +1576,7 @@ function loadVideoJS() {
             enableButtonTabbing( gvp.player );
             watchPlayerWidth( gvp.player );
 
-            // video.js names this control "Playback Rate". Speed is the plain
-            // word for it, and the one its menu heading uses.
-            let rateBar = self.getChild( 'controlBar' );
-            let rateButton = rateBar ? rateBar.getChild( 'PlaybackRateMenuButton' ) : null;
-
-            if ( rateButton ) {
-                rateButton.controlText( 'Playback Speed' );
-            }
+            arrangeMenuButtons( self );
 
             // if youtube, hide cover on ready and reset markers
             if ( flags.isYouTube ) {
@@ -2012,6 +2005,42 @@ function nameMenusByTheirHeadings() {
     };
 
     MenuButton.prototype.gvpNamesMenus = true;
+
+}
+
+/**
+ * Names the speed control and puts Chapters before it.
+ *
+ * Chapters moves through the video, so it sits next to the timeline; Speed
+ * joins Captions and Quality as a playback setting. video.js orders them the
+ * other way round in its default control bar.
+ *
+ * @function arrangeMenuButtons
+ * @param {Object} player the video.js player
+ */
+function arrangeMenuButtons( player ) {
+
+    let controlBar = player.getChild( 'controlBar' );
+
+    if ( !controlBar ) {
+        return;
+    }
+
+    let rateButton = controlBar.getChild( 'PlaybackRateMenuButton' );
+    let chaptersButton = controlBar.getChild( 'ChaptersButton' );
+
+    if ( !rateButton ) {
+        return;
+    }
+
+    // video.js names this control "Playback Rate". Speed is the plain word
+    // for it, and the one its menu heading uses.
+    rateButton.controlText( 'Playback Speed' );
+
+    if ( chaptersButton ) {
+        controlBar.removeChild( chaptersButton );
+        controlBar.addChild( chaptersButton, {}, controlBar.children().indexOf( rateButton ) );
+    }
 
 }
 
