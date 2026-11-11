@@ -1386,7 +1386,9 @@ $slider-bg-color: lighter($primary-background-color, 33%);
 }
 
 .video-js .vjs-play-progress::before {
-    z-index: 2;
+    // 3: above the caption search marks (2) and chapter dots (1), so the
+    // playhead can always be grabbed and dragged.
+    z-index: 3;
     /* Video.js 8 centres this dot with `line-height: 0.35em` instead of v7's
        `top: -0.333em`. Overriding `top` here would push it above the bar. */
 }
@@ -1439,6 +1441,12 @@ $slider-bg-color: lighter($primary-background-color, 33%);
     width: rem( 2px );
     margin-left: rem( -1px );
     background-color: #fff;
+
+    // Purely a readout: video.js tracks the pointer on the progress control
+    // itself. Left catching the pointer, this line -- always right under it,
+    // full height, z-index 1 -- swallowed hovers meant for the caption search
+    // marks beneath it whenever the pointer was over the middle of the bar.
+    pointer-events: none;
 }
 
 /* line-height comes with it: video.js sets `3em`, which tracks the font size,
@@ -1804,6 +1812,31 @@ and (min-device-width : 680px) {
 
 }
 
+// The count and its hint share this box; it is centred in the 3em bar.
+.video-js .gvp-find-countbox {
+    position: relative;
+    flex: none;
+}
+
+// The one-time "Press Return to jump", hanging just under the count rather
+// than adding a row to the bar: half the box, then half the bar, then a gap.
+.video-js .gvp-find-hint {
+    position: absolute;
+    left: 0;
+    top: calc( 50% + 1.5em + 0.4em );
+    padding: 0.3em 0.6em;
+    border-radius: rem( 3px );
+    background-color: rgba( 0, 0, 0, 0.85 );
+    color: #fff;
+    font-size: 1em;
+    white-space: nowrap;
+    pointer-events: none;
+
+    &[hidden] {
+        display: none;
+    }
+}
+
 .video-js .gvp-find-count {
     flex: none;
     font-size: 1.05em;
@@ -1885,13 +1918,13 @@ and (min-device-width : 680px) {
 // changes the progress holder's em basis on hover. Amber, apart from the green
 // chapter dots; the dark outline keeps them at 3:1 or better over the white
 // played portion as well as the track.
-// z-index 0: above the played and loaded bars, below the chapter dots (1) and
-// the playhead (2), so a chapter dot near a match stays clickable and the
-// playhead can always be dragged.
+// z-index 2: above the chapter dots (1), so a match sitting on a chapter dot
+// stays visible and clickable; below the playhead (3), so it can always be
+// dragged.
 .video-js .gvp-find-ticks {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: 2;
     pointer-events: none;
 }
 
@@ -1919,6 +1952,22 @@ and (min-device-width : 680px) {
         bottom: -5px;
         left: -2px;
         right: -2px;
+    }
+
+}
+
+// Where Return will go while nothing is current: a white ring around the mark,
+// so it differs by shape as well as colour.
+.video-js .gvp-find-tick-next {
+    z-index: 1;
+    box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.7 ), 0 0 0 3px #fff;
+}
+
+@media ( forced-colors: active ) {
+
+    .video-js .gvp-find-tick-next {
+        outline: 2px solid CanvasText;
+        outline-offset: 2px;
     }
 
 }
