@@ -672,6 +672,8 @@ html {
         // titles are author-written prose and regularly are not.
         white-space: normal;
         overflow-wrap: anywhere;
+        // and when one does wrap, not with one word alone on the last line
+        text-wrap: pretty;
         position: relative;
     }
 
@@ -687,6 +689,12 @@ html {
 
     .video-js .vjs-chapters-button.vjs-menu-button-popup .vjs-menu .vjs-menu-content {
         counter-reset: gvp-chapter;
+
+        // Chapter titles are sentences, so this menu may grow wider than the
+        // others before a title wraps -- but never wider than the player
+        // (--gvp-menu-room, measured in clampMenus). 22em, the shared bound,
+        // until the first measurement.
+        max-width: min( 32em, var( --gvp-menu-room, 22em ) );
 
         // The number column is only as wide as the widest number, so a short
         // list keeps its numbers tight against the marker column. The first
@@ -846,12 +854,13 @@ html {
         width: max-content;
         min-width: 6em;
 
-        // One bound, declared once. The previous 16em clipped anything longer
-        // than it and hid the overflow, so a chapter name you cannot read in
-        // full became a chapter you cannot tell from its neighbour. Give it
-        // more room and let the label wrap inside that bound rather than be
-        // sliced -- 22em is still comfortably narrower than the player at the
-        // 530px breakpoint where these menus start appearing.
+        // The default bound; only chapters, whose titles are sentences, goes
+        // wider (see its own rule above). The previous 16em clipped anything
+        // longer than it and hid the overflow, so a chapter name you cannot
+        // read in full became a chapter you cannot tell from its neighbour.
+        // Give it more room and let the label wrap inside that bound rather
+        // than be sliced -- 22em is still comfortably narrower than the player
+        // at the 530px breakpoint where these menus start appearing.
         max-width: 22em;
 
         // Vertically, the menu may use all the room between the control bar

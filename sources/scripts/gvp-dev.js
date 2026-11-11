@@ -1951,12 +1951,14 @@ function arrangeMenuButtons( player ) {
  * Keeps popup menus inside the player.
  *
  * The menus are centred on their button, which is fine mid-bar and breaks for
- * the controls nearest the right edge: a chapters menu wide enough to hold a
- * real chapter title hangs off the side of a narrow player. Capping the width
- * does not solve it -- a button close enough to the edge overflows at any width
- * -- so the box is measured after it opens and nudged back inside. The same
- * measurement sets how tall the box may grow: into the room above it, up to
- * 70% of the player's height.
+ * the controls near the right edge: a chapters menu wide enough to hold a real
+ * chapter title hangs off the side of a narrow player. Capping the width does
+ * not solve it -- a button close enough to the edge overflows at any width --
+ * so the box is measured after it opens and nudged back inside. The same
+ * measurement sets how wide the box may grow (--gvp-menu-room, the player's
+ * width less a margin each side; only the chapters menu uses more than its
+ * 22em) and how tall: into the room above it, up to 70% of the player's
+ * height.
  *
  * @function clampMenus
  * @param {Object} player
@@ -1973,6 +1975,7 @@ function clampMenus( player ) {
 
         let bounds = playerEl.getBoundingClientRect();
         let menus = playerEl.querySelectorAll( '.vjs-menu-button-popup .vjs-menu .vjs-menu-content' );
+        let edge = 8;
 
         for ( let i = 0; i < menus.length; i++ ) {
 
@@ -1981,6 +1984,9 @@ function clampMenus( player ) {
             // measure unshifted, or the previous nudge skews the reading
             menu.style.setProperty( '--gvp-menu-shift', '0px' );
 
+            // the widest a menu may be and still fit with a margin each side
+            menu.style.setProperty( '--gvp-menu-room', Math.floor( bounds.width - edge * 2 ) + 'px' );
+
             let rect = menu.getBoundingClientRect();
 
             if ( !rect.width ) {
@@ -1988,7 +1994,6 @@ function clampMenus( player ) {
             }
 
             let shift = 0;
-            let edge = 8;
 
             if ( rect.right > bounds.right - edge ) {
                 shift = ( bounds.right - edge ) - rect.right;
