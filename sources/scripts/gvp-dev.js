@@ -1038,6 +1038,7 @@ function loadVideoJS() {
     }
 
     nameMenusByTheirHeadings();
+    putCaptionStyleLast();
 
     // initialize the video player bases options/configurations
     gvp.player = videojs( 'gvp-video', playerOptions, function() {
@@ -1961,6 +1962,73 @@ function watchPlayerWidth( player ) {
     }
 
     update();
+
+}
+
+/**
+ * Moves the caption style command to the foot of the Captions menu.
+ *
+ * video.js lists "captions settings" first, styled like the tracks, so it
+ * read as one more caption choice. As on a Mac menu, the choices come first
+ * and the command that opens a window comes last, under a divider (in the
+ * stylesheet), with an ellipsis: "Caption Style…".
+ *
+ * Patched on the prototype before any player exists, so it also covers the
+ * menu video.js rebuilds whenever a track is added.
+ *
+ * @function putCaptionStyleLast
+ */
+function putCaptionStyleLast() {
+
+    let SubsCapsButton = videojs.getComponent( 'SubsCapsButton' );
+    let SettingsItem = videojs.getComponent( 'CaptionSettingsMenuItem' );
+
+    if ( !SubsCapsButton || !SettingsItem || SubsCapsButton.prototype.gvpStyleLast ) {
+        return;
+    }
+
+    let label = 'Caption Style\u2026';
+
+    let relabel = function( item ) {
+
+        let text = item.el().querySelector( '.vjs-menu-item-text' );
+
+        if ( text ) {
+            text.textContent = label;
+        }
+
+    };
+
+    // video.js puts its own label back when the language changes
+    let handleLanguagechange = SettingsItem.prototype.handleLanguagechange;
+
+    SettingsItem.prototype.handleLanguagechange = function() {
+        handleLanguagechange.apply( this, arguments );
+        relabel( this );
+    };
+
+    let createItems = SubsCapsButton.prototype.createItems;
+
+    SubsCapsButton.prototype.createItems = function() {
+
+        let items = createItems.apply( this, arguments );
+
+        for ( let i = 0; i < items.length; i++ ) {
+
+            if ( items[i] instanceof SettingsItem ) {
+                let item = items.splice( i, 1 )[0];
+                relabel( item );
+                items.push( item );
+                break;
+            }
+
+        }
+
+        return items;
+
+    };
+
+    SubsCapsButton.prototype.gvpStyleLast = true;
 
 }
 

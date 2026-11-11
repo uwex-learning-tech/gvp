@@ -803,6 +803,15 @@ html {
         display: none;
     }
 
+    // Caption Style... is a command, not a caption choice, so it sits last
+    // (putCaptionStyleLast), under a hairline like a Mac menu separator. The
+    // highlight stops below the line rather than painting over it.
+    .video-js .vjs-menu li.vjs-texttrack-settings {
+        margin-top: rem( 6px );
+        border-top: 1px solid rgba( 255, 255, 255, 0.2 );
+        background-clip: padding-box;
+    }
+
     // Zero out the video.js default `margin-bottom: 1.5em` on .vjs-menu so the
     // menu's box bottom sits flush with the bottom of the button; the calc()
     // offsets below are then measured from the button bottom directly.
