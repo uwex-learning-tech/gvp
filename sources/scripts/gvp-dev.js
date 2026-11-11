@@ -2290,6 +2290,9 @@ function setupCaptionSearch( player ) {
         button.setAttribute( 'aria-expanded', 'false' );
         player.removeClass( 'gvp-search-open' );
 
+        // the ticks belong to the search, so they go with it
+        drawTicks();
+
         if ( focusTo ) {
             if ( hadFocus ) {
                 focusTo.focus();
@@ -2553,6 +2556,8 @@ function setupCaptionSearch( player ) {
             ? snippetFor( search.source, search.hits[ search.current ], search.query )
             : '';
 
+        drawTicks();
+
     };
 
     // "12 matches" waits for typing to settle; "Not found" is said once.
@@ -2607,6 +2612,272 @@ function setupCaptionSearch( player ) {
         return title || document.title;
 
     };
+
+    // ---- ticks on the progress bar ----
+
+    // A map of where the word comes up: a thin mark per match on the seek
+    // bar, on a layer of its own so the chapter markers plugin leaves it
+    // alone. Decorative to assistive technology -- the bar offers all of it.
+    let progress = controlBar.getChild( 'ProgressControl' );
+    let seekBar = progress ? progress.getChild( 'SeekBar' ) : null;
+    let tickLayer = null;
+    let tickTip = null;
+    let tickGroups = [];    // [{ el, ks: [match indexes] }]
+
+    if ( seekBar ) {
+
+        tickLayer = document.createElement( 'div' );
+        tickLayer.className = 'gvp-find-ticks';
+        tickLayer.setAttribute( 'aria-hidden', 'true' );
+        seekBar.el().appendChild( tickLayer );
+
+        tickTip = document.createElement( 'div' );
+        tickTip.className = 'gvp-find-tip';
+        tickTip.setAttribute( 'aria-hidden', 'true' );
+        tickTip.hidden = true;
+        progress.el().appendChild( tickTip );
+
+    }
+
+    let drawTicks = function() {
+
+        if ( !tickLayer ) {
+            return;
+        }
+
+        tickLayer.textContent = '';
+        tickGroups = [];
+        hideTickTip();
+
+        let duration = player.duration();
+        let width = tickLayer.offsetWidth;
+
+        if ( !search.open || !search.hits.length || !duration || !isFinite( duration ) || duration <= 0 || !width ) {
+            return;
+        }
+
+        let cues = search.source.cues;
+        let group = null;
+
+        let place = function( x0, x1, ks, current ) {
+
+            let el = document.createElement( 'div' );
+            el.className = 'gvp-find-tick' + ( current ? ' gvp-find-tick-current' : '' ) + ( x1 > x0 ? ' gvp-find-band' : '' );
+            el.style.left = x0 + 'px';
+
+            // a band runs from its first mark to the far edge of its last
+            if ( x1 > x0 ) {
+                el.style.width = ( x1 - x0 + 3 ) + 'px';
+            }
+
+            tickLayer.appendChild( el );
+            tickGroups.push( { el: el, ks: ks } );
+
+        };
+
+        // Marks closer than 3px merge into one band, so a common word reads as
+        // a few bands rather than a solid bar. The count stays exact.
+        let groups = [];
+
+        search.hits.forEach( function( ci, k ) {
+
+            let x = Math.min( width, Math.max( 0, cues[ ci ].start / duration * width ) );
+
+            if ( group && x - group.x1 < 3 ) {
+                group.x1 = x;
+                group.ks.push( k );
+            } else {
+                group = { x0: x, x1: x, ks: [ k ] };
+                groups.push( group );
+            }
+
+        } );
+
+        groups.forEach( function( g ) {
+            place( g.x0, g.x1, g.ks, false );
+        } );
+
+        // The current match keeps a tall mark of its own, even inside a band.
+        if ( search.current >= 0 ) {
+
+            let x = Math.min( width, Math.max( 0, cues[ search.hits[ search.current ] ].start / duration * width ) );
+
+            place( x, x, [ search.current ], true );
+
+        }
+
+    };
+
+    let tickFor = function( target ) {
+
+        for ( let i = 0; i < tickGroups.length; i++ ) {
+
+            if ( tickGroups[ i ].el === target ) {
+                return tickGroups[ i ];
+            }
+
+        }
+
+        return null;
+
+    };
+
+    // The match nearest the pointer, across every match rather than just the
+    // mark under it: hit areas overlap where marks sit close, and the current
+    // match's taller mark sits on top of any band it falls in.
+    let matchAtPointer = function( clientX ) {
+
+        let rect = tickLayer.getBoundingClientRect();
+        let t = ( clientX - rect.left ) / rect.width * player.duration();
+        let cues = search.source.cues;
+        let best = 0;
+
+        search.hits.forEach( function( ci, k ) {
+
+            if ( Math.abs( cues[ ci ].start - t ) < Math.abs( cues[ search.hits[ best ] ].start - t ) ) {
+                best = k;
+            }
+
+        } );
+
+        return best;
+
+    };
+
+    let showTickTip = function( k ) {
+
+        let ci = search.hits[ k ];
+        let parts = snippetParts( search.source, ci, search.query );
+
+        tickTip.textContent = '';
+        tickTip.dataset.k = k;
+
+        let time = document.createElement( 'span' );
+        time.className = 'gvp-find-tip-time';
+        time.textContent = formatDuration( search.source.cues[ ci ].start );
+        tickTip.appendChild( time );
+
+        let line = document.createElement( 'span' );
+
+        if ( parts.before ) {
+            line.appendChild( document.createTextNode( '…' ) );
+        }
+
+        parts.words.forEach( function( w, i ) {
+
+            if ( i ) {
+                line.appendChild( document.createTextNode( ' ' ) );
+            }
+
+            if ( w.hit ) {
+                let b = document.createElement( 'b' );
+                b.textContent = w.text;
+                line.appendChild( b );
+            } else {
+                line.appendChild( document.createTextNode( w.text ) );
+            }
+
+        } );
+
+        if ( parts.after ) {
+            line.appendChild( document.createTextNode( '…' ) );
+        }
+
+        tickTip.appendChild( line );
+        tickTip.hidden = false;
+
+        // Centred on the match, kept inside the player rather than the
+        // narrower progress control, so it stays over its mark.
+        let host = progress.el().getBoundingClientRect();
+        let edges = player.el().getBoundingClientRect();
+        let x = ( search.source.cues[ ci ].start / player.duration() ) * tickLayer.offsetWidth
+            + tickLayer.getBoundingClientRect().left - host.left;
+        let half = tickTip.offsetWidth / 2;
+        let min = edges.left - host.left + half + 6;
+        let max = edges.right - host.left - half - 6;
+
+        tickTip.style.left = Math.max( min, Math.min( max, x ) ) + 'px';
+
+        // the hovered timecode steps aside, as it does for chapter titles
+        player.addClass( 'gvp-find-tip-shown' );
+
+    };
+
+    let hideTickTip = function() {
+
+        if ( tickTip && !tickTip.hidden ) {
+            tickTip.hidden = true;
+            player.removeClass( 'gvp-find-tip-shown' );
+        }
+
+    };
+
+    if ( tickLayer ) {
+
+        let onHover = function( e ) {
+
+            if ( tickFor( e.target ) ) {
+                showTickTip( matchAtPointer( e.clientX ) );
+            }
+
+        };
+
+        tickLayer.addEventListener( 'mouseover', onHover );
+        tickLayer.addEventListener( 'mousemove', onHover );
+
+        tickLayer.addEventListener( 'mouseout', function( e ) {
+
+            if ( tickFor( e.target ) && !tickLayer.contains( e.relatedTarget ) ) {
+                hideTickTip();
+            }
+
+        } );
+
+        // A press on a mark must not also start a scrub of the seek bar.
+        [ 'mousedown', 'touchstart', 'pointerdown' ].forEach( function( type ) {
+
+            tickLayer.addEventListener( type, function( e ) {
+
+                if ( tickFor( e.target ) ) {
+                    e.stopPropagation();
+                }
+
+            } );
+
+        } );
+
+        // Clicking jumps to the match the tooltip showed, and hands the
+        // keyboard back to the field so Return carries on from there.
+        tickLayer.addEventListener( 'click', function( e ) {
+
+            if ( !tickFor( e.target ) ) {
+                return;
+            }
+
+            e.stopPropagation();
+
+            let k = tickTip && !tickTip.hidden && tickTip.dataset.k !== undefined
+                ? Number( tickTip.dataset.k )
+                : matchAtPointer( e.clientX );
+
+            jump( k );
+            input.focus();
+
+        } );
+
+        player.on( [ 'loadedmetadata', 'durationchange', 'playerresize', 'fullscreenchange' ], drawTicks );
+
+        // The seek bar also changes width when controls come and go at a
+        // breakpoint without the player itself resizing.
+        if ( typeof ResizeObserver === 'function' ) {
+            new ResizeObserver( function() {
+                if ( search.open ) {
+                    drawTicks();
+                }
+            } ).observe( tickLayer );
+        }
+
+    }
 
     // ---- which track ----
 
@@ -3004,7 +3275,89 @@ function cueAtOffset( offsets, offset ) {
 }
 
 /**
- * About six words around a match, for a screen reader to read on request.
+ * About six words around a match, each flagged if it is part of the match, so
+ * the tooltip can bold them. A phrase that runs into the next caption brings
+ * that caption along.
+ *
+ * @function snippetParts
+ * @param {Object} source
+ * @param {Number} ci - cue index
+ * @param {String} query
+ * @return {Object} { words: [{ text, hit }], before, after } -- before/after
+ *                  say whether text was cut off at either end
+ */
+function snippetParts( source, ci, query ) {
+
+    let q = normaliseForSearch( query ).trim();
+    let text = source.cues[ ci ].text;
+
+    if ( normaliseForSearch( text ).indexOf( q ) === -1 && source.cues[ ci + 1 ] ) {
+        text += ' ' + source.cues[ ci + 1 ].text;
+    }
+
+    let words = text.split( ' ' );
+    let norms = words.map( function( w ) { return normaliseForSearch( w ).trim(); } );
+    let anywhere = NO_SPACE_SCRIPT.test( q.charAt( 0 ) );
+
+    // The run of words that spells out the match, by the same rule findHits
+    // uses: from the start of a word (or anywhere, for scripts without
+    // spaces), and able to run across several words.
+    let first = -1;
+    let last = -1;
+
+    for ( let i = 0; i < words.length && first < 0; i++ ) {
+
+        if ( !norms[ i ] ) {
+            continue;
+        }
+
+        let joined = norms[ i ];
+
+        for ( let j = i; j < words.length; j++ ) {
+
+            if ( j > i && norms[ j ] ) {
+                joined += ' ' + norms[ j ];
+            }
+
+            let at = joined.indexOf( q );
+
+            if ( !anywhere && at > 0 ) {
+                let space = joined.indexOf( ' ' + q );
+                at = space === -1 ? -1 : space + 1;
+            }
+
+            // the match has to begin inside word i, or a later start owns it
+            if ( at !== -1 && at < norms[ i ].length ) {
+                first = i;
+                last = j;
+                break;
+            }
+
+            if ( joined.length > norms[ i ].length + q.length + 1 ) {
+                break;
+            }
+
+        }
+
+    }
+
+    let at = Math.max( 0, first );
+    let from = Math.max( 0, at - 3 );
+    let to = Math.min( words.length, Math.max( from + 7, last + 1 ) );
+
+    return {
+        words: words.slice( from, to ).map( function( w, k ) {
+            let i = from + k;
+            return { text: w, hit: first >= 0 && i >= first && i <= last };
+        } ),
+        before: from > 0,
+        after: to < words.length
+    };
+
+}
+
+/**
+ * The same words as plain text, for a screen reader to read on request.
  *
  * @function snippetFor
  * @param {Object} source
@@ -3014,31 +3367,11 @@ function cueAtOffset( offsets, offset ) {
  */
 function snippetFor( source, ci, query ) {
 
-    let q = normaliseForSearch( query ).trim();
-    let text = source.cues[ ci ].text;
+    let s = snippetParts( source, ci, query );
 
-    // a phrase that runs into the next caption brings it along
-    if ( normaliseForSearch( text ).indexOf( q ) === -1 && source.cues[ ci + 1 ] ) {
-        text += ' ' + source.cues[ ci + 1 ].text;
-    }
-
-    let words = text.split( ' ' );
-    let first = q.split( ' ' )[0];
-    let at = 0;
-
-    for ( let k = 0; k < words.length; k++ ) {
-
-        if ( normaliseForSearch( words[ k ] ).trim().indexOf( first ) === 0 ) {
-            at = k;
-            break;
-        }
-
-    }
-
-    let from = Math.max( 0, at - 3 );
-    let to = Math.min( words.length, from + 7 );
-
-    return ( from > 0 ? '…' : '' ) + words.slice( from, to ).join( ' ' ) + ( to < words.length ? '…' : '' );
+    return ( s.before ? '\u2026' : '' )
+        + s.words.map( function( w ) { return w.text; } ).join( ' ' )
+        + ( s.after ? '\u2026' : '' );
 
 }
 
