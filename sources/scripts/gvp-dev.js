@@ -110,7 +110,8 @@ let flags = {
     playReached25: false,
     playReached50: false,
     playReached75: false,
-    playReached100: false
+    playReached100: false,
+    searchSeeked: false
 };
 
 /**** GVP CORE FUNCTIONS ****/
@@ -1157,7 +1158,8 @@ function loadVideoJS() {
                 
                 if ( flags.played === false ) {
                     
-                    if ( flags.isYouTube ) {
+                    // a caption search jump made before the first play stands
+                    if ( flags.isYouTube && !flags.searchSeeked ) {
                         self.currentTime( queryToSeconds( reference.params.get( 'start' ) ) );
                     }
                     
@@ -1165,7 +1167,7 @@ function loadVideoJS() {
                     
                 }
                 
-                if ( self.played().length === 0 ) {
+                if ( self.played().length === 0 && !flags.searchSeeked ) {
                     
                     self.currentTime( queryToSeconds( reference.params.get( 'start' ) ) );
                     
@@ -2122,11 +2124,34 @@ function setupCaptionSearch( player ) {
         query: '',
         source: null,
         hits: [],           // indexes into source.cues, in time order
+        outside: [],        // matches outside the ?start= / ?end= clip
         current: -1,
+        saved: null,        // caption modes to put back on close
+        recorded: null,     // caption modes as search last left them
+        applied: false,     // captions shown for the search yet
+        endHidden: false,   // hidden over the end card, search kept
         typing: null,       // debounce timer
         speaking: null,     // announcement debounce timer
         lastSpoken: '',
         ownSeek: false
+    };
+
+    // A link with ?start= or ?end= plays a clip; matches outside it are shown
+    // dimmed and are never stepped to.
+    let clip = { start: 0, end: Infinity };
+
+    if ( reference.params.has( 'start' ) ) {
+        let t = queryToSeconds( reference.params.get( 'start' ) );
+        clip.start = isFinite( t ) && t > 0 ? t : 0;
+    }
+
+    if ( reference.params.has( 'end' ) ) {
+        let t = queryToSeconds( reference.params.get( 'end' ) );
+        clip.end = isFinite( t ) && t > clip.start ? t : Infinity;
+    }
+
+    let inClip = function( t ) {
+        return t >= clip.start && t < clip.end;
     };
 
     // ---- the bar ----
@@ -2236,7 +2261,10 @@ function setupCaptionSearch( player ) {
 
     button.on( 'gvpsearchtoggle', function() {
 
-        if ( search.open ) {
+        if ( search.open && search.endHidden ) {
+            endHide( false );
+            input.focus();
+        } else if ( search.open ) {
             close();
         } else {
             open();
@@ -2254,6 +2282,11 @@ function setupCaptionSearch( player ) {
 
         search.open = true;
         search.current = -1;
+
+        // The student's own caption setting, to put back on close.
+        search.saved = captionModes();
+        search.recorded = search.saved;
+        search.applied = false;
 
         bar.setAttribute( 'aria-label', 'Search the video: ' + videoTitle() );
         bar.hidden = false;
@@ -2285,10 +2318,25 @@ function setupCaptionSearch( player ) {
 
         search.open = false;
         search.current = -1;
+        search.endHidden = false;
+
+        // Captions go back to how the student had them, unless they chose
+        // something else while searching.
+        if ( search.saved ) {
+            setCaptionModes( search.saved );
+        }
+
+        search.saved = null;
+        search.recorded = null;
+        search.applied = false;
 
         bar.hidden = true;
         button.setAttribute( 'aria-expanded', 'false' );
         player.removeClass( 'gvp-search-open' );
+
+        if ( tickLayer ) {
+            tickLayer.hidden = false;
+        }
 
         // the ticks belong to the search, so they go with it
         drawTicks();
@@ -2396,7 +2444,11 @@ function setupCaptionSearch( player ) {
         search.query = query;
         search.source = pickSource();
         search.current = -1;
-        search.hits = search.source ? findHits( search.source, query ) : [];
+        let all = search.source ? findHits( search.source, query ) : [];
+        let cues = search.source ? search.source.cues : [];
+
+        search.hits = all.filter( function( ci ) { return inClip( cues[ ci ].start ); } );
+        search.outside = all.filter( function( ci ) { return !inClip( cues[ ci ].start ); } );
 
         updatePlaceholder();
         render();
@@ -2453,9 +2505,12 @@ function setupCaptionSearch( player ) {
 
                 k = -1;
 
+                // A jump lands 50ms into its caption, so a match counts as
+                // before the playhead only once it starts clearly earlier --
+                // otherwise Previous would land on the caption already showing.
                 search.hits.forEach( function( ci, i ) {
 
-                    if ( cues[ ci ].start < t ) {
+                    if ( cues[ ci ].start < t - 0.1 ) {
                         k = i;
                     }
 
@@ -2479,10 +2534,22 @@ function setupCaptionSearch( player ) {
 
         search.current = k;
 
-        // The exact start of the caption: a lead-in would show the previous
-        // line and look like a wrong match. Play or pause is left alone.
+        // The first jump shows the searched captions, so the line on screen
+        // is the one with the match -- unless the student has chosen their
+        // own captions since opening the bar.
+        if ( search.saved && !search.applied ) {
+            showSearchedCaptions();
+        }
+
+        // The start of the caption: a lead-in would show the previous line
+        // and look like a wrong match. 50ms in, not exactly at the start --
+        // caption files usually end one cue at the very instant the next
+        // begins, and landing on that instant shows both, stacked. 50ms is
+        // under one frame. Play or pause is left alone. A jump before the
+        // first play is not undone by the ?start= seek.
         search.ownSeek = true;
-        player.currentTime( cue.start );
+        flags.searchSeeked = true;
+        player.currentTime( Math.min( cue.start + 0.05, cue.end > cue.start ? ( cue.start + cue.end ) / 2 : cue.start + 0.05 ) );
 
         render();
 
@@ -2520,7 +2587,8 @@ function setupCaptionSearch( player ) {
 
         let n = search.hits.length;
         let valid = isQueryLongEnough( search.query );
-        let missing = valid && !n;
+        let elsewhere = search.outside.length;
+        let missing = valid && !n && !elsewhere;
 
         field.classList.toggle( 'gvp-find-missing', missing );
 
@@ -2535,6 +2603,8 @@ function setupCaptionSearch( player ) {
 
         if ( !valid ) {
             count.textContent = '';
+        } else if ( !n && elsewhere ) {
+            count.textContent = 'No matches in this clip (' + elsewhere + ' elsewhere)';
         } else if ( !n ) {
             count.textContent = 'Not found';
         } else if ( search.current < 0 ) {
@@ -2575,7 +2645,9 @@ function setupCaptionSearch( player ) {
                 return;
             }
 
-            if ( !n ) {
+            if ( !n && search.outside.length ) {
+                message = 'No matches in this clip, ' + search.outside.length + ' elsewhere';
+            } else if ( !n ) {
                 message = 'Not found';
             } else {
                 message = n === 1 ? '1 match' : n + ' matches';
@@ -2652,17 +2724,17 @@ function setupCaptionSearch( player ) {
         let duration = player.duration();
         let width = tickLayer.offsetWidth;
 
-        if ( !search.open || !search.hits.length || !duration || !isFinite( duration ) || duration <= 0 || !width ) {
+        if ( !search.open || ( !search.hits.length && !search.outside.length ) || !duration || !isFinite( duration ) || duration <= 0 || !width ) {
             return;
         }
 
         let cues = search.source.cues;
         let group = null;
 
-        let place = function( x0, x1, ks, current ) {
+        let place = function( x0, x1, ks, current, outside ) {
 
             let el = document.createElement( 'div' );
-            el.className = 'gvp-find-tick' + ( current ? ' gvp-find-tick-current' : '' ) + ( x1 > x0 ? ' gvp-find-band' : '' );
+            el.className = 'gvp-find-tick' + ( current ? ' gvp-find-tick-current' : '' ) + ( x1 > x0 ? ' gvp-find-band' : '' ) + ( outside ? ' gvp-find-tick-outside' : '' );
             el.style.left = x0 + 'px';
 
             // a band runs from its first mark to the far edge of its last
@@ -2671,30 +2743,46 @@ function setupCaptionSearch( player ) {
             }
 
             tickLayer.appendChild( el );
-            tickGroups.push( { el: el, ks: ks } );
+
+            // outside the clip: shown, never hovered or clicked
+            if ( !outside ) {
+                tickGroups.push( { el: el, ks: ks } );
+            }
 
         };
 
         // Marks closer than 3px merge into one band, so a common word reads as
         // a few bands rather than a solid bar. The count stays exact.
-        let groups = [];
+        let layout = function( list ) {
 
-        search.hits.forEach( function( ci, k ) {
+            let groups = [];
 
-            let x = Math.min( width, Math.max( 0, cues[ ci ].start / duration * width ) );
+            group = null;
 
-            if ( group && x - group.x1 < 3 ) {
-                group.x1 = x;
-                group.ks.push( k );
-            } else {
-                group = { x0: x, x1: x, ks: [ k ] };
-                groups.push( group );
-            }
+            list.forEach( function( ci, k ) {
 
+                let x = Math.min( width, Math.max( 0, cues[ ci ].start / duration * width ) );
+
+                if ( group && x - group.x1 < 3 ) {
+                    group.x1 = x;
+                    group.ks.push( k );
+                } else {
+                    group = { x0: x, x1: x, ks: [ k ] };
+                    groups.push( group );
+                }
+
+            } );
+
+            return groups;
+
+        };
+
+        layout( search.outside ).forEach( function( g ) {
+            place( g.x0, g.x1, [], false, true );
         } );
 
-        groups.forEach( function( g ) {
-            place( g.x0, g.x1, g.ks, false );
+        layout( search.hits ).forEach( function( g ) {
+            place( g.x0, g.x1, g.ks, false, false );
         } );
 
         // The current match keeps a tall mark of its own, even inside a band.
@@ -2878,6 +2966,180 @@ function setupCaptionSearch( player ) {
         }
 
     }
+
+    // ---- captions while searching ----
+
+    let captionTracks = function() {
+
+        let list = player.textTracks();
+        let out = [];
+
+        for ( let i = 0; i < list.length; i++ ) {
+            if ( isCaptionTrack( list[ i ] ) ) {
+                out.push( list[ i ] );
+            }
+        }
+
+        return out;
+
+    };
+
+    let captionModes = function() {
+        return captionTracks().map( function( t ) { return { track: t, mode: t.mode }; } );
+    };
+
+    // Turning tracks off before turning one on, so there is never a moment
+    // with two showing.
+    let setCaptionModes = function( modes ) {
+
+        let present = captionTracks();
+        let live = modes.filter( function( m ) { return present.indexOf( m.track ) !== -1; } );
+
+        live.forEach( function( m ) {
+            if ( m.mode !== 'showing' ) {
+                m.track.mode = m.mode;
+            }
+        } );
+
+        live.forEach( function( m ) {
+            if ( m.mode === 'showing' ) {
+                m.track.mode = 'showing';
+            }
+        } );
+
+    };
+
+    // Exactly one track shows while searching: the one being searched.
+    let showSearchedCaptions = function() {
+
+        let searched = search.source ? search.source.track : null;
+
+        setCaptionModes( captionTracks().map( function( t ) {
+            return { track: t, mode: t === searched ? 'showing' : 'disabled' };
+        } ) );
+
+        search.applied = true;
+        search.recorded = captionModes();
+
+    };
+
+    // The change event arrives later and batched, so it cannot say who made a
+    // change. Comparing with what search last set can: any difference on the
+    // same tracks is the student's own choice from the Captions menu, and
+    // theirs to keep. A track that has only just been added is no difference.
+    player.textTracks().addEventListener( 'change', function() {
+
+        if ( !search.open || !search.recorded ) {
+            return;
+        }
+
+        let present = captionTracks();
+        let changed = search.recorded.some( function( r ) {
+            return present.indexOf( r.track ) !== -1 && r.track.mode !== r.mode;
+        } );
+
+        if ( !changed ) {
+            return;
+        }
+
+        search.saved = null;
+        search.recorded = captionModes();
+
+        // A new language shown: search it instead, landing on the match
+        // nearest the playhead without moving the video.
+        let shown = sources.find( function( s ) { return s.track.mode === 'showing' && s.cues.length; } );
+
+        if ( shown && shown !== search.source ) {
+
+            run( search.query, false );
+
+            if ( search.hits.length ) {
+
+                let t = player.currentTime() || 0;
+                let cues = search.source.cues;
+                let best = 0;
+
+                search.hits.forEach( function( ci, k ) {
+                    if ( Math.abs( cues[ ci ].start - t ) < Math.abs( cues[ search.hits[ best ] ].start - t ) ) {
+                        best = k;
+                    }
+                } );
+
+                search.current = best;
+                render();
+
+            }
+
+            announce( 'Searching ' + shown.label + '. ' + count.textContent.replace( ' \u00b7 ', ', ' ) );
+
+        }
+
+    } );
+
+    // ---- the end of the video ----
+
+    // Over the end card the bar steps aside but keeps its search, and comes
+    // back as it was on replay or on a seek away from the end.
+    let endHide = function( hide ) {
+
+        if ( !search.open || search.endHidden === hide ) {
+            return;
+        }
+
+        // Focus in the bar, or -- outside SB+ -- anywhere in the control bar,
+        // which GVP hides at the end along with the magnifier.
+        let active = document.activeElement;
+        let hadFocus = bar.contains( active )
+            || ( !flags.sbplusEmbed && controlBar.el().contains( active ) );
+
+        search.endHidden = hide;
+        bar.hidden = hide;
+
+        if ( tickLayer ) {
+            tickLayer.hidden = hide;
+        }
+
+        // A hidden layer has no width, so a search rerun meanwhile (a new
+        // caption language, a late track) cleared the ticks without drawing
+        // them. Draw them again now there is room.
+        if ( !hide ) {
+            drawTicks();
+        }
+
+        if ( hide ) {
+
+            hideTickTip();
+
+            // Never drop focus: to the replay button, or in SB+ -- where the
+            // control bar stays -- to the magnifier that brings the bar back.
+            if ( hadFocus ) {
+
+                let replay = player.getChild( 'BigPlayButton' );
+
+                if ( flags.sbplusEmbed || !replay ) {
+                    button.focus();
+                } else {
+                    replay.el().focus();
+                }
+
+            }
+
+        }
+
+    };
+
+    player.on( 'ended', function() { endHide( true ); } );
+    player.on( 'play', function() { endHide( false ); } );
+
+    player.on( 'seeked', function() {
+
+        let duration = player.duration();
+
+        if ( search.endHidden && duration && ( player.currentTime() || 0 ) < duration - 0.5 ) {
+            endHide( false );
+        }
+
+    } );
 
     // ---- which track ----
 
@@ -5067,17 +5329,22 @@ function announce( message ) {
 
     let region = document.getElementById( 'gvp-live-region' );
 
-    if ( !region ) {
+    // Inside the player once there is one: in fullscreen, everything outside
+    // the fullscreen element is out of reach, live regions included.
+    let playerEl = gvp.player && gvp.player.el ? gvp.player.el() : null;
+    let host = playerEl || document.getElementsByClassName( 'gvp-video-wrapper' )[0] || document.body;
 
-        let host = document.getElementsByClassName( 'gvp-video-wrapper' )[0] || document.body;
+    if ( !region ) {
 
         region = document.createElement( 'p' );
         region.id = 'gvp-live-region';
         region.className = 'gvp-visually-hidden';
         region.setAttribute( 'role', 'status' );
 
-        host.appendChild( region );
+    }
 
+    if ( region.parentNode !== host ) {
+        host.appendChild( region );
     }
 
     // Re-setting identical text does not re-announce, so clear first.

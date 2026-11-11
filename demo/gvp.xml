@@ -9,6 +9,9 @@
 
     <settings>
         <kalturaId>1_jzsl74em</kalturaId>
+        <!-- Caption search is on by default. Uncomment to turn it off for
+             this video. -->
+        <!-- <captionSearch>false</captionSearch> -->
     </settings>
 
     <!-- Chapter titles follow the topics covered in the video. They drive both

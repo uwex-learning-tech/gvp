@@ -1693,6 +1693,17 @@ and (min-device-width : 680px) {
     pointer-events: auto;
 }
 
+// With the control bar kept up, captions stay above it rather than dropping
+// to the bottom as they do when the player goes idle.
+.video-js.gvp-search-open:not(.vjs-controls-disabled):not(.vjs-error) .vjs-text-track-display {
+    bottom: calc( 3.5em + 2% );
+}
+
+// And in fullscreen the pointer stays visible while searching.
+.video-js.vjs-fullscreen.vjs-user-inactive.gvp-search-open {
+    cursor: auto;
+}
+
 .video-js .gvp-find-bar {
 
     position: absolute;
@@ -1715,6 +1726,13 @@ and (min-device-width : 680px) {
 
     &[hidden] {
         display: none;
+    }
+
+    // slides down into place; no slide and no fade with Reduce Motion
+    animation: gvp-find-in 160ms ease-out;
+
+    @media ( prefers-reduced-motion: reduce ) {
+        animation: none;
     }
 
     button {
@@ -1905,6 +1923,21 @@ and (min-device-width : 680px) {
 
 }
 
+// Outside the ?start= / ?end= clip: dimmed, and not hovered or clicked.
+.video-js .gvp-find-tick-outside {
+    opacity: 0.35;
+    pointer-events: none;
+    cursor: default;
+
+    &::before {
+        content: none;
+    }
+}
+
+.video-js .gvp-find-ticks[hidden] {
+    display: none;
+}
+
 // The current match: brighter and taller, so it differs by size, not colour alone.
 .video-js .gvp-find-tick-current {
     width: 4px;
@@ -1972,4 +2005,15 @@ and (min-device-width : 680px) {
     color: rgba( 255, 255, 255, 0.75 );
     font-size: rem( 12px );
     font-variant-numeric: tabular-nums;
+}
+
+@keyframes gvp-find-in {
+    from {
+        opacity: 0;
+        transform: translateY( -0.5em );
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
 }
