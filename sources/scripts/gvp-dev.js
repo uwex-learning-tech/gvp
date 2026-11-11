@@ -1566,6 +1566,7 @@ function loadVideoJS() {
             setupChapters( gvp.player );
             clampMenus( gvp.player );
             enableButtonTabbing( gvp.player );
+            watchPlayerWidth( gvp.player );
 
             // if youtube, hide cover on ready and reset markers
             if ( flags.isYouTube ) {
@@ -1893,6 +1894,63 @@ function enableButtonTabbing( player ) {
         new MutationObserver( apply ).observe( bar, { childList: true, subtree: true } );
 
     }
+
+}
+
+/**
+ * Marks the player gvp-player-narrow when its control bar does not fit, so the
+ * bar can make room (the time display goes, the buttons narrow slightly).
+ *
+ * Measured rather than set at a width: how many buttons the bar carries varies
+ * by video (Downloads, an audio-track menu, caption search) and by window
+ * width (the skip buttons and Quality come and go), so no single breakpoint
+ * is right for all of them.
+ *
+ * @function watchPlayerWidth
+ * @param {Object} player
+ */
+function watchPlayerWidth( player ) {
+
+    let controlBar = player.getChild( 'controlBar' );
+
+    if ( !controlBar ) {
+        return;
+    }
+
+    let bar = controlBar.el();
+    let pending = false;
+
+    let update = function() {
+
+        pending = false;
+
+        // measure the full-size bar, then narrow it only if that overflows
+        player.removeClass( 'gvp-player-narrow' );
+        player.toggleClass( 'gvp-player-narrow', bar.scrollWidth > bar.clientWidth + 1 );
+
+    };
+
+    // once per frame at most: a burst of changes is measured once
+    let schedule = function() {
+
+        if ( !pending ) {
+            pending = true;
+            requestAnimationFrame( update );
+        }
+
+    };
+
+    // 'play' too: before the first play video.js hides the control bar, so a
+    // measure then sees nothing to fit
+    player.on( [ 'play', 'playerresize', 'fullscreenchange', 'loadedmetadata', 'durationchange' ], schedule );
+
+    // buttons added late (Downloads, Quality, caption search) or shown and
+    // hidden (vjs-hidden) change what the bar has to fit
+    if ( typeof MutationObserver === 'function' ) {
+        new MutationObserver( schedule ).observe( bar, { childList: true, attributes: true, attributeFilter: [ 'class' ], subtree: false } );
+    }
+
+    update();
 
 }
 
@@ -2226,6 +2284,10 @@ function setupCaptionSearch( player ) {
             el.appendChild( document.createTextNode( before + ' ' ) );
         }
 
+        // the keys share a box, so a tooltip can put them on a line of their own
+        let group = document.createElement( 'span' );
+        group.className = 'gvp-find-keys';
+
         keys.forEach( function( key, i ) {
 
             // keys pressed together: Shift + Return
@@ -2233,14 +2295,17 @@ function setupCaptionSearch( player ) {
                 let plus = document.createElement( 'span' );
                 plus.className = 'gvp-find-plus';
                 plus.textContent = '+';
-                el.appendChild( plus );
+                group.appendChild( plus );
             }
 
             let cap = document.createElement( 'kbd' );
             cap.className = 'gvp-find-key';
             cap.textContent = key;
-            el.appendChild( cap );
+            group.appendChild( cap );
+
         } );
+
+        el.appendChild( group );
 
         if ( after ) {
             el.appendChild( document.createTextNode( ' ' + after ) );
@@ -2408,14 +2473,21 @@ function setupCaptionSearch( player ) {
     // the field, count, arrows and Done still fit on one row.
     let fitWidth = function() {
 
-        // the full-size row needs about 500px; below 520 it drops a size
-        let compact = player.el().offsetWidth < 520;
+        let width = player.el().offsetWidth;
 
-        if ( bar.classList.contains( 'gvp-find-compact' ) !== compact ) {
+        // The full-size row needs about 500px; below 520 it drops a size.
+        // Below 400 -- a phone held upright -- the field takes a row of its
+        // own and the count, arrows and Done sit under it.
+        let compact = width < 520;
+        let stacked = width < 400;
+
+        if ( bar.classList.contains( 'gvp-find-compact' ) !== compact
+            || bar.classList.contains( 'gvp-find-stacked' ) !== stacked ) {
 
             bar.classList.toggle( 'gvp-find-compact', compact );
+            bar.classList.toggle( 'gvp-find-stacked', stacked );
 
-            // the count's timestamps come and go at the same width
+            // the count's wording depends on the room it has
             if ( search.open ) {
                 render();
             }
@@ -2804,9 +2876,13 @@ function setupCaptionSearch( player ) {
 
         count.textContent = full;
 
-        // Below 480px the timestamp always goes, as the plan has it; above,
-        // only when the full wording does not fit.
-        if ( short && ( player.el().offsetWidth < 480 || count.scrollWidth > count.clientWidth ) ) {
+        // Below 480px the timestamp goes, as the plan has it, unless the bar
+        // is stacked; otherwise only when the full wording does not fit.
+        // (stacked, the count has a row to share with the arrows only, and
+        // keeps its timestamp)
+        let narrow = player.el().offsetWidth < 480 && !bar.classList.contains( 'gvp-find-stacked' );
+
+        if ( short && ( narrow || count.scrollWidth > count.clientWidth ) ) {
             count.textContent = short;
         }
 
