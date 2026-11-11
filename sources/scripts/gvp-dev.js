@@ -1520,6 +1520,13 @@ function loadVideoJS() {
             
         } );
         
+        // Menus open on click (or Enter/Space), never on hover. video.js adds
+        // this class on every browser but iOS, and it is all that lets its
+        // hover state show a menu -- so a pointer passing over the control bar
+        // on its way somewhere else popped menus open over the video. Outside
+        // the try below, so a failed decoration cannot bring hover back.
+        self.removeClass( 'vjs-workinghover' );
+
         // Everything from here to hideCover() is decoration -- extra buttons
         // and chapter markers -- but the cover is opaque, so a throw in any of
         // it used to leave the viewer staring at a blank cover forever. The
@@ -1541,13 +1548,6 @@ function loadVideoJS() {
             setupChapters( gvp.player );
             clampMenus( gvp.player );
             enableButtonTabbing( gvp.player );
-
-            // Menus open on click (or Enter/Space), never on hover. video.js
-            // adds this class on every browser but iOS, and it is all that
-            // lets its hover state show a menu -- so a pointer passing over
-            // the control bar on its way somewhere else popped menus open
-            // over the video.
-            self.removeClass( 'vjs-workinghover' );
 
             // if youtube, hide cover on ready and reset markers
             if ( flags.isYouTube ) {
