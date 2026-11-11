@@ -1730,7 +1730,8 @@ and (min-device-width : 680px) {
     background-color: rgba( $primary-background-color, 0.95 );
     color: #fff;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1em;
+    // 2pt up from the control bar's text: the bar is read, not just clicked
+    font-size: calc( 1em + 2pt );
 
     &[hidden] {
         display: none;
@@ -1757,11 +1758,21 @@ and (min-device-width : 680px) {
 
 }
 
+// The field and its hint. Room for a word or a short phrase, not a sentence:
+// students search for a term, and a long field only pushes the count away.
+.video-js .gvp-find-fieldbox {
+    position: relative;     // the hint hangs centred under it
+    display: flex;
+    // gives way first, down to its minimum; only then the count
+    flex: 0 20 15em;
+    min-width: 10em;
+    max-width: 15em;
+}
+
 .video-js .gvp-find-field {
 
-    flex: 1 1 18em;
-    min-width: 10em;
-    max-width: 26em;
+    flex: 1 1 auto;
+    min-width: 0;
     height: 2.1em;
     display: flex;
     align-items: center;
@@ -1812,37 +1823,167 @@ and (min-device-width : 680px) {
 
 }
 
-// The count and its hint share this box; it is centred in the 3em bar.
+// The count's box, between the field and the arrows.
 .video-js .gvp-find-countbox {
-    position: relative;
-    flex: none;
+    // Shrinks only once the field is down to its minimum: flex shares the
+    // squeeze out in proportion, so a near-zero factor here keeps the count
+    // whole until the field can give no more. render() swaps in a shorter
+    // wording when the full one does not fit.
+    flex: 0 0.001 auto;
+    min-width: 0;
 }
 
-// The one-time "Press Return to jump", hanging just under the count rather
-// than adding a row to the bar: half the box, then half the bar, then a gap.
-.video-js .gvp-find-hint {
+// the screen-reader snippet takes no place (or gap) in the row
+.video-js .gvp-find-bar > .gvp-visually-hidden {
     position: absolute;
-    left: 0;
-    top: calc( 50% + 1.5em + 0.4em );
-    padding: 0.3em 0.6em;
+}
+
+// One plate for the hint and the arrow tooltips: dark, hanging below the bar.
+.video-js .gvp-find-hint,
+.video-js .gvp-find-keytip {
+    position: absolute;
+    padding: 0.3em 0.55em;
     border-radius: rem( 3px );
-    background-color: rgba( 0, 0, 0, 0.85 );
+    background-color: rgba( 0, 0, 0, 0.88 );
     color: #fff;
     font-size: 1em;
+    font-weight: normal;
+    line-height: 1.5;
     white-space: nowrap;
     pointer-events: none;
+}
+
+// A key drawn as a keycap, its name spelled out: light outline, heavier
+// bottom edge.
+.video-js .gvp-find-key {
+    display: inline-block;
+    min-width: 1.5em;
+    margin: 0 0.12em;
+    padding: 0 0.3em;
+    box-sizing: border-box;
+    border: 1px solid rgba( 255, 255, 255, 0.6 );
+    border-bottom-width: 2px;
+    border-radius: rem( 3px );
+    background-color: rgba( 255, 255, 255, 0.1 );
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95em;
+    line-height: 1.35;
+    text-align: center;
+}
+
+// the "+" between keys pressed together
+.video-js .gvp-find-plus {
+    margin: 0 0.15em;
+    opacity: 0.8;
+}
+
+// "Press Return to jump", centred under the search field while a new search
+// has matches and no jump yet, rather than adding a row to the bar. The field
+// is centred in the bar: half the field, then half the bar, then a gap.
+.video-js .gvp-find-hint {
+    left: 50%;
+    transform: translateX( -50% );
+    top: calc( 50% + 1.5em + 0.4em );
 
     &[hidden] {
         display: none;
     }
 }
 
+// The arrows' tooltips, under the nav, centred on their button and kept inside
+// the video (left set by placeTip). Shown on hover after a short pause, and at
+// once on keyboard focus.
+.video-js .gvp-find-keytip {
+    left: 0;
+    // the nav is centred in the bar too, so the same sum as the hint lands
+    // both plates the same distance below the bar
+    top: calc( 50% + 1.5em + 0.4em );
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 120ms ease-out 0s, visibility 0s linear 120ms;
+}
+
+.video-js .gvp-find-prev:hover:not( :disabled ) ~ .gvp-find-keytip-prev,
+.video-js .gvp-find-next:hover:not( :disabled ) ~ .gvp-find-keytip-next {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 120ms ease-out 500ms, visibility 0s linear 500ms;
+}
+
+.video-js .gvp-find-prev:focus-visible ~ .gvp-find-keytip-prev,
+.video-js .gvp-find-next:focus-visible ~ .gvp-find-keytip-next {
+    opacity: 1;
+    visibility: visible;
+    transition: none;
+}
+
+// The hint steps aside while an arrow's tooltip is up -- the tooltip says the
+// same, in more detail, and at the larger size the two would collide. Same
+// pause as the tooltip on hover; at once on keyboard focus.
+.video-js .gvp-find-hint {
+    transition: opacity 120ms ease-out;
+}
+
+.video-js .gvp-find-bar:has( .gvp-find-prev:hover:not( :disabled ), .gvp-find-next:hover:not( :disabled ) ) .gvp-find-hint {
+    opacity: 0;
+    transition: opacity 120ms ease-out 500ms;
+}
+
+.video-js .gvp-find-bar:has( .gvp-find-prev:focus-visible, .gvp-find-next:focus-visible ) .gvp-find-hint {
+    opacity: 0;
+    transition: none;
+}
+
+// Narrow players: back to the control bar's text size, so everything fits on
+// one row at 320px, and both tooltips end at the right of the arrows so the
+// wider one stays inside the video.
+.video-js .gvp-find-bar.gvp-find-compact {
+    font-size: 1em;
+    gap: 0.3em;
+    padding: 0 0.4em;
+
+    .gvp-find-nav button {
+        width: 2em;
+    }
+
+    .gvp-find-done {
+        padding: 0 0.5em;
+    }
+
+    // on a narrow player the hint starts at the field's left edge, so it
+    // cannot run off the left of the video
+    .gvp-find-hint {
+        left: 0;
+        transform: none;
+    }
+}
+
+// touch screens have no hover and no Return key
+@media ( pointer: coarse ) {
+
+    .video-js .gvp-find-keytip {
+        display: none;
+    }
+
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+
+    .video-js .gvp-find-keytip {
+        transition: none !important;
+    }
+
+}
+
 .video-js .gvp-find-count {
-    flex: none;
+    display: block;
     font-size: 1.05em;
     color: rgba( 255, 255, 255, 0.8 );
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    // last resort, if even the short wording does not fit
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .video-js .gvp-find-spacer {
@@ -1852,10 +1993,20 @@ and (min-device-width : 680px) {
 .video-js .gvp-find-nav {
 
     flex: none;
+    position: relative;
     display: inline-flex;
     border: 1px solid rgba( 255, 255, 255, 0.3 );
     border-radius: rem( 4px );
-    overflow: hidden;
+
+    // rounded at the ends here rather than clipped, so the tooltips can hang
+    // out below
+    button:first-child {
+        border-radius: rem( 3px ) 0 0 rem( 3px );
+    }
+
+    button:nth-child( 2 ) {
+        border-radius: 0 rem( 3px ) rem( 3px ) 0;
+    }
 
     button {
         width: 2.4em;
@@ -1910,6 +2061,13 @@ and (min-device-width : 680px) {
     .video-js .gvp-find-nav button,
     .video-js .gvp-find-done {
         min-width: 44px;
+    }
+
+    // On a narrow touch screen the 44px targets and a 120px field leave the
+    // count about 35px -- too little for "3 of 12". The field gives way
+    // instead: an on-screen keyboard needs no wide field to type a word.
+    .video-js .gvp-find-compact .gvp-find-fieldbox {
+        min-width: 7em;
     }
 
 }
@@ -2033,8 +2191,8 @@ and (min-device-width : 680px) {
     background-color: rgba( 0, 0, 0, 0.9 );
     color: #fff;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: rem( 13px );
-    line-height: rem( 18px );
+    font-size: calc( #{rem( 13px )} + 2pt );
+    line-height: 1.4;
     text-align: center;
     white-space: normal;
     pointer-events: none;
@@ -2052,7 +2210,7 @@ and (min-device-width : 680px) {
 .video-js .gvp-find-tip-time {
     display: block;
     color: rgba( 255, 255, 255, 0.75 );
-    font-size: rem( 12px );
+    font-size: calc( #{rem( 12px )} + 2pt );
     font-variant-numeric: tabular-nums;
 }
 

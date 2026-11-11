@@ -2212,51 +2212,132 @@ function setupCaptionSearch( player ) {
 
     // A one-time nudge, the first time a student searches in a session:
     // what to press to go to the matches.
+    // Text with keys drawn as keycaps: keyLine( el, 'Next match', [ enterKey ] ).
+    let keyLine = function( el, before, keys, after ) {
+
+        el.textContent = '';
+
+        if ( before ) {
+            el.appendChild( document.createTextNode( before + ' ' ) );
+        }
+
+        keys.forEach( function( key, i ) {
+
+            // keys pressed together: Shift + Return
+            if ( i ) {
+                let plus = document.createElement( 'span' );
+                plus.className = 'gvp-find-plus';
+                plus.textContent = '+';
+                el.appendChild( plus );
+            }
+
+            let cap = document.createElement( 'kbd' );
+            cap.className = 'gvp-find-key';
+            cap.textContent = key;
+            el.appendChild( cap );
+        } );
+
+        if ( after ) {
+            el.appendChild( document.createTextNode( ' ' + after ) );
+        }
+
+    };
+
+    let coarse = window.matchMedia && window.matchMedia( '( pointer: coarse )' ).matches;
+
+    // The key is labelled Return on a Mac and Enter almost everywhere else --
+    // Windows PCs and Chromebooks, which many LMS students use. Name it the
+    // way the student's own keyboard does.
+    let platform = ( navigator.userAgentData && navigator.userAgentData.platform )
+        || navigator.platform
+        || navigator.userAgent
+        || '';
+    let enterKey = /mac|iphone|ipad|ipod/i.test( platform ) ? 'Return' : 'Enter';
+
+    // What each arrow does, and that Return and Shift-Return do the same --
+    // shown on hover, after a short pause as Mac tooltips are, and on
+    // keyboard focus. The buttons carry their own names for assistive tech.
+    let prevTip = document.createElement( 'span' );
+    prevTip.className = 'gvp-find-keytip gvp-find-keytip-prev';
+    prevTip.setAttribute( 'aria-hidden', 'true' );
+    keyLine( prevTip, 'Previous match', [ 'Shift', enterKey ] );
+
+    let nextTip = document.createElement( 'span' );
+    nextTip.className = 'gvp-find-keytip gvp-find-keytip-next';
+    nextTip.setAttribute( 'aria-hidden', 'true' );
+    keyLine( nextTip, 'Next match', [ enterKey ] );
+
+    nav.appendChild( prevTip );
+    nav.appendChild( nextTip );
+
+    // Centred under its button, then nudged left only as far as it takes to
+    // stay inside the video on the right (and on the left, on a tiny player).
+    let placeTip = function( tip, btn ) {
+
+        let edge = 6;
+        let navBox = nav.getBoundingClientRect();
+        let box = player.el().getBoundingClientRect();
+        let width = tip.offsetWidth;
+        let left = btn.offsetLeft + btn.offsetWidth / 2 - width / 2;
+        let maxLeft = box.right - navBox.left - edge - width;
+        let minLeft = box.left - navBox.left + edge;
+
+        tip.style.left = Math.max( minLeft, Math.min( maxLeft, left ) ) + 'px';
+
+    };
+
+    [ [ prevTip, prev ], [ nextTip, next ] ].forEach( function( pair ) {
+
+        let place = function() { placeTip( pair[0], pair[1] ); };
+
+        pair[1].addEventListener( 'mouseenter', place );
+        pair[1].addEventListener( 'focus', place );
+
+    } );
+
+    // The nudge under the count while a new search has matches but no jump
+    // yet: what to press to go to them. Same keycaps as the arrow tooltips.
     let hint = document.createElement( 'span' );
     hint.className = 'gvp-find-hint';
     hint.setAttribute( 'aria-hidden', 'true' );
     hint.hidden = true;
-    hint.textContent = window.matchMedia && window.matchMedia( '( pointer: coarse )' ).matches
-        ? 'Tap \u203a to jump'
-        : 'Press Return to jump';
 
-    let hintKey = 'gvp-find-hint-seen';
-    let hintDone = false;
-
-    try {
-        hintDone = window.sessionStorage.getItem( hintKey ) === '1';
-    } catch ( e ) {
-        // storage blocked: the hint simply shows once per page
+    if ( coarse ) {
+        keyLine( hint, 'Tap', [ '\u203a' ], 'to jump' );
+        hint.dataset.spoken = 'Tap Next match to jump';
+    } else {
+        keyLine( hint, 'Press', [ enterKey ], 'to jump' );
+        hint.dataset.spoken = 'Press ' + enterKey + ' to jump';
     }
 
+    // the search the student has already jumped in; its hint has done its job
+    let hintDoneFor = null;
+
     let showHint = function( wanted ) {
-        hint.hidden = hintDone || !wanted;
+        hint.hidden = !wanted || normaliseForSearch( search.query ).trim() === hintDoneFor;
     };
 
     let hintSeen = function() {
-
-        hintDone = true;
+        hintDoneFor = normaliseForSearch( search.query ).trim();
         hint.hidden = true;
-
-        try {
-            window.sessionStorage.setItem( hintKey, '1' );
-        } catch ( e ) {
-            // see above
-        }
-
     };
 
     let spacer = document.createElement( 'span' );
     spacer.className = 'gvp-find-spacer';
 
-    // The hint shares a box with the count, so it stays under it at any width
-    // without being measured.
+    // The hint hangs centred under the search field it explains, positioned by
+    // CSS alone. It shares a box with the field rather than sitting inside its
+    // <label>, where Safari would read it as part of the field's name.
+    let fieldBox = document.createElement( 'span' );
+    fieldBox.className = 'gvp-find-fieldbox';
+    fieldBox.appendChild( field );
+    fieldBox.appendChild( hint );
+
     let countBox = document.createElement( 'span' );
     countBox.className = 'gvp-find-countbox';
     countBox.appendChild( count );
-    countBox.appendChild( hint );
 
-    bar.appendChild( field );
+    bar.appendChild( fieldBox );
     bar.appendChild( countBox );
     bar.appendChild( spacer );
     bar.appendChild( nav );
@@ -2318,11 +2399,44 @@ function setupCaptionSearch( player ) {
 
     // ---- open and close ----
 
+    // On a narrow player the bar drops back to the control bar's text size so
+    // the field, count, arrows and Done still fit on one row.
+    let fitWidth = function() {
+
+        // the full-size row needs about 500px; below 520 it drops a size
+        let compact = player.el().offsetWidth < 520;
+
+        if ( bar.classList.contains( 'gvp-find-compact' ) !== compact ) {
+
+            bar.classList.toggle( 'gvp-find-compact', compact );
+
+            // the count's timestamps come and go at the same width
+            if ( search.open ) {
+                render();
+            }
+
+        }
+
+    };
+
+    // A resize also re-renders the count, so its wording fits the new width.
+    player.on( [ 'playerresize', 'fullscreenchange' ], function() {
+
+        fitWidth();
+
+        if ( search.open ) {
+            render();
+        }
+
+    } );
+
     let open = function() {
 
         if ( search.open ) {
             return;
         }
+
+        fitWidth();
 
         search.open = true;
         search.current = -1;
@@ -2484,6 +2598,12 @@ function setupCaptionSearch( player ) {
     // ---- searching ----
 
     let run = function( query, speak ) {
+
+        // Any change to the query is a new search, and gets the hint again;
+        // only the unchanged search the student has jumped in stays quiet.
+        if ( normaliseForSearch( query ).trim() !== hintDoneFor ) {
+            hintDoneFor = null;
+        }
 
         search.query = query;
         search.source = pickSource();
@@ -2647,35 +2767,46 @@ function setupCaptionSearch( player ) {
         prev.disabled = !n;
         next.disabled = !n;
 
+        // Each state has a full wording and a short one; the short one is used
+        // when the full one does not fit beside the field, rather than cutting
+        // the words off. The timestamps go first.
+        let full = '';
+        let short = '';
+        let tiny = '';
+
         if ( !valid ) {
-            count.textContent = '';
+            full = '';
         } else if ( !n && elsewhere ) {
-            count.textContent = 'No matches in this clip (' + elsewhere + ' elsewhere)';
+            full = 'No matches in this clip (' + elsewhere + ' elsewhere)';
+            short = elsewhere + ' outside clip';
+            tiny = elsewhere + ' outside';
         } else if ( !n ) {
-            count.textContent = 'Not found';
+            full = 'Not found';
         } else if ( search.current < 0 ) {
 
             // Say where Return will go, without going there: typing never
             // moves the video, so the first jump has to be predictable.
-            let text = n === 1 ? '1 match' : n + ' matches';
-
-            if ( player.el().offsetWidth >= 480 ) {
-                text += ' \u00b7 next ' + formatDuration( search.source.cues[ search.hits[ search.next ] ].start );
-            }
-
-            count.textContent = text;
+            short = n === 1 ? '1 match' : n + ' matches';
+            tiny = n + ' found';
+            full = short + ' \u00b7 next ' + formatDuration( search.source.cues[ search.hits[ search.next ] ].start );
 
         } else {
 
-            let text = ( search.current + 1 ) + ' of ' + n;
+            short = ( search.current + 1 ) + ' of ' + n;
+            full = short + ' \u00b7 ' + formatDuration( search.source.cues[ search.hits[ search.current ] ].start );
 
-            // The timestamp goes first when room runs short.
-            if ( player.el().offsetWidth >= 480 ) {
-                text += ' · ' + formatDuration( search.source.cues[ search.hits[ search.current ] ].start );
-            }
+        }
 
-            count.textContent = text;
+        count.textContent = full;
 
+        // Below 480px the timestamp always goes, as the plan has it; above,
+        // only when the full wording does not fit.
+        if ( short && ( player.el().offsetWidth < 480 || count.scrollWidth > count.clientWidth ) ) {
+            count.textContent = short;
+        }
+
+        if ( tiny && count.scrollWidth > count.clientWidth ) {
+            count.textContent = tiny;
         }
 
         snippet.textContent = search.current >= 0
@@ -2716,7 +2847,7 @@ function setupCaptionSearch( player ) {
                 }
 
                 if ( !hint.hidden ) {
-                    message += '. ' + hint.textContent;
+                    message += '. ' + hint.dataset.spoken;
                 }
 
             }
