@@ -1986,6 +1986,19 @@ and (min-device-width : 680px) {
     cursor: auto;
 }
 
+// keepLiveTextOffFullscreen's stand-in video: a pixel larger than the real one
+// on every side so Safari takes it for the main video, and otherwise nothing at
+// all: unseen, and no target for the pointer.
+.video-js .gvp-live-text-guard {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    width: calc( 100% + 2px );
+    height: calc( 100% + 2px );
+    opacity: 0;
+    pointer-events: none;
+}
+
 // A video.js modal (Caption Style) covers the player like a sheet, so it goes
 // above the find bar (3) and the control bar (4). With no z-index of its own it
 // sat under the find bar, which took the clicks meant for its close button and,

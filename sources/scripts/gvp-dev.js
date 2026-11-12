@@ -1563,6 +1563,7 @@ function loadVideoJS() {
             setupChapters( gvp.player );
             clampMenus( gvp.player );
             quietMenuDismissal( gvp.player );
+            keepLiveTextOffFullscreen( gvp.player );
             enableButtonTabbing( gvp.player );
             watchPlayerWidth( gvp.player );
             fitSplash( gvp.player );
@@ -2468,6 +2469,88 @@ function quietMenuDismissal( player ) {
         }
 
     }, true );
+
+}
+
+/**
+ * Keeps Safari's Live Text off the video while the player is fullscreen.
+ *
+ * Paused in fullscreen on a frame with text in it, Safari on the Mac runs Live
+ * Text on the video and lays its selection layer over the whole screen. That
+ * layer takes every click, the controls' included, so the player cannot be
+ * clicked back into play. WebKit gives a page no way to opt out (WebKit bug
+ * 283671).
+ *
+ * Safari only analyses the largest <video> in the fullscreen element, and only
+ * once it has been paused for a moment. So while fullscreen, an invisible,
+ * silent video a pixel larger than the real one plays a still, blank stream:
+ * it is the one Safari watches, and it is never paused.
+ *
+ * @function keepLiveTextOffFullscreen
+ * @param {Object} player
+ */
+function keepLiveTextOffFullscreen( player ) {
+
+    let browser = videojs.browser;
+
+    if ( !browser.IS_ANY_SAFARI || browser.IS_IOS || typeof HTMLCanvasElement.prototype.captureStream !== 'function' ) {
+        return;
+    }
+
+    let decoy = null;
+
+    let remove = function() {
+
+        if ( decoy ) {
+            decoy.pause();
+            decoy.srcObject.getTracks().forEach( function( track ) {
+                track.stop();
+            } );
+            decoy.remove();
+            decoy = null;
+        }
+
+    };
+
+    player.on( 'fullscreenchange', function() {
+
+        if ( !player.isFullscreen() ) {
+            remove();
+            return;
+        }
+
+        if ( decoy ) {
+            return;
+        }
+
+        let canvas = document.createElement( 'canvas' );
+        canvas.width = 2;
+        canvas.height = 2;
+        canvas.getContext( '2d' ).fillRect( 0, 0, 2, 2 );
+
+        decoy = document.createElement( 'video' );
+        decoy.className = 'gvp-live-text-guard';
+        decoy.muted = true;
+        decoy.playsInline = true;
+        decoy.setAttribute( 'aria-hidden', 'true' );
+        decoy.setAttribute( 'tabindex', '-1' );
+
+        // a still frame: the stream need not keep sending to keep playing
+        decoy.srcObject = canvas.captureStream( 0 );
+
+        player.el().appendChild( decoy );
+
+        let playing = decoy.play();
+
+        if ( playing && typeof playing.catch === 'function' ) {
+            playing.catch( function( e ) {
+                console.warn( 'GVP: the Live Text guard could not play: ' + e.message );
+            } );
+        }
+
+    } );
+
+    player.on( 'dispose', remove );
 
 }
 
