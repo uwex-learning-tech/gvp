@@ -15,18 +15,18 @@
     </settings>
 
     <!-- Chapter titles follow the topics covered in the video. They drive both
-         the dots on the progress bar and the chapters menu. -->
+         the segments on the progress bar and the chapters menu. -->
 
     <markers>
-        <marker timecode="00:04" color="">Welcome to the Campus Garden</marker>
-        <marker timecode="00:29" color="">How the Garden Started</marker>
-        <marker timecode="00:56" color="">Growing for Local Food Banks</marker>
-        <marker timecode="01:16" color="">The Food and Water Connection</marker>
-        <marker timecode="02:35" color="">Food Waste Is Wasted Water</marker>
-        <marker timecode="03:28" color="">Food Insecurity</marker>
-        <marker timecode="04:23" color="">Students in the Garden</marker>
-        <marker timecode="05:36" color="">Saving Water in the Garden</marker>
-        <marker timecode="06:30" color="">A Changing Growing Season</marker>
+        <marker timecode="00:04">Welcome to the Campus Garden</marker>
+        <marker timecode="00:29">How the Garden Started</marker>
+        <marker timecode="00:56">Growing for Local Food Banks</marker>
+        <marker timecode="01:16">The Food and Water Connection</marker>
+        <marker timecode="02:35">Food Waste Is Wasted Water</marker>
+        <marker timecode="03:28">Food Insecurity</marker>
+        <marker timecode="04:23">Students in the Garden</marker>
+        <marker timecode="05:36">Saving Water in the Garden</marker>
+        <marker timecode="06:30">A Changing Growing Season</marker>
     </markers>
 
 </gvp>

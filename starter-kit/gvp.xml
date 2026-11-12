@@ -49,12 +49,13 @@
            attribute. Timecode value must be in hh:mm:ss or mm:ss format.
          * The texts between the open and close marker tag will be displayed.
          * Remove all if will be not be used.
-         * Color attribute is optional and must be in HEX or RGB(A) string value
+         * Each marker starts a chapter: the progress bar is split into one
+           segment per chapter, and the chapters menu lists them.
          
          Usage:
          
          <markers>
-            <marker timecode="00:30" color="">How to write XML!</marker>
+            <marker timecode="00:30">How to write XML!</marker>
          </markers>
          
     #########################################################################-->
