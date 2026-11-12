@@ -1,5 +1,17 @@
 # Version Change Log
 
+**4.4.1**
+* Fixed clicks not working in Safari after pausing in fullscreen on a frame with text
+* Fixed the caption search bar covering Caption Style and the top of menus
+* Fixed the controls disappearing after changing quality while paused
+* The speed menu now closes when its button is clicked again
+* Caption Style fits small and embedded players, with one column on narrow ones
+* Clicking a search mark near the start of a chapter now jumps to the match, not the chapter
+* On narrow players the volume slider opens above the speaker instead of over the progress bar
+* The download buttons on the poster no longer cover the duration or the play button on small players
+* After a cancelled load, the video can be started again with play
+* Clicking the video to close a menu no longer also plays or pauses it
+
 **4.4.0**
 * Chapters now split the progress bar into segments instead of showing dots; hover a segment to see the chapter title above the time
 * Clicking near the start of a chapter jumps to its beginning, and a mark shows where the click will land
