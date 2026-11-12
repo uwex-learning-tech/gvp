@@ -1389,8 +1389,13 @@ $center-big-play-button: true; // true default
 // bottom-right corner with it. pointer-events on the watermark keeps the buttons
 // clickable; this keeps them legible, by putting the bar's own ground over the
 // logo instead of letting the logo show through the middle of the button row.
+//
+// 4: above the caption search bar (3) too. The bar's popup menus grow up from
+// it, and on a short player they reach the top, where the search bar sat over
+// their first rows and took the clicks. An open menu now covers the search bar
+// for as long as it is open, as a menu does.
 .video-js .vjs-control-bar {
-    z-index: 2;
+    z-index: 4;
 }
 
 // ---- control-bar glyph balance ---------------------------------------------
@@ -1914,6 +1919,15 @@ and (min-device-width : 680px) {
 // And in fullscreen the pointer stays visible while searching.
 .video-js.vjs-fullscreen.vjs-user-inactive.gvp-search-open {
     cursor: auto;
+}
+
+// A video.js modal (Caption Style) covers the player like a sheet, so it goes
+// above the find bar (3) and the control bar (4). With no z-index of its own it
+// sat under the find bar, which took the clicks meant for its close button and,
+// in fullscreen on a large screen, its whole top row of settings. Still under
+// the error panel (100).
+.video-js .vjs-modal-dialog {
+    z-index: 5;
 }
 
 .video-js .gvp-find-bar {
