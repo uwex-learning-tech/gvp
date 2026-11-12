@@ -676,7 +676,42 @@ html {
             }
 
         }
-        
+
+        // When the pills do not fit beside the duration and author (measured
+        // by fitSplash), they get a row of their own under them. Otherwise
+        // the row, which has no left edge, grew leftward over the badge.
+        &.gvp-pills-below {
+
+            .gvp-splash-meta {
+                right: calc( var( --gvp-inset ) + #{rem( 16px )} );
+            }
+
+            .gvp-splash-download-wrapper {
+
+                top: var( --gvp-pills-top );
+                left: calc( var( --gvp-inset ) + #{rem( 16px )} );
+
+                .gvp-splash-downloads {
+                    justify-content: flex-start;
+                }
+
+            }
+
+        }
+
+        // And when the poster is too short for the pills and the play button
+        // too, the button shrinks into the room under them (fitSplash) rather
+        // than sitting beneath the pills, which took the clicks on its top.
+        &.gvp-big-play-fit .vjs-big-play-button {
+            top: var( --gvp-big-play-middle );
+            width: var( --gvp-big-play-size );
+            height: var( --gvp-big-play-size );
+            line-height: var( --gvp-big-play-size );
+            margin-left: calc( var( --gvp-big-play-size ) / -2 );
+            margin-top: calc( var( --gvp-big-play-size ) / -2 );
+            font-size: calc( var( --gvp-big-play-size ) / 2 );
+        }
+
     }
 
     .gvp-footer {
