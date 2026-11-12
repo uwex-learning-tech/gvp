@@ -2516,7 +2516,9 @@ function drawChapterSegments( player, chapters, duration ) {
     };
 
     // The chapter under the pointer, and whether it is snapped to its start.
-    let find = function( clientX ) {
+    // Never snapped over a caption search mark (setupCaptionSearch): the mark
+    // names the match it jumps to, and a snap would land somewhere else.
+    let find = function( clientX, target ) {
 
         let rect = holder.getBoundingClientRect();
 
@@ -2525,7 +2527,8 @@ function drawChapterSegments( player, chapters, duration ) {
         }
 
         let x = clientX - rect.left;
-        let snap = snapAt( x, rect.width );
+        let onMark = !!( target && target.closest && target.closest( '.gvp-find-tick' ) );
+        let snap = onMark ? null : snapAt( x, rect.width );
 
         if ( snap ) {
             return { segment: snap, snapped: true };
@@ -2603,7 +2606,7 @@ function drawChapterSegments( player, chapters, duration ) {
             return;
         }
 
-        setHovered( find( e.clientX ) );
+        setHovered( find( e.clientX, e.target ) );
 
     }, true );
 
@@ -2617,9 +2620,11 @@ function drawChapterSegments( player, chapters, duration ) {
     // are left alone, so scrubbing stays precise, and so is a press that
     // ends off the bar.
     let downX = null;
+    let downTarget = null;
 
     control.addEventListener( 'pointerdown', function( e ) {
         downX = e.isPrimary ? e.clientX : null;
+        downTarget = e.target;
     }, true );
 
     document.addEventListener( 'pointercancel', function() {
@@ -2636,7 +2641,7 @@ function drawChapterSegments( player, chapters, duration ) {
         downX = null;
 
         let bounds = control.getBoundingClientRect();
-        let found = find( e.clientX );
+        let found = find( e.clientX, downTarget );
 
         // A touch has no hover to end it, so clear anything a tap left
         // behind once the snap is read.
