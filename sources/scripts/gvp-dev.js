@@ -1800,6 +1800,13 @@ function enableButtonTabbing( player ) {
  * Marks the player gvp-player-narrow when its control bar does not fit, so the
  * bar can make room (the time display goes, the buttons narrow slightly).
  *
+ * Also marks it gvp-volume-tight when the bar has no room for the volume panel
+ * to open. video.js widens the panel to 10em on hover to show the slider
+ * beside the speaker. Without that room the bar either overflowed, pushing
+ * Captions, Downloads and Fullscreen off the player, or (narrow, where the
+ * panel's width is fixed) the slider spilled over the seek bar, which took
+ * its clicks. Tight, the slider opens above the speaker instead.
+ *
  * Measured rather than set at a width: how many buttons the bar carries varies
  * by video (Downloads, an audio-track menu, caption search) and by window
  * width (the skip buttons and Quality come and go), so no single breakpoint
@@ -1825,7 +1832,30 @@ function watchPlayerWidth( player ) {
 
         // measure the full-size bar, then narrow it only if that overflows
         player.removeClass( 'gvp-player-narrow' );
+        player.removeClass( 'gvp-volume-tight' );
         player.toggleClass( 'gvp-player-narrow', bar.scrollWidth > bar.clientWidth + 1 );
+
+        // a narrow bar fixes the panel's width, so it never opens sideways
+        player.toggleClass( 'gvp-volume-tight', player.hasClass( 'gvp-player-narrow' ) || !volumeCanOpen() );
+
+    };
+
+    // Whether the seek bar can give up the width the opened volume panel needs.
+    // Measured from the panel's current width, so it holds even if the pointer
+    // is over the panel (already open) when the player is resized.
+    let volumeCanOpen = function() {
+
+        let panel = bar.querySelector( '.vjs-volume-panel-horizontal' );
+        let progress = bar.querySelector( '.vjs-progress-control' );
+
+        if ( !panel || !progress || !panel.offsetWidth || panel.classList.contains( 'vjs-mute-toggle-only' ) ) {
+            return true;
+        }
+
+        let opened = 10 * parseFloat( getComputedStyle( panel ).fontSize );
+        let spare = progress.offsetWidth - ( parseFloat( getComputedStyle( progress ).minWidth ) || 0 );
+
+        return opened - panel.offsetWidth <= spare;
 
     };
 
