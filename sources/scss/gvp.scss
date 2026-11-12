@@ -1930,6 +1930,26 @@ and (min-device-width : 680px) {
     z-index: 5;
 }
 
+// Caption Style is a sheet over the whole player, not a box over 70% of it.
+// video.js's 70% left a short scroll box on a small player, whose Reset and Done
+// fell below its edge (a few pixels of them even on a 760px embed), with the
+// picture showing through underneath.
+.video-js .vjs-modal-dialog.vjs-text-track-settings {
+    height: 100%;
+    container-type: inline-size;
+}
+
+// video.js drops to one column through its vjs-layout-* classes, which this
+// player does not use, so the two columns stayed side by side on a phone-width
+// player: wider than the sheet, with Done off its right edge, out of reach.
+@container ( max-width: 480px ) {
+
+    .video-js .vjs-text-track-settings .vjs-modal-dialog-content {
+        grid-template-columns: 1fr;
+    }
+
+}
+
 .video-js .gvp-find-bar {
 
     position: absolute;
