@@ -1,5 +1,16 @@
 # Version Change Log
 
+**4.4.0**
+* Chapters now split the progress bar into segments instead of showing dots; hover a segment to see the chapter title above the time
+* Clicking near the start of a chapter jumps to its beginning, and a mark shows where the click will land
+* The time shown when hovering the progress bar stays centred over the pointer near the ends of the bar
+* Caption Style… (formerly Captions Settings) is now at the bottom of the Captions menu, below the caption choices
+* The first item in every menu now highlights when pointed at
+* The search button now shows the pointing hand, like the other buttons
+* Control bar icons are balanced in size; the speed button reads 1× and the remaining time uses a true minus sign
+* Browsers now check for an updated player template and settings file on every visit
+* The color attribute on markers in gvp.xml is no longer used and can be removed
+
 **4.3.0**
 * Added caption search: a magnifier in the control bar opens a find bar for searching what is said in a video and jumping to each place it comes up
 * Search matches are marked on the progress bar; hover a mark to see the words around it, click it to jump there
