@@ -1027,6 +1027,7 @@ function loadVideoJS() {
     }
 
     nameMenusByTheirHeadings();
+    letTimeTooltipsUseThePlayer();
 
     // initialize the video player bases options/configurations
     gvp.player = videojs( 'gvp-video', playerOptions, function() {
@@ -1847,6 +1848,59 @@ function watchPlayerWidth( player ) {
     }
 
     update();
+
+}
+
+/**
+ * Lets the hover timecode (and the chapter title above it) stay centred on
+ * the pointer until it would cross the edge of the player.
+ *
+ * video.js means to keep the tooltip inside the player, but the hover display
+ * hands it a measurement of the bar with no right edge, and it then falls
+ * back to keeping the tooltip inside the bar: near either end of the bar it
+ * slid off the pointer, even with the whole video beside it to use. Given a
+ * full measurement, it keeps to the player, here with an 8px margin as the
+ * menus have.
+ *
+ * Patched on the prototype before any player exists: video.js binds the
+ * method when it builds the tooltip.
+ *
+ * @function letTimeTooltipsUseThePlayer
+ */
+function letTimeTooltipsUseThePlayer() {
+
+    let TimeTooltip = videojs.getComponent( 'TimeTooltip' );
+
+    if ( !TimeTooltip || TimeTooltip.prototype.gvpUsesPlayer ) {
+        return;
+    }
+
+    let update = TimeTooltip.prototype.update;
+    let margin = 8;
+
+    TimeTooltip.prototype.update = function( seekBarRect, seekBarPoint, content ) {
+
+        let holder = this.el_ && this.el_.closest( '.vjs-progress-holder' );
+
+        if ( seekBarRect && seekBarRect.right === undefined && holder ) {
+
+            let rect = holder.getBoundingClientRect();
+
+            // widened by the margin, so the space video.js finds on each
+            // side stops that far short of the player's edge
+            seekBarRect = {
+                left: rect.left - margin,
+                right: rect.right + margin,
+                width: rect.width
+            };
+
+        }
+
+        return update.call( this, seekBarRect, seekBarPoint, content );
+
+    };
+
+    TimeTooltip.prototype.gvpUsesPlayer = true;
 
 }
 
