@@ -47,6 +47,14 @@ $body-bgcolor: #636266;
     @return ( math.div($px , $base) ) * 1rem;
 };
 
+// Sizes a control-bar glyph (or label) at $size em and keeps its em box
+// centred in the bar: the bar is 3em tall, so the line-height is 3em over the
+// size. See "control-bar glyph balance".
+@mixin gvp-glyph-size( $size ) {
+    font-size: $size * 1em;
+    line-height: math.div( 3, $size );
+}
+
 // Removes an element from sight while leaving it in the accessibility tree.
 // Used where text is visually redundant but is still the only thing naming the
 // content for a screen reader -- notably the embedded title bar.
@@ -609,10 +617,19 @@ html {
                     // Icons come from the VideoJS font we already ship, not from
                     // a third-party CDN. The box is reserved up front so a late
                     // face cannot widen the pills.
+                    //
+                    // At 1em the download glyph's ink was 9.7px, shorter than
+                    // the 10px capitals beside it. The glyph is drawn at 1.2em
+                    // (11.6px of ink, a hair over cap height, which is where a
+                    // glyph beside text reads as the same size). Its box stays
+                    // 1em tall, so the pill keeps its 28px height: the line box
+                    // is 1em, and the larger em box overflows it equally above
+                    // and below, which keeps it centred.
                     .gvp-icon {
                         flex: 0 0 auto;
                         display: inline-block;
-                        width: 1em;
+                        width: 1.2em;
+                        height: 1em;
                         text-align: center;
                         font-family: VideoJS;
                         font-weight: normal;
@@ -620,7 +637,18 @@ html {
                         line-height: 1;
 
                         &::before {
+                            display: block;
+                            font-size: 1.2em;
+                            line-height: math.div( 1, 1.2 );
+                        }
+
+                        // The tray puts this glyph's mass well below its box
+                        // centre. It rises by half that gap (about 1px), as the
+                        // control-bar download glyph does.
+                        &.gvp-icon-download::before {
                             content: '\f110';   // file-download
+                            position: relative;
+                            top: -0.058em;
                         }
 
                         &.gvp-icon-transcript::before {
@@ -1119,10 +1147,13 @@ and (min-device-width : 900px) {
             .vjs-icon-placeholder:before {
                 font-family: VideoJS;
                 content: "\f110";          // file-download
-                font-size: 1.5em;
-                line-height: 2;
+                // Sized with the other glyphs in "control-bar glyph balance".
+                // The tray puts this glyph's mass well below its box centre,
+                // so it rises by half that gap (about 1.2px) to sit level
+                // with its neighbours.
+                @include gvp-glyph-size( 1.83 );
                 position: relative;
-                top: 0.03em;
+                top: -0.055em;
             }
         }
 
@@ -1346,6 +1377,93 @@ $center-big-play-button: true; // true default
 // logo instead of letting the logo show through the middle of the button row.
 .video-js .vjs-control-bar {
     z-index: 2;
+}
+
+// ---- control-bar glyph balance ---------------------------------------------
+// video.js sets every glyph at 1.8em, which gives them all the same em box and
+// nothing else in common. The caption box and the cog are solid shapes and
+// carry about four times the ink of the outline glyphs beside them (search,
+// download, fullscreen), so at one size they read as much bigger, and the play
+// triangle reads smaller than the pause bars it swaps with.
+//
+// Instead, glyphs are sized for an equal perceived size: the geometric mean
+// of the ink box and the square root of the ink area, measured from the font's
+// outlines. That shrinks the solid glyphs and grows the open ones. Each group
+// is balanced on its own, because the eye compares a glyph with its
+// neighbours, not with one across the seek bar:
+//
+// - Left (play/pause/replay, skip, volume): all at about 12px.
+// - Right (search through fullscreen): the formula is the starting point, then
+//   tuned by eye. Taken all the way, it makes the open glyphs (download,
+//   fullscreen) look too big, so they stop short of it. The solid ones (cog,
+//   captions) sit a little above it.
+//
+// gvp-glyph-size (defined near the top of this file) keeps each glyph's em box
+// centred in the 3em bar at any size.
+
+// Child combinators throughout: a menu button's wrapper holds its menu, and a
+// bare descendant selector would also resize the glyphs in the menu rows.
+.video-js .vjs-control-bar {
+
+    // Play, pause and replay are one control in three states. The font has
+    // already shifted the play triangle right so that its mass sits on centre.
+    .vjs-play-control > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 2.3 );
+    }
+
+    .vjs-play-control.vjs-playing > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 2.05 );
+    }
+
+    .vjs-play-control.vjs-ended > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 1.84 );
+    }
+
+    // The round arrow's box sits a little low in its em box; half of that,
+    // about 0.4px, lifts it level.
+    .vjs-forward-button > .vjs-icon-placeholder:before,
+    .vjs-backward-button > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 1.84 );
+        top: -0.02em;
+    }
+
+    // One size for every volume level, sized by the loudest. Sizing each level
+    // separately would make the speaker grow and shrink as the volume changes.
+    .vjs-mute-control > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 1.67 );
+    }
+
+    .vjs-chapters-button > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 2.09 );
+    }
+
+    // The audio glyph's box sits about 1.3px low; it rises by half that.
+    .vjs-audio-button > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 1.6 );
+        top: -0.03em;
+    }
+
+    .vjs-subs-caps-button > .vjs-icon-placeholder:before,
+    .vjs-captions-button > .vjs-icon-placeholder:before,
+    .vjs-subtitles-button > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 1.6 );
+    }
+
+    .vjs-resolution-button > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 1.55 );
+    }
+
+    .vjs-fullscreen-control > .vjs-icon-placeholder:before {
+        @include gvp-glyph-size( 2.04 );
+    }
+
+    // The speed label's stems match the glyph strokes in bold at 15.5px; at
+    // video.js's regular 18px it read as the largest thing on the bar.
+    .vjs-playback-rate .vjs-playback-rate-value {
+        @include gvp-glyph-size( math.div( 15.5, 12 ) );
+        font-weight: bold;
+    }
+
 }
 
 /* The default color of control backgrounds is mostly black but with a little
@@ -1755,11 +1873,14 @@ and (min-device-width : 680px) {
 // A find bar at the top of the player, the same inset, height and ground as the
 // control bar, opened from a magnifier in the control bar (setupCaptionSearch).
 
+// Sized with the other glyphs in "control-bar glyph balance". The lens holds
+// most of the magnifier's mass, up and to the left, so the mask moves about
+// 0.45px down and right to put lens and handle together on centre.
 .video-js .vjs-control-bar .gvp-search-button .vjs-icon-placeholder:before {
     content: '';
     background-color: currentColor;
-    -webkit-mask: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'/%3E%3C/svg%3E" ) no-repeat center / 0.8em;
-    mask: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'/%3E%3C/svg%3E" ) no-repeat center / 0.8em;
+    -webkit-mask: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'/%3E%3C/svg%3E" ) no-repeat calc( 50% + 0.02em ) calc( 50% + 0.02em ) / 0.95em;
+    mask: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'/%3E%3C/svg%3E" ) no-repeat calc( 50% + 0.02em ) calc( 50% + 0.02em ) / 0.95em;
 }
 
 // While the bar is open the control bar stays put, as video.js does for audio

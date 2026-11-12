@@ -1565,6 +1565,7 @@ function loadVideoJS() {
             watchPlayerWidth( gvp.player );
 
             arrangeMenuButtons( self );
+            setControlBarSigns( self );
 
         } catch ( e ) {
 
@@ -1980,6 +1981,81 @@ function arrangeMenuButtons( player ) {
     if ( chaptersButton ) {
         controlBar.removeChild( chaptersButton );
         controlBar.addChild( chaptersButton, {}, controlBar.children().indexOf( rateButton ) );
+    }
+
+}
+
+/**
+ * Sets the speed and the remaining time with their proper signs.
+ *
+ * video.js writes the speed as "1x" and puts a hyphen in front of the remaining
+ * time. Beside the control-bar glyphs both look wrong. A lowercase x sits
+ * below the digit's cap height, so "1x" looks like it is dropping off the
+ * baseline. A hyphen is shorter and lower than a minus. These become the
+ * multiplication sign and the minus sign, in the speed menu as well as on the
+ * button, so the two agree.
+ *
+ * Screen readers are unaffected: the minus is aria-hidden, the speed button is
+ * named by its control text, and VoiceOver reads "1×" as "1 times".
+ *
+ * @function setControlBarSigns
+ * @param {Object} player - the video.js player
+ */
+function setControlBarSigns( player ) {
+
+    let controlBar = player.getChild( 'controlBar' );
+
+    if ( !controlBar ) {
+        return;
+    }
+
+    let rateButton = controlBar.getChild( 'PlaybackRateMenuButton' );
+
+    if ( rateButton ) {
+
+        let times = function( text ) {
+            return text.replace( /x$/, '×' );
+        };
+
+        // video.js rebuilds the menu whenever the list of rates changes, so the
+        // items are fixed as they are made rather than once.
+        let createItems = rateButton.createItems;
+
+        rateButton.createItems = function() {
+
+            let items = createItems.apply( this, arguments );
+
+            items.forEach( function( item ) {
+
+                let text = item.el().querySelector( '.vjs-menu-item-text' );
+
+                if ( text ) {
+                    text.textContent = times( text.textContent );
+                }
+
+            } );
+
+            return items;
+
+        };
+
+        let updateLabel = rateButton.updateLabel;
+
+        rateButton.updateLabel = function() {
+            updateLabel.apply( this, arguments );
+            this.labelEl_.textContent = times( this.labelEl_.textContent );
+        };
+
+        rateButton.update();
+        rateButton.updateLabel();
+
+    }
+
+    let remaining = controlBar.getChild( 'RemainingTimeDisplay' );
+    let sign = remaining && remaining.el().querySelector( ':scope > span[aria-hidden="true"]' );
+
+    if ( sign ) {
+        sign.textContent = '−';
     }
 
 }
