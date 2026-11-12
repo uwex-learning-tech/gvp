@@ -1562,6 +1562,7 @@ function loadVideoJS() {
             labelMarkers();
             setupChapters( gvp.player );
             clampMenus( gvp.player );
+            quietMenuDismissal( gvp.player );
             enableButtonTabbing( gvp.player );
             watchPlayerWidth( gvp.player );
             fitSplash( gvp.player );
@@ -2402,6 +2403,57 @@ function clampMenus( player ) {
 
     player.on( 'playerresize', clamp );
     window.addEventListener( 'resize', clamp );
+
+}
+
+/**
+ * Makes a click on the picture that closes an open menu only close it.
+ *
+ * video.js closes a popup menu when focus leaves it, so a click on the video
+ * closed the menu and then, reaching the video, played or paused it too. On
+ * a Mac the click that dismisses a menu does nothing else, and a viewer who
+ * opened Captions and changed their mind should not lose their place. The
+ * menu has already closed by the time the click arrives, so whether one was
+ * open is read when the press starts.
+ *
+ * @function quietMenuDismissal
+ * @param {Object} player
+ */
+function quietMenuDismissal( player ) {
+
+    let playerEl = player.el();
+    let menuWasOpen = false;
+
+    playerEl.addEventListener( 'pointerdown', function( e ) {
+        menuWasOpen = e.isPrimary && !!playerEl.querySelector( '.vjs-menu.vjs-lock-showing' );
+    }, true );
+
+    // Not every press ends in a click (video.js cancels the one after a tap,
+    // and a press can end off the player), so the reading expires once any
+    // click from it would have arrived. Left set, it swallowed the next click
+    // that came with no press at all, such as VoiceOver activating the video.
+    let expire = function() {
+        setTimeout( function() {
+            menuWasOpen = false;
+        }, 0 );
+    };
+
+    document.addEventListener( 'pointerup', expire, true );
+    document.addEventListener( 'pointercancel', expire, true );
+
+    // Before video.js's own click handler on the video element below. Only a
+    // pointer's click: one from the keyboard or assistive technology has a
+    // detail of 0 and dismisses nothing.
+    playerEl.addEventListener( 'click', function( e ) {
+
+        let dismissing = menuWasOpen && e.detail !== 0;
+        menuWasOpen = false;
+
+        if ( dismissing && e.target.closest( '.vjs-tech' ) ) {
+            e.stopPropagation();
+        }
+
+    }, true );
 
 }
 
