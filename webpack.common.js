@@ -206,8 +206,9 @@ module.exports = {
         new ConcatVideoJsPlugin( {
             dest: 'sources/scripts/videojs/video.js',
             src: [
-                './sources/scripts/videojs/video.js',
-                './sources/scripts/videojs/plugins/markers/videojs-markers.js'
+                './sources/scripts/videojs/video.js'
+                // videojs-markers was retired in favour of chapter segments
+                // (drawChapterSegments in gvp-dev.js).
                 // videojs-resolution-switcher was retired in favour of the
                 // in-house quality menu (setupQualityMenu in gvp-dev.js).
                 // youtube.min.js is deliberately NOT bundled here: it is only

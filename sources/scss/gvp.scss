@@ -1380,7 +1380,7 @@ $slider-bg-color: lighter($primary-background-color, 33%);
 }
 
 .video-js .vjs-play-progress::before {
-    // 3: above the caption search marks (2) and chapter dots (1), so the
+    // 3: above the caption search marks (2) and chapter segments (0), so the
     // playhead can always be grabbed and dragged.
     z-index: 3;
     /* Video.js 8 centres this dot with `line-height: 0.35em` instead of v7's
@@ -1403,13 +1403,10 @@ $slider-bg-color: lighter($primary-background-color, 33%);
     display: none;
 }
 
-/* The timecode tooltip and the chapter tip are separate components that surface
-   in the same spot, so they are given one shared geometry -- same size, same
-   line box, same padding -- and both are anchored from the SAME edge. That last
-   part is what stops them moving: anchored by `top`, this plate grew downward
-   into the control bar as its content changed, while the chapter tip (anchored
-   by `bottom`) stayed put. Pinned by `bottom`, a longer label grows upward and
-   the baseline never moves.
+/* The timecode plate is anchored by its bottom edge: anchored by `top`, it grew
+   downward into the control bar as its content changed. Pinned by `bottom`, a
+   longer label -- or a chapter title above the time -- grows upward and the
+   baseline never moves.
    
    `line-height` is explicit for the same reason -- left to the font's own
    metrics the plate height drifts with the glyphs in it.
@@ -1451,11 +1448,9 @@ $slider-bg-color: lighter($primary-background-color, 33%);
     line-height: rem( 36px );
 }
 
-/* While a chapter title is up, the hovered timecode gets out of its way. The
-   class is set from gvp-dev.js only when the marker tip is genuinely showing,
-   so an untitled marker keeps its timecode. Specificity has to clear video.js's
-   own (0,4,0) `.vjs-progress-control:hover .vjs-time-tooltip` reveal. */
-.video-js.gvp-marker-tip-shown .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip,
+/* While a caption search snippet is up, the hovered timecode gets out of its
+   way. Specificity has to clear video.js's own (0,4,0)
+   `.vjs-progress-control:hover .vjs-time-tooltip` reveal. */
 .video-js.gvp-find-tip-shown .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip {
     visibility: hidden;
 }
@@ -1560,87 +1555,133 @@ smaller disconnected loaded time ranges */
     
 }
 
-// markers plugin
-.vjs-progress-control:hover {
-    
-    .vjs-marker {
-        top: -2px;
-    }
-    
+// ---- chapter segments ------------------------------------------------------
+// With chapters, the bar is split into one segment per chapter
+// (drawChapterSegments in gvp-dev.js). video.js's own track, loaded and played
+// bars go transparent -- they still size themselves, and the segments copy
+// their widths -- while the playhead dot on the played bar stays.
+.video-js.gvp-has-segments .vjs-progress-holder,
+.video-js.gvp-has-segments .vjs-progress-holder .vjs-load-progress,
+.video-js.gvp-has-segments .vjs-progress-holder .vjs-load-progress div,
+.video-js.gvp-has-segments .vjs-progress-holder .vjs-play-progress {
+    background: transparent;
 }
-           
-.vjs-marker {
+
+// z-index 0: under the caption search marks (2) and the playhead (3).
+.video-js .gvp-segments {
     position: absolute;
-    top: -3px;
-    left: 0;
-    bottom: 0em;
-    opacity: 1;
-    height: 10px;
-    width: 10px;
-    margin-left: -5px;
-    border-radius: 50%;
-    background-color: rgb(166, 231, 141);
-    transition: opacity 0.2s ease;
-    z-index: 1;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
 }
 
-.vjs-marker:hover {
-    cursor: pointer;
-    transform: scale( 1.7 );
-}
-
-.vjs-tip {
-    visibility: hidden;
-    display: block;
-    padding: 5px;
-    font-size: 14px;
+// One gradient per segment: played, then loaded, then the bare track, split
+// at the shares drawChapterSegments writes into --gvp-played / --gvp-loaded.
+.video-js .gvp-segment {
     position: absolute;
-    /* Clears the top edge of the control bar. The plate used to bottom out ~1px
-       inside it: the arrow is 5px, so the old 14px put the plate's underside at
-       19px above the progress holder while the bar's top edge sits at ~20px. */
-    bottom: rem( 20px );
-    z-index: 100000;
-}
-
-.vjs-tip .vjs-tip-arrow {
-    background: url(data:image/gif;base64,R0lGODlhCQAJAIABAAAAAAAAACH5BAEAAAEALAAAAAAJAAkAAAIRjAOnwIrcDJxvwkplPtchVQAAOw==) no-repeat top left;
-    bottom: 0;
-    left: 50%;
-    margin-left: -4px;
-    background-position: bottom left;
-    position: absolute;
-    width: 9px;
-    height: 5px;
-}
-
-.vjs-tip .vjs-tip-inner {
-    border-radius: rem( 3px );
-    /* Matches the timecode plate exactly, so the two share a baseline. The
-       container's own 5px padding-bottom lifts this plate to the same 25px
-       above the progress holder that the timecode plate is pinned to, leaving
-       room underneath for the arrow. */
-    padding: rem( 6px ) rem( 10px );
-    line-height: rem( 18px );
-    /* The transparency lives here, on the plate, rather than as `opacity` on
-       the whole tip -- opacity fades the label along with its background, which
-       is what made the chapter title look washed out against every other piece
-       of chrome. */
-    background-color: rgba( 0, 0, 0, 0.9 );
-    color: #fff;
-    max-width: 200px;
-    text-align: center;
-}
-
-.vjs-break-overlay {
-    visibility: hidden;
-    position: absolute;
-    z-index: 100000;
     top: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to right,
+        $primary-foreground-color calc( var( --gvp-played, 0 ) * 100% ),
+        rgba( $slider-bg-color, 0.75 ) calc( var( --gvp-played, 0 ) * 100% ) calc( var( --gvp-loaded, 0 ) * 100% ),
+        rgba( $slider-bg-color, 0.5 ) calc( var( --gvp-loaded, 0 ) * 100% )
+    );
+    transition: transform 0.1s ease;
 }
 
-.vjs-break-overlay .vjs-break-overlay-text {
-    padding: 9px;
-    text-align: center;
+// The chapter under the pointer stands out from its neighbours.
+.video-js .gvp-segment-hover {
+    transform: scaleY( 1.8 );
+}
+
+// Near a chapter start, a click lands on the start itself. The mark sits on
+// that start, standing proud of the bar like the playhead does, and the usual
+// line under the pointer steps aside so there is one answer to "where will
+// this go". Sizes in px: the holder's em basis changes on hover.
+.video-js .gvp-snap-mark {
+    display: none;
+    position: absolute;
+    top: 50%;
+    width: 4px;
+    height: 16px;
+    margin-left: -2px;
+    transform: translateY( -50% );
+    border-radius: 2px;
+    background-color: #fff;
+    box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.6 );
+}
+
+.video-js.gvp-snapping .gvp-snap-mark {
+    display: block;
+}
+
+.video-js.gvp-snapping .vjs-progress-control .vjs-mouse-display {
+    background-color: transparent;
+}
+
+@media ( prefers-reduced-motion: reduce ) {
+
+    .video-js .gvp-segment {
+        transition: none;
+    }
+
+}
+
+// System colours keep the split visible in Windows high contrast, which
+// would otherwise flatten the gradients.
+@media ( forced-colors: active ) {
+
+    .video-js .gvp-snap-mark {
+        forced-color-adjust: none;
+        background-color: CanvasText;
+        box-shadow: 0 0 0 1px Canvas;
+    }
+
+    .video-js .gvp-segment {
+        forced-color-adjust: none;
+        background: linear-gradient(
+            to right,
+            Highlight calc( var( --gvp-played, 0 ) * 100% ),
+            GrayText calc( var( --gvp-played, 0 ) * 100% )
+        );
+    }
+
+}
+
+// The hovered chapter's title, above the time in the same plate: the time
+// keeps its place and the title stacks above it, since the plate is pinned
+// by its bottom edge.
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip[data-gvp-chapter]::before {
+    content: attr( data-gvp-chapter );
+    display: block;
+    // as wide as the title, so the plate grows to fit it; long ones wrap
+    width: max-content;
+    max-width: rem( 240px );
+    margin-bottom: rem( 2px );
+    white-space: normal;
+    font-weight: 600;
+}
+
+// Near a chapter start a click lands on the start itself, so the plate shows
+// that time instead of the one under the pointer: video.js's own text is
+// shrunk away (font size and line height both zero, so it leaves no blank
+// line) and the start time drawn in its place. Every size inside is in rem,
+// so the zeros here do not reach the title or the time.
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip[data-gvp-snap] {
+    font-size: 0;
+    line-height: 0;
+}
+
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip[data-gvp-snap]::before,
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip[data-gvp-snap]::after {
+    font-size: rem( 14px );
+    line-height: rem( 18px );
+}
+
+.video-js .vjs-progress-control .vjs-mouse-display .vjs-time-tooltip[data-gvp-snap]::after {
+    content: attr( data-gvp-snap );
+    display: block;
 }
 
 @media only screen 
@@ -2135,12 +2176,11 @@ and (min-device-width : 680px) {
 }
 
 // Ticks: one mark per match on the seek bar. Sizes are in px because video.js
-// changes the progress holder's em basis on hover. Amber, apart from the green
-// chapter dots; the dark outline keeps them at 3:1 or better over the white
-// played portion as well as the track.
-// z-index 2: above the chapter dots (1), so a match sitting on a chapter dot
-// stays visible and clickable; below the playhead (3), so it can always be
-// dragged.
+// changes the progress holder's em basis on hover. Amber; the dark outline
+// keeps them at 3:1 or better over the white played portion as well as the
+// track.
+// z-index 2: above the chapter segments (0), so a match is always visible and
+// clickable; below the playhead (3), so it can always be dragged.
 .video-js .gvp-find-ticks {
     position: absolute;
     inset: 0;
@@ -2238,8 +2278,8 @@ and (min-device-width : 680px) {
 
 }
 
-// The snippet over a hovered tick. Same plate as the chapter tip and the
-// hovered timecode, which steps aside while this is up.
+// The snippet over a hovered tick. Same plate as the hovered timecode, which
+// steps aside while this is up.
 .video-js .gvp-find-tip {
     position: absolute;
     bottom: calc( 50% + #{rem( 25px )} );

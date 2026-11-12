@@ -592,21 +592,11 @@ function getVideoSource() {
                         
                         for ( var i = 0; i < markerTag.length; i++ ) {
                             
-                            let markerColor = '';
-                            
-                            if ( markerTag[i].attributes.color !== undefined ) {
-        
-                                if ( markerTag[i].attributes.color.nodeValue.trim() !== '' ) {
-                                    markerColor = markerTag[i].attributes.color.nodeValue.trim();
-                                }
-                                
-                            }
-                            
-                            // The sibling colour lookup above is guarded and
-                            // this one was not: a <marker> with no timecode
-                            // threw here and stranded the player on its cover.
-                            // One malformed marker should cost that marker, not
-                            // the video.
+                            // A <marker> with no timecode used to throw here
+                            // and strand the player on its cover. One
+                            // malformed marker should cost that marker, not
+                            // the video. (A color attribute, from when markers
+                            // were coloured dots, is ignored.)
                             if ( markerTag[i].attributes.timecode === undefined ) {
                                 console.warn( 'GVP: skipping a marker with no timecode attribute' );
                                 continue;
@@ -614,8 +604,7 @@ function getVideoSource() {
                             
                             let marker = {
                                 time: toSeconds( markerTag[i].attributes.timecode.nodeValue ),
-                                text: markerTag[i].childNodes[0] ? markerTag[i].childNodes[0].nodeValue : '',
-                                color: markerColor
+                                text: markerTag[i].childNodes[0] ? markerTag[i].childNodes[0].nodeValue : ''
                             };
                             
                             xml.markersCollection.push( marker );
@@ -1554,11 +1543,9 @@ function loadVideoJS() {
         self.removeClass( 'vjs-workinghover' );
 
         // Everything from here to hideCover() is decoration -- extra buttons
-        // and chapter markers -- but the cover is opaque, so a throw in any of
-        // it used to leave the viewer staring at a blank cover forever. The
-        // markers plugin in particular is only present once webpack has
-        // concatenated it, so serving straight from sources/ threw here. None
-        // of it is worth the whole player.
+        // and chapters -- but the cover is opaque, so a throw in any of it
+        // used to leave the viewer staring at a blank cover forever. None of
+        // it is worth the whole player.
         try {
 
             // add forward and backward seconds button if video is longer than 1 minutes
@@ -1568,28 +1555,15 @@ function loadVideoJS() {
             // add download button if it is not indside
             addDownloadFilesButton( self );
 
-            // add markers if any -- the dots on the progress bar, plus the
-            // chapters menu that makes them reachable without a mouse
-            setupMarkers( gvp.player );
+            // chapters, if any: the segments on the progress bar and the
+            // chapters menu, both built from one chapters track
+            labelMarkers();
             setupChapters( gvp.player );
             clampMenus( gvp.player );
             enableButtonTabbing( gvp.player );
             watchPlayerWidth( gvp.player );
 
             arrangeMenuButtons( self );
-
-            // if youtube, hide cover on ready and reset markers
-            if ( flags.isYouTube ) {
-
-                self.on( 'play', function() {
-
-                    if ( gvp.player.markers ) {
-                        gvp.player.markers.reset( xml.markersCollection );
-                    }
-
-                } );
-
-            }
 
         } catch ( e ) {
 
@@ -1732,18 +1706,12 @@ function sendToGoogleAnalytics( event, value = 0 ) {
 }
 
 /**
- * Add markers specified in the XML to the video
- * progress bar.
- * 
- * @function setupMarkers
- */
-/**
  * Gives every marker the label the player should display for it.
  *
  * Numbered by time order, not document order, so the generated names line up
  * with the sequence a viewer actually sees on the progress bar. Written onto the
- * marker objects themselves so the timeline tooltip and the chapters menu are
- * reading the same string rather than each deriving its own.
+ * marker objects themselves so the chapter segments' tooltip and the chapters
+ * menu are reading the same string rather than each deriving its own.
  *
  * The number must also match the one the chapters menu shows beside it, so it
  * counts chapters the way setupChapters() builds them: markers with no usable
@@ -1772,88 +1740,6 @@ function labelMarkers() {
 
         } );
 
-}
-
-function setupMarkers( player ) {
-
-    labelMarkers();
-    
-    // add markers
-    player.markers( {
-
-        markers: xml.markersCollection,
-
-        // A marker with no text between its tags used to get no tooltip at all
-        // -- the plugin suppresses the tip when the text is empty -- while the
-        // chapters menu showed a generated "Chapter N" for the same marker. Two
-        // surfaces, two different answers for one dot. Both read the label
-        // computed by labelMarkers() now, so they cannot disagree.
-        markerTip: {
-            text: function( marker ) {
-                return marker.label || marker.text || '';
-            }
-        }
-
-    } );
-
-    // A hovered chapter dot puts the marker's title above the progress bar, and
-    // video.js independently puts the hovered timecode there too -- so the two
-    // stack. The title is the more useful of the pair while it is up, so the
-    // timecode steps aside for it.
-    //
-    // This keys off whether the plugin actually SHOWED its tip rather than
-    // merely whether a dot is hovered: it hides the tip for a marker with no
-    // text (see markerTip visibility in videojs-markers.js), and blanking the
-    // timecode for those would leave the viewer with nothing at all.
-    let holder = player.el().querySelector( '.vjs-progress-holder' );
-
-    if ( holder ) {
-
-        let syncTipState = function() {
-
-            let tip = holder.querySelector( '.vjs-tip' );
-            let shown = !!( tip && tip.style.visibility === 'visible' );
-
-            player.el().classList.toggle( 'gvp-marker-tip-shown', shown );
-
-        };
-
-        holder.addEventListener( 'mouseover', function( e ) {
-
-            if ( e.target && e.target.classList.contains( 'vjs-marker' ) ) {
-                // after the plugin's own mouseover handler has set the tip
-                requestAnimationFrame( syncTipState );
-            }
-
-        } );
-
-        holder.addEventListener( 'mouseout', function( e ) {
-
-            if ( e.target && e.target.classList.contains( 'vjs-marker' ) ) {
-                player.el().classList.remove( 'gvp-marker-tip-shown' );
-            }
-
-        } );
-
-    }
-
-    // The plugin renders each chapter as a bare, unlabelled <div> on the progress
-    // bar with click handlers but no role, no text and no keyboard path. To a
-    // screen reader that is meaningless clutter sitting inside the seek control,
-    // so it is hidden from the accessibility tree rather than left as noise a
-    // user cannot act on. Chapters remain a sighted-mouse affordance; exposing
-    // them properly would mean a WebVTT chapters track, which video.js already
-    // has a keyboard-navigable menu for.
-    player.on( 'loadedmetadata', function() {
-
-        let markers = document.getElementsByClassName( 'vjs-marker' );
-
-        for ( let i = 0; i < markers.length; i++ ) {
-            markers[i].setAttribute( 'aria-hidden', 'true' );
-        }
-
-    } );
-    
 }
 
 /**
@@ -2154,16 +2040,15 @@ function clampMenus( player ) {
 /**
  * Publishes the XML chapter markers as a WebVTT chapters track.
  *
- * The markers plugin draws the chapters as dots on the progress bar, which is a
- * pointing affordance: you have to see them and click them. Nothing about it is
- * reachable by keyboard or announced by a screen reader, so chapters simply did
- * not exist for those users.
+ * The segments on the progress bar (drawChapterSegments) are a pointing
+ * affordance: you have to see them and hover them. Nothing about them is
+ * reachable by keyboard or announced by a screen reader.
  *
  * video.js already ships a ChaptersButton in its default control bar -- it just
- * renders nothing until a chapters track exists. Publishing the same marker data
- * as that track gives a proper menu: keyboard operable, chapter names announced,
- * seeks on selection. The dots stay exactly as they were (now aria-hidden), so
- * this adds a second presentation of one data source rather than replacing it.
+ * renders nothing until a chapters track exists. Publishing the marker data as
+ * that track gives a proper menu: keyboard operable, chapter names announced,
+ * seeks on selection. The segments are drawn from the same chapters, so the
+ * two cannot disagree.
  *
  * Generated at runtime -- no authored .vtt file, no server involvement.
  *
@@ -2209,6 +2094,7 @@ function setupChapters( player ) {
         }
 
         let track = player.addTextTrack( 'chapters', 'Chapters', gvp.captionLanguage.code || 'en' );
+        let chapters = [];
 
         points.forEach( function( point, i ) {
 
@@ -2224,6 +2110,7 @@ function setupChapters( player ) {
             let text = point.label || ( point.text || '' ).trim();
 
             track.addCue( new Cue( point.time, end, text ) );
+            chapters.push( { start: point.time, end: end, text: text } );
 
         } );
 
@@ -2239,10 +2126,327 @@ function setupChapters( player ) {
             chaptersButton.update();
         }
 
+        drawChapterSegments( player, chapters, duration );
+
     };
 
     player.on( [ 'loadedmetadata', 'durationchange' ], build );
     build();
+
+}
+
+/**
+ * Splits the progress bar into one segment per chapter, as YouTube does.
+ *
+ * Chapters used to be dots on the bar that looked just like the playhead. Now
+ * the bar itself breaks at each chapter start with a small gap; the segment
+ * under the pointer grows taller, and the timecode tooltip names its chapter
+ * above the time. A click close to a chapter start lands exactly on it; while
+ * the pointer is that close, a mark sits on the start and the tooltip shows
+ * that chapter and its start time, so both match where the click will go.
+ *
+ * video.js's own bars stay in charge of the numbers: the segments are painted
+ * from the widths it gives its played and loaded bars (made transparent in the
+ * stylesheet), so seeking, scrubbing and buffering all keep their behaviour.
+ * The playhead dot is video.js's and is untouched.
+ *
+ * Decoration only, hidden from screen readers: the chapters menu is the
+ * accessible way to the same chapters.
+ *
+ * @function drawChapterSegments
+ * @param {Object} player
+ * @param {Array} chapters {start, end, text}, in time order, end > start
+ * @param {Number} duration
+ */
+function drawChapterSegments( player, chapters, duration ) {
+
+    let control = player.el().querySelector( '.vjs-progress-control' );
+    let holder = control ? control.querySelector( '.vjs-progress-holder' ) : null;
+
+    if ( !holder || !chapters.length || !duration ) {
+        return;
+    }
+
+    let playBar = holder.querySelector( '.vjs-play-progress' );
+    let loadBar = holder.querySelector( '.vjs-load-progress' );
+
+    // Time before the first chapter is a segment of its own, with no title.
+    if ( chapters[0].start > 0 ) {
+        chapters = [ { start: 0, end: chapters[0].start, text: '' } ].concat( chapters );
+    }
+
+    let layer = document.createElement( 'div' );
+    layer.className = 'gvp-segments';
+    layer.setAttribute( 'aria-hidden', 'true' );
+
+    let last = chapters.length - 1;
+
+    let segments = chapters.map( function( chapter, i ) {
+
+        let from = chapter.start / duration;
+        let to = Math.min( chapter.end / duration, 1 );
+
+        // a 2px gap at each chapter start: 1px off each neighbour, none at
+        // the two ends of the bar
+        let trim = ( i > 0 ? 1 : 0 ) + ( i < last ? 1 : 0 );
+
+        let el = document.createElement( 'div' );
+        el.className = 'gvp-segment';
+        el.style.left = i > 0 ? 'calc( ' + ( from * 100 ) + '% + 1px )' : '0';
+        el.style.width = 'calc( ' + ( ( to - from ) * 100 ) + '% - ' + trim + 'px )';
+        layer.appendChild( el );
+
+        return { el: el, from: from, to: to, start: chapter.start, text: chapter.text };
+
+    } );
+
+    holder.appendChild( layer );
+    player.addClass( 'gvp-has-segments' );
+
+    // ---- fill: mirror video.js's played and loaded widths -------------------
+
+    let fraction = function( bar ) {
+
+        let width = bar ? parseFloat( bar.style.width ) : NaN;
+
+        return isNaN( width ) ? 0 : Math.max( 0, Math.min( width / 100, 1 ) );
+
+    };
+
+    let share = function( at, segment ) {
+        return Math.max( 0, Math.min( ( at - segment.from ) / ( segment.to - segment.from ), 1 ) );
+    };
+
+    let pending = false;
+
+    let paint = function() {
+
+        pending = false;
+
+        let played = fraction( playBar );
+        let loaded = Math.max( fraction( loadBar ), played );
+
+        segments.forEach( function( segment ) {
+            segment.el.style.setProperty( '--gvp-played', share( played, segment ) );
+            segment.el.style.setProperty( '--gvp-loaded', share( loaded, segment ) );
+        } );
+
+    };
+
+    let schedule = function() {
+
+        if ( !pending ) {
+            pending = true;
+            requestAnimationFrame( paint );
+        }
+
+    };
+
+    if ( typeof MutationObserver === 'function' ) {
+
+        let watch = new MutationObserver( schedule );
+
+        [ playBar, loadBar ].forEach( function( bar ) {
+            if ( bar ) {
+                watch.observe( bar, { attributes: true, attributeFilter: [ 'style' ] } );
+            }
+        } );
+
+    } else {
+
+        player.on( [ 'timeupdate', 'progress', 'seeking' ], schedule );
+
+    }
+
+    paint();
+
+    // ---- hover and click: grow, name, snap ----------------------------------
+
+    // How close, in pixels, a click must be to a chapter start to land on
+    // it: generous after the start, where students aim for the beginning of
+    // a chapter, and less before it, which is the end of the one before.
+    // Each side is capped at a third of the chapter it reaches into, so a
+    // short one can still be clicked in the middle.
+    let SNAP_AFTER = 11;
+    let SNAP_BEFORE = 7;
+
+    // Shows where a click will land while the pointer is in a snap zone.
+    let snapMark = document.createElement( 'div' );
+    snapMark.className = 'gvp-snap-mark';
+    layer.appendChild( snapMark );
+
+    let tooltip = control.querySelector( '.vjs-mouse-display .vjs-time-tooltip' );
+    let formatTime = videojs.time && videojs.time.formatTime;
+    let hovered = null;
+    let snapped = false;
+
+    // The chapter whose start x is close enough to snap to, if any; the
+    // nearest start wins where two zones meet.
+    let snapAt = function( x, width ) {
+
+        let best = null;
+        let bestDistance = Infinity;
+
+        for ( let i = 0; i < segments.length; i++ ) {
+
+            let start = segments[i].from * width;
+            let after = Math.min( SNAP_AFTER, ( segments[i].to - segments[i].from ) * width / 3 );
+            let before = i > 0 ? Math.min( SNAP_BEFORE, ( segments[i - 1].to - segments[i - 1].from ) * width / 3 ) : 0;
+            let distance = Math.abs( x - start );
+
+            if ( x >= start - before && x <= start + after && distance < bestDistance ) {
+                best = segments[i];
+                bestDistance = distance;
+            }
+
+        }
+
+        return best;
+
+    };
+
+    // The chapter under the pointer, and whether it is snapped to its start.
+    let find = function( clientX ) {
+
+        let rect = holder.getBoundingClientRect();
+
+        if ( !rect.width ) {
+            return null;
+        }
+
+        let x = clientX - rect.left;
+        let snap = snapAt( x, rect.width );
+
+        if ( snap ) {
+            return { segment: snap, snapped: true };
+        }
+
+        let at = x / rect.width;
+
+        for ( let i = 0; i < segments.length; i++ ) {
+
+            if ( at >= segments[i].from && ( at < segments[i].to || i === last ) ) {
+                return { segment: segments[i], snapped: false };
+            }
+
+        }
+
+        return null;
+
+    };
+
+    let setHovered = function( found ) {
+
+        let segment = found ? found.segment : null;
+        let snap = !!( found && found.snapped );
+
+        if ( segment !== hovered ) {
+
+            if ( hovered ) {
+                hovered.el.classList.remove( 'gvp-segment-hover' );
+            }
+
+            if ( segment ) {
+                segment.el.classList.add( 'gvp-segment-hover' );
+            }
+
+        }
+
+        hovered = segment;
+        snapped = snap;
+
+        player.toggleClass( 'gvp-snapping', snap );
+
+        // on the chapter start itself: the middle of the gap before it
+        if ( snap ) {
+            snapMark.style.left = ( segment.from * 100 ) + '%';
+        }
+
+        if ( !tooltip ) {
+            return;
+        }
+
+        if ( segment && segment.text ) {
+            tooltip.setAttribute( 'data-gvp-chapter', segment.text );
+        } else {
+            tooltip.removeAttribute( 'data-gvp-chapter' );
+        }
+
+        // In the snap zone the plate shows the chapter's start, not the
+        // time under the pointer (see the stylesheet).
+        if ( snap && formatTime ) {
+            tooltip.setAttribute( 'data-gvp-snap', formatTime( segment.start, duration ) );
+        } else {
+            tooltip.removeAttribute( 'data-gvp-snap' );
+        }
+
+    };
+
+    // Capture phase, and a pointer event (which comes before the mouse event
+    // video.js listens to), so the title is in the tooltip before video.js
+    // measures it to keep it inside the player. Touch has no hover: its taps
+    // are followed by a made-up mousemove that would bring the mark back, so
+    // only a mouse or pen shows it.
+    control.addEventListener( 'pointermove', function( e ) {
+
+        if ( e.pointerType === 'touch' ) {
+            return;
+        }
+
+        setHovered( find( e.clientX ) );
+
+    }, true );
+
+    control.addEventListener( 'mouseleave', function() {
+        setHovered( null );
+    } );
+
+    // A click -- the pointer barely moved between down and up -- near a
+    // chapter start lands on it. video.js has already seeked to the exact
+    // spot by then; this corrects it once its own handling is done. Drags
+    // are left alone, so scrubbing stays precise, and so is a press that
+    // ends off the bar.
+    let downX = null;
+
+    control.addEventListener( 'pointerdown', function( e ) {
+        downX = e.isPrimary ? e.clientX : null;
+    }, true );
+
+    document.addEventListener( 'pointercancel', function() {
+        downX = null;
+    }, true );
+
+    document.addEventListener( 'pointerup', function( e ) {
+
+        if ( downX === null || !e.isPrimary ) {
+            return;
+        }
+
+        let moved = Math.abs( e.clientX - downX );
+        downX = null;
+
+        let bounds = control.getBoundingClientRect();
+        let found = find( e.clientX );
+
+        // A touch has no hover to end it, so clear anything a tap left
+        // behind once the snap is read.
+        if ( e.pointerType === 'touch' ) {
+            setHovered( null );
+        }
+
+        if ( moved > 3 || e.clientY < bounds.top || e.clientY > bounds.bottom ) {
+            return;
+        }
+
+        if ( found && found.snapped ) {
+
+            setTimeout( function() {
+                player.currentTime( found.segment.start );
+            }, 0 );
+
+        }
+
+    }, true );
 
 }
 
@@ -3063,8 +3267,8 @@ function setupCaptionSearch( player ) {
     // ---- ticks on the progress bar ----
 
     // A map of where the word comes up: a thin mark per match on the seek
-    // bar, on a layer of its own so the chapter markers plugin leaves it
-    // alone. Decorative to assistive technology -- the bar offers all of it.
+    // bar, on a layer of its own above the chapter segments. Decorative to
+    // assistive technology -- the bar offers all of it.
     let progress = controlBar.getChild( 'ProgressControl' );
     let seekBar = progress ? progress.getChild( 'SeekBar' ) : null;
     let tickLayer = null;
