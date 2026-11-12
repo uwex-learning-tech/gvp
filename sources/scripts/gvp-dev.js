@@ -2413,7 +2413,7 @@ function clampMenus( player ) {
  * closed the menu and then, reaching the video, played or paused it too. On
  * a Mac the click that dismisses a menu does nothing else, and a viewer who
  * opened Captions and changed their mind should not lose their place. The
- * menu has already closed by the time the click arrives, so whether one was
+ * menu has normally closed by the time the click arrives, so whether one was
  * open is read when the press starts.
  *
  * @function quietMenuDismissal
@@ -2449,8 +2449,22 @@ function quietMenuDismissal( player ) {
         let dismissing = menuWasOpen && e.detail !== 0;
         menuWasOpen = false;
 
-        if ( dismissing && e.target.closest( '.vjs-tech' ) ) {
-            e.stopPropagation();
+        if ( !dismissing || !e.target.closest( '.vjs-tech' ) ) {
+            return;
+        }
+
+        e.stopPropagation();
+
+        // Focus leaving the menu normally closes it. If no blur arrived, close
+        // it here, or the click would leave it open.
+        let controlBar = player.getChild( 'controlBar' );
+
+        if ( controlBar ) {
+            controlBar.children().forEach( function( child ) {
+                if ( child.buttonPressed_ && typeof child.unpressButton === 'function' ) {
+                    child.unpressButton();
+                }
+            } );
         }
 
     }, true );
