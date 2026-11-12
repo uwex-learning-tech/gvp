@@ -2046,6 +2046,18 @@ function arrangeMenuButtons( player ) {
     // for it, and the one its menu heading uses.
     rateButton.controlText( 'Playback Speed' );
 
+    // A second click on the speed button left its menu open: mousedown moved
+    // focus from the menu to the button, video.js took that for leaving the
+    // menu and closed it, and the click opened it again. video.js tells its
+    // own button apart as the wrapper's first child, but the speed label is
+    // appended before the button exists. The label is absolutely placed and
+    // ignores the pointer, so moving it behind the button changes nothing else.
+    let rateLabel = rateButton.el().querySelector( ':scope > .vjs-playback-rate-value' );
+
+    if ( rateLabel && rateButton.menuButton_ ) {
+        rateButton.menuButton_.el().after( rateLabel );
+    }
+
     if ( chaptersButton ) {
         controlBar.removeChild( chaptersButton );
         controlBar.addChild( chaptersButton, {}, controlBar.children().indexOf( rateButton ) );
