@@ -1335,6 +1335,11 @@ $center-big-play-button: true; // true default
         position: relative;
         transition: background-color 120ms ease;
 
+        // video.js gives the pointing hand to each of its own controls by
+        // name, so a button it does not know (the search magnifier) kept the
+        // arrow. Every button in the bar gets the hand here instead.
+        cursor: pointer;
+
         // There was no hover state on these controls at all -- the pointer got
         // no feedback whatsoever before a click. An inset chip rather than a
         // full-height wash: at this width the gaps between chips are what let
