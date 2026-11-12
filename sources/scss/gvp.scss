@@ -1888,6 +1888,36 @@ and (min-device-width : 680px) {
     }
 
 }
+
+// No room for the volume panel to open sideways (watchPlayerWidth): it stays a
+// single button, and the slider opens above it in a box like a menu's, still
+// on hover and on keyboard focus as video.js shows it.
+.video-js.gvp-volume-tight .vjs-control-bar {
+
+    .vjs-volume-panel.vjs-volume-panel-horizontal {
+        position: relative;
+        width: auto;
+    }
+
+    // video.js shrinks the slider to 1px while it is closed, so it only takes
+    // up room above the bar while it is showing.
+    .vjs-volume-panel .vjs-volume-control.vjs-volume-horizontal {
+        position: absolute;
+        bottom: 100%;
+        left: 0;
+        margin: 0;
+        border-radius: rem( 4px );
+        background-color: rgba( $primary-background-color, 0.95 );
+
+        // the ground turns opaque Canvas, which needs an edge against the
+        // picture to read as a box
+        @media ( forced-colors: active ) {
+            border: 1px solid CanvasText;
+        }
+    }
+
+}
+
 // ---- caption search -------------------------------------------------------
 // A find bar at the top of the player, the same inset, height and ground as the
 // control bar, opened from a magnifier in the control bar (setupCaptionSearch).
