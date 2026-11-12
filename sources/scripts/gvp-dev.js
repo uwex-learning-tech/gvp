@@ -6074,6 +6074,7 @@ function reportError( code, context ) {
 
     if ( entry.notice ) {
         showErrorNotice( entry.title, detail );
+        reloadAfterAbort();
     } else {
         showErrorMsgOnCover( entry.title, detail, panelSource, code );
     }
@@ -6274,6 +6275,74 @@ function showErrorNotice( title, detail ) {
         gvp.player.one( 'play', noticeState.onPlay );
 
     }
+
+}
+
+// whether reloadAfterAbort has reloaded since playback last resumed
+let abortReloaded = false;
+
+/**
+ * Makes "Press play to try again" true after a cancelled load (GVP-601).
+ *
+ * video.js marks the player vjs-error, which hides the control bar and the big
+ * play button, and only clears it when a new source starts loading. So the
+ * notice asked for play with no play control on screen, and the aborted media
+ * element would not have started again anyway. Loading the same source again
+ * clears the error; the position is kept, and so are the controls if playback
+ * had already started (video.js would otherwise reset that on a paused load).
+ *
+ * Once until playback resumes: a source that aborts every time it loads would
+ * otherwise reload forever.
+ *
+ * @function reloadAfterAbort
+ */
+function reloadAfterAbort() {
+
+    let player = gvp.player;
+    let source = player && player.currentSource();
+
+    if ( !source || !source.src || abortReloaded ) {
+        return;
+    }
+
+    abortReloaded = true;
+
+    player.one( 'playing', function() {
+        abortReloaded = false;
+    } );
+
+    let resumeAt = player.currentTime();
+    let hadStarted = player.hasStarted();
+
+    let keepStarted = function() {
+        if ( hadStarted ) {
+            player.hasStarted( true );
+        }
+    };
+
+    // If the reload fails too, these must not linger and fire on some later
+    // load, seeking it to this stale position (as in gvpSetQuality).
+    let settle = function() {
+        player.off( 'loadstart', keepStarted );
+        player.off( 'loadedmetadata', resume );
+        player.off( 'error', settle );
+    };
+
+    let resume = function() {
+
+        settle();
+
+        if ( resumeAt > 0 ) {
+            player.currentTime( resumeAt );
+        }
+
+    };
+
+    player.one( 'loadstart', keepStarted );
+    player.one( 'loadedmetadata', resume );
+    player.one( 'error', settle );
+
+    player.src( source );
 
 }
 
