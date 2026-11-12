@@ -1564,6 +1564,7 @@ function loadVideoJS() {
             clampMenus( gvp.player );
             enableButtonTabbing( gvp.player );
             watchPlayerWidth( gvp.player );
+            fitSplash( gvp.player );
 
             arrangeMenuButtons( self );
             setControlBarSigns( self );
@@ -1880,6 +1881,133 @@ function watchPlayerWidth( player ) {
     }
 
     update();
+
+}
+
+/**
+ * Keeps the poster's download pills clear of the duration badge and the play
+ * button.
+ *
+ * The pills sit in the top-right corner and the duration and author in the
+ * top-left. The pill row has no left edge, so on a player too narrow for both
+ * it grew leftward over the badge, and on a phone-width one it wrapped onto a
+ * second row over the play button, which took the clicks on its top. Measured
+ * here, since the pills, the author's name and the player all vary:
+ *
+ *   - gvp-pills-below gives the pills a row of their own under the badge;
+ *   - gvp-big-play-fit shrinks the play button to the room left under them:
+ *     centred on the picture if it fits there, otherwise centred in the room
+ *     under the pills, and no smaller than a comfortable 44px target.
+ *
+ * @function fitSplash
+ * @param {Object} player
+ */
+function fitSplash( player ) {
+
+    let stage = document.getElementsByClassName( 'gvp-video-wrapper' )[0];
+    let pills = stage && stage.querySelector( '.gvp-splash-download-wrapper' );
+    let meta = stage && stage.querySelector( '.gvp-splash-meta' );
+
+    if ( !pills || !meta || typeof ResizeObserver !== 'function' ) {
+        return;
+    }
+
+    let gap = 8;
+    let smallest = 44;
+
+    let fit = function() {
+
+        stage.classList.remove( 'gvp-pills-below', 'gvp-big-play-fit' );
+
+        let row = pills.getBoundingClientRect();
+
+        if ( !row.width ) {
+            return;
+        }
+
+        // the badge and author chip that are actually showing
+        let shown = Array.prototype.filter.call( meta.children, function( el ) {
+            return el.offsetWidth > 0;
+        } );
+
+        let metaRight = -Infinity;
+        let metaBottom = -Infinity;
+
+        shown.forEach( function( el ) {
+            let r = el.getBoundingClientRect();
+            metaRight = Math.max( metaRight, r.right );
+            metaBottom = Math.max( metaBottom, r.bottom );
+        } );
+
+        let firstPill = pills.querySelector( 'a' );
+        let wrapped = firstPill && row.height > firstPill.offsetHeight * 1.5;
+
+        if ( row.left < metaRight + gap || ( wrapped && shown.length ) ) {
+
+            let top = metaBottom - stage.getBoundingClientRect().top + gap;
+
+            stage.style.setProperty( '--gvp-pills-top', Math.round( top ) + 'px' );
+            stage.classList.add( 'gvp-pills-below' );
+            row = pills.getBoundingClientRect();
+
+        }
+
+        let big = player.el().querySelector( '.vjs-big-play-button' );
+        let button = big && big.getBoundingClientRect();
+
+        if ( !button || !button.height || row.bottom + gap <= button.top ) {
+            return;
+        }
+
+        // the room under the pills, measured from the player's top
+        let frame = player.el().getBoundingClientRect();
+        let roomTop = row.bottom + gap - frame.top;
+        let roomBottom = frame.height - gap;
+
+        // still centred on the picture if it fits there, else centred in the
+        // room under the pills
+        let middle = frame.height / 2;
+        let size = Math.min( button.height, 2 * ( middle - roomTop ) );
+
+        if ( size < smallest ) {
+            middle = ( roomTop + roomBottom ) / 2;
+            size = Math.max( smallest, Math.min( button.height, roomBottom - roomTop ) );
+        }
+
+        stage.style.setProperty( '--gvp-big-play-size', Math.floor( size ) + 'px' );
+        stage.style.setProperty( '--gvp-big-play-middle', Math.round( middle ) + 'px' );
+        stage.classList.add( 'gvp-big-play-fit' );
+
+    };
+
+    // A frame later, not inside the observer's callback: fit() resizes what is
+    // being observed, and doing that in the callback is a loop the browser
+    // reports as an error.
+    let pending = false;
+
+    let schedule = function() {
+
+        if ( !pending ) {
+            pending = true;
+            requestAnimationFrame( function() {
+                pending = false;
+                fit();
+            } );
+        }
+
+    };
+
+    // The pills arrive one at a time as each download is confirmed, the badge
+    // once the duration is known, and both come back on the end card.
+    let observer = new ResizeObserver( schedule );
+
+    observer.observe( pills );
+    observer.observe( meta );
+    observer.observe( player.el() );
+
+    Array.prototype.forEach.call( meta.children, function( el ) {
+        observer.observe( el );
+    } );
 
 }
 
