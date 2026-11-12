@@ -766,6 +766,15 @@ html {
         letter-spacing: 0.01em;
     }
 
+    // video.js focuses the first row whenever a menu opens, mouse or not, and
+    // then clears the tint from a mouse-focused row with a rule strong enough
+    // to beat its own hover tint as well -- so the first row of every menu
+    // never lit up under the pointer. Give that row its hover back. (Same
+    // colour as video.js's own hover.)
+    .video-js .vjs-menu li.vjs-menu-item:not( .vjs-selected ):focus:not( :focus-visible ):hover {
+        background-color: rgba( 115, 133, 159, 0.5 );
+    }
+
     .video-js .vjs-menu .vjs-menu-item::before {
         content: '';
         position: absolute;
