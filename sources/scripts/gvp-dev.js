@@ -4673,14 +4673,28 @@ function setupQualityMenu( player, flavors, startAt ) {
         // Preserve where the viewer was and whether they were watching.
         let resumeAt = player.currentTime();
         let wasPaused = player.paused();
+        let hadStarted = player.hasStarted();
 
         // `current` only advances once the new source has actually loaded. It
         // used to be assigned up front, so a flavor that failed to load left the
         // menu showing a quality that was never playing.
         let settleQuality = function() {
 
+            player.off( 'loadstart', keepStarted );
             player.off( 'loadedmetadata', onLoaded );
             player.off( 'error', onFailed );
+
+        };
+
+        // A new source loaded while paused makes video.js reset hasStarted,
+        // which hides the control bar and brings back the big play button: the
+        // controls vanished until the viewer found the video and clicked it.
+        // Its own loadstart handler does that before this one runs.
+        let keepStarted = function() {
+
+            if ( hadStarted ) {
+                player.hasStarted( true );
+            }
 
         };
 
@@ -4711,6 +4725,7 @@ function setupQualityMenu( player, flavors, startAt ) {
 
         };
 
+        player.one( 'loadstart', keepStarted );
         player.one( 'loadedmetadata', onLoaded );
         player.one( 'error', onFailed );
 
